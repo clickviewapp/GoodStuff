@@ -1,0 +1,47 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28917.181
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.Abstractions", "src\Repositories\Abstractions\src\ClickView.GoodStuff.Repositories.Abstractions.csproj", "{992BC5AC-F31F-494A-974B-859332D28EB9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repositories", "Repositories", "{17A5F05F-B3EB-4011-A58C-BB1BB7995692}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.MySql", "src\Repositories\MySql\src\ClickView.GoodStuff.Repositories.MySql.csproj", "{87102E9F-7E89-4A39-A039-EE610824B671}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MySql", "MySql", "{BBBCE886-F029-442F-AC97-EE52C7D64374}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MySql.Tests", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.Tests\ClickView.GoodStuff.Repositories.MySql.Tests.csproj", "{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{992BC5AC-F31F-494A-974B-859332D28EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{992BC5AC-F31F-494A-974B-859332D28EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{992BC5AC-F31F-494A-974B-859332D28EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{992BC5AC-F31F-494A-974B-859332D28EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87102E9F-7E89-4A39-A039-EE610824B671}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87102E9F-7E89-4A39-A039-EE610824B671}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87102E9F-7E89-4A39-A039-EE610824B671}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87102E9F-7E89-4A39-A039-EE610824B671}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{992BC5AC-F31F-494A-974B-859332D28EB9} = {17A5F05F-B3EB-4011-A58C-BB1BB7995692}
+		{87102E9F-7E89-4A39-A039-EE610824B671} = {BBBCE886-F029-442F-AC97-EE52C7D64374}
+		{BBBCE886-F029-442F-AC97-EE52C7D64374} = {17A5F05F-B3EB-4011-A58C-BB1BB7995692}
+		{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054} = {BBBCE886-F029-442F-AC97-EE52C7D64374}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
+	EndGlobalSection
+EndGlobal
