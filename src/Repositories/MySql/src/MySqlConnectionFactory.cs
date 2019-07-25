@@ -4,9 +4,16 @@
     using Abstractions.Factories;
     using global::MySql.Data.MySqlClient;
 
-    public class MySqlConnectionFactory : ConnectionFactory<MySqlConnection, MySqlConnectionOptions>
+    public class MySqlConnectionFactory : MySqlConnectionFactory<MySqlConnectionOptions>
     {
         public MySqlConnectionFactory(ConnectionFactoryOptions<MySqlConnectionOptions> options) : base(options)
+        {
+        }
+    }
+
+    public class MySqlConnectionFactory<TOptions> : ConnectionFactory<MySqlConnection, TOptions> where TOptions : MySqlConnectionOptions
+    {
+        public MySqlConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
         {
         }
 
