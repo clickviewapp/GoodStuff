@@ -11,7 +11,9 @@
         }
     }
 
-    public class MySqlConnectionFactory<TOptions> : ConnectionFactory<MySqlConnection, TOptions> where TOptions : MySqlConnectionOptions
+    public class MySqlConnectionFactory<TOptions>
+        : ConnectionFactory<MySqlConnection, TOptions>, IMySqlConnectionFactory
+        where TOptions : MySqlConnectionOptions
     {
         public MySqlConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
         {
