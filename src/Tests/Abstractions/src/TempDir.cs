@@ -12,19 +12,23 @@ namespace ClickView.GoodStuff.Tests.Abstractions
         {
         }
 
-        public TempDir(string path)
+        private TempDir(string path)
         {
             if (string.IsNullOrWhiteSpace(path))
                 throw new ArgumentNullException(nameof(path));
 
-            var tempPath = GenerateTempFilePath(path);
+            var tempPath = Path.Combine(path, CreateRandomString());
             Debug.WriteLine("Creating temp directory: " + tempPath);
             Directory.CreateDirectory(tempPath);
 
             _path = tempPath;
         }
 
-        protected string GenerateTempFilePath(string path) => Path.Combine(path, Guid.NewGuid().ToString("N"));
+        /// <summary>
+        /// Generates a new path in the current TempDir path directory
+        /// </summary>
+        /// <returns></returns>
+        public string GenerateTempFilePath() => Path.Combine(_path, CreateRandomString());
 
         public void Dispose()
         {
@@ -38,5 +42,7 @@ namespace ClickView.GoodStuff.Tests.Abstractions
         }
 
         public static implicit operator string(TempDir tempDir) => tempDir._path;
+
+        private static string CreateRandomString() => Guid.NewGuid().ToString("N");
     }
 }
