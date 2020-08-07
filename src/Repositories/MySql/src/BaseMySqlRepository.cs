@@ -5,7 +5,7 @@
     using Abstractions;
     using Abstractions.Factories;
     using Dapper;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public abstract class BaseMySqlRepository : BaseRepository<MySqlConnection>
     {

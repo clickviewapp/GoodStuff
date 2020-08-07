@@ -1,7 +1,7 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MySql
 {
     using Abstractions.Factories;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public interface IMySqlConnectionFactory : IConnectionFactory<MySqlConnection>
     {

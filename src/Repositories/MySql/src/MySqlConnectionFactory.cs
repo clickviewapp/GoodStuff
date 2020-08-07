@@ -2,7 +2,7 @@
 {
     using System;
     using Abstractions.Factories;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public class MySqlConnectionFactory : MySqlConnectionFactory<MySqlConnectionOptions>
     {
