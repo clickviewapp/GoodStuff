@@ -5,12 +5,52 @@
     using System.Threading.Tasks;
     using Abstractions;
     using Dapper;
+    using Microsoft.Extensions.Logging;
     using MySqlConnector;
+    using Polly;
 
     public abstract class BaseMySqlRepository : BaseRepository<MySqlConnection>
     {
-        protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory) : base(connectionFactory)
+        private readonly Policy _retryPolicy;
+        private readonly ILogger<BaseMySqlRepository> _logger;
+
+        protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory)
+            : this(connectionFactory, new MySqlRepositoryOptions())
         {
+        }
+
+        protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory, MySqlRepositoryOptions options)
+            : base(connectionFactory)
+        {
+            if (options == null)
+                throw new ArgumentNullException(nameof(options));
+
+            // try to create a logger
+            if (options.LoggerFactory != null)
+                _logger = options.LoggerFactory.CreateLogger<BaseMySqlRepository>();
+
+            _retryPolicy = Policy
+                .Handle<MySqlException>(MySqlUtils.IsFailoverException)
+                .WaitAndRetry(options.FailOverRetryCount, options.FailOverRetryTimeout,
+                    (ex, time) =>
+                    {
+                        // only log if we have a logger
+                        if (_logger == null)
+                            return;
+
+                        // exception should always be the correct type as we are only handling MySqlExceptions
+                        var mysqlEx = (MySqlException) ex;
+
+                        _logger.LogWarning(ex,
+                            "MySql query failed with error: {@Error}. Retrying in {RetrySeconds} seconds...",
+                            new
+                            {
+                                Msg = mysqlEx.Message,
+                                mysqlEx.Number,
+                                HR = mysqlEx.HResult
+                            },
+                            time.TotalSeconds);
+                    });
         }
 
         /// <summary>
@@ -102,22 +142,32 @@
                 param: param);
         }
 
-        private async Task<T> WrapAsync<T>(Func<MySqlConnection, string, object, Task<T>> func,
+        private Task<T> WrapAsync<T>(Func<MySqlConnection, string, object, Task<T>> func,
             bool write, string sql, object param = null)
         {
-            await using var connection = write ? GetWriteConnection() : GetReadConnection();
-
-            try
+            return _retryPolicy.Execute(async () =>
             {
-                return await func(connection, sql, param);
-            }
-            catch (MySqlException ex) when (MySqlUtils.IsFailoverException(ex))
-            {
-                // catch the failover exceptions, remove the connection from the Pool
-                await MySqlConnection.ClearPoolAsync(connection);
+                #if NETSTANDARD2_1
+                await using var connection = write ? GetWriteConnection() : GetReadConnection();
+                #else
+                // ReSharper disable once UseAwaitUsing
+                using var connection = write ? GetWriteConnection() : GetReadConnection();
+                #endif
 
-                throw;
-            }
+                try
+                {
+                    return await func(connection, sql, param);
+                }
+                catch (MySqlException ex) when (MySqlUtils.IsFailoverException(ex))
+                {
+                    _logger?.LogWarning(ex, "Clearing current connection pool because a fail-over exception occurred");
+
+                    // catch the fail-over exceptions, remove the connection from the Pool
+                    await MySqlConnection.ClearPoolAsync(connection);
+
+                    throw;
+                }
+            });
         }
     }
 }

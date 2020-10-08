@@ -4,6 +4,11 @@
 
     public static class MySqlUtils
     {
+        /// <summary>
+        /// Checks if the provided <paramref name="mySqlException"/> is a failover exception
+        /// </summary>
+        /// <param name="mySqlException"></param>
+        /// <returns></returns>
         public static bool IsFailoverException(MySqlException mySqlException)
         {
             return mySqlException.Number == (int) MySqlErrorCode.UnableToConnectToHost ||
