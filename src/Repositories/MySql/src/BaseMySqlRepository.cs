@@ -1,5 +1,6 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MySql
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Abstractions;
@@ -18,12 +19,12 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<int> ExecuteAsync(string sql, object param = null)
+        protected Task<int> ExecuteAsync(string sql, object param = null)
         {
-            using (var conn = GetWriteConnection())
-            {
-                return await conn.ExecuteAsync(sql, param);
-            }
+            return WrapAsync((c, s, p) => c.ExecuteAsync(s, p),
+                write: true,
+                sql: sql,
+                param: param);
         }
 
         /// <summary>
@@ -33,12 +34,12 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> ExecuteScalarAsync<T>(string sql, object param = null)
+        protected Task<T> ExecuteScalarAsync<T>(string sql, object param = null)
         {
-            using (var conn = GetWriteConnection())
-            {
-                return await conn.ExecuteScalarAsync<T>(sql, param);
-            }
+            return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
+                write: true,
+                sql: sql,
+                param: param);
         }
 
         /// <summary>
@@ -48,12 +49,12 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QueryScalarValueAsync<T>(string sql, object param = null)
+        protected Task<T> QueryScalarValueAsync<T>(string sql, object param = null)
         {
-            using (var conn = GetReadConnection())
-            {
-                return await conn.ExecuteScalarAsync<T>(sql, param);
-            }
+            return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
+                write: false,
+                sql: sql,
+                param: param);
         }
 
         /// <summary>
@@ -63,12 +64,12 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QueryFirstAsync<T>(string sql, object param = null)
+        protected Task<T> QueryFirstAsync<T>(string sql, object param = null)
         {
-            using (var conn = GetReadConnection())
-            {
-                return await conn.QueryFirstOrDefaultAsync<T>(sql, param);
-            }
+            return WrapAsync((c, s, p) => c.QueryFirstOrDefaultAsync<T>(s, p),
+                write: false,
+                sql: sql,
+                param: param);
         }
 
         /// <summary>
@@ -78,12 +79,12 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QuerySingleAsync<T>(string sql, object param = null)
+        protected Task<T> QuerySingleAsync<T>(string sql, object param = null)
         {
-            using (var conn = GetReadConnection())
-            {
-                return await conn.QuerySingleOrDefaultAsync<T>(sql, param);
-            }
+            return WrapAsync((c, s, p) => c.QuerySingleOrDefaultAsync<T>(s, p),
+                write: false,
+                sql: sql,
+                param: param);
         }
 
         /// <summary>
@@ -93,11 +94,29 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
         {
-            using (var conn = GetReadConnection())
+            return WrapAsync((c, s, p) => c.QueryAsync<T>(s, p),
+                write: false,
+                sql: sql,
+                param: param);
+        }
+
+        private async Task<T> WrapAsync<T>(Func<MySqlConnection, string, object, Task<T>> func,
+            bool write, string sql, object param = null)
+        {
+            await using var connection = write ? GetWriteConnection() : GetReadConnection();
+
+            try
             {
-                return await conn.QueryAsync<T>(sql, param);
+                return await func(connection, sql, param);
+            }
+            catch (MySqlException ex) when (MySqlUtils.IsFailoverException(ex))
+            {
+                // catch the failover exceptions, remove the connection from the Pool
+                await MySqlConnection.ClearPoolAsync(connection);
+
+                throw;
             }
         }
     }
