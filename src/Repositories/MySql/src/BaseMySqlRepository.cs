@@ -11,7 +11,7 @@
 
     public abstract class BaseMySqlRepository : BaseRepository<MySqlConnection>
     {
-        private readonly Policy _retryPolicy;
+        private readonly IAsyncPolicy _retryPolicy;
         private readonly ILogger<BaseMySqlRepository> _logger;
 
         protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory)
@@ -31,7 +31,7 @@
 
             _retryPolicy = Policy
                 .Handle<MySqlException>(MySqlUtils.IsFailoverException)
-                .WaitAndRetry(options.FailOverRetryCount, options.FailOverRetryTimeout,
+                .WaitAndRetryAsync(options.FailOverRetryCount, options.FailOverRetryTimeout,
                     (ex, time) =>
                     {
                         // only log if we have a logger
@@ -145,7 +145,7 @@
         private Task<T> WrapAsync<T>(Func<MySqlConnection, string, object, Task<T>> func,
             bool write, string sql, object param = null)
         {
-            return _retryPolicy.Execute(async () =>
+            return _retryPolicy.ExecuteAsync(async () =>
             {
                 #if NETSTANDARD2_1
                 await using var connection = write ? GetWriteConnection() : GetReadConnection();
@@ -160,7 +160,7 @@
                 }
                 catch (MySqlException ex) when (MySqlUtils.IsFailoverException(ex))
                 {
-                    _logger?.LogWarning(ex, "Clearing current connection pool because a fail-over exception occurred");
+                    _logger?.LogWarning("Clearing current connection pool because a fail-over exception occurred");
 
                     // catch the fail-over exceptions, remove the connection from the Pool
                     await MySqlConnection.ClearPoolAsync(connection);
