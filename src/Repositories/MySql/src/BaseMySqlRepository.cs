@@ -3,13 +3,12 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Abstractions;
-    using Abstractions.Factories;
     using Dapper;
     using MySqlConnector;
 
     public abstract class BaseMySqlRepository : BaseRepository<MySqlConnection>
     {
-        protected BaseMySqlRepository(IConnectionFactory<MySqlConnection> connectionFactory) : base(connectionFactory)
+        protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory) : base(connectionFactory)
         {
         }
 
