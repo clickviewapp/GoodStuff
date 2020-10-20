@@ -1,16 +1,14 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MySql.TestApp
 {
     using System.Threading.Tasks;
-    using Abstractions.Factories;
-    using MySqlConnector;
 
     public class TestRepo : BaseMySqlRepository
     {
-        public TestRepo(IConnectionFactory<MySqlConnection> connectionFactory) : base(connectionFactory)
+        public TestRepo(IMySqlConnectionFactory connectionFactory) : base(connectionFactory)
         {
         }
 
-        public TestRepo(IConnectionFactory<MySqlConnection> connectionFactory, MySqlRepositoryOptions options) : base(connectionFactory, options)
+        public TestRepo(IMySqlConnectionFactory connectionFactory, MySqlRepositoryOptions options) : base(connectionFactory, options)
         {
         }
 
