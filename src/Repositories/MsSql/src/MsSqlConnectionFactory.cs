@@ -4,18 +4,18 @@
     using System.Data.SqlClient;
     using Abstractions.Factories;
 
-    public class MySqlConnectionFactory : MySqlConnectionFactory<MsSqlConnectionOptions>
+    public class MsSqlConnectionFactory : MsSqlConnectionFactory<MsSqlConnectionOptions>
     {
-        public MySqlConnectionFactory(ConnectionFactoryOptions<MsSqlConnectionOptions> options) : base(options)
+        public MsSqlConnectionFactory(ConnectionFactoryOptions<MsSqlConnectionOptions> options) : base(options)
         {
         }
     }
 
-    public class MySqlConnectionFactory<TOptions>
+    public class MsSqlConnectionFactory<TOptions>
         : ConnectionFactory<SqlConnection, TOptions>, IMsSqlConnectionFactory
         where TOptions : MsSqlConnectionOptions
     {
-        public MySqlConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
+        public MsSqlConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
         {
         }
 
