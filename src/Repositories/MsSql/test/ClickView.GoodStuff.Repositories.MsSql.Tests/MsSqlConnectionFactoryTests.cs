@@ -9,7 +9,7 @@ namespace ClickView.GoodStuff.Repositories.MsSql.Tests
         [Fact]
         public void GetReadConnection()
         {
-            var factory = new MySqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>
+            var factory = new MsSqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>
             {
                 Read = new MsSqlConnectionOptions()
             });
@@ -22,7 +22,7 @@ namespace ClickView.GoodStuff.Repositories.MsSql.Tests
         [Fact]
         public void GetWriteConnection()
         {
-            var factory = new MySqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>
+            var factory = new MsSqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>
             {
                 Write = new MsSqlConnectionOptions()
             });
@@ -35,14 +35,14 @@ namespace ClickView.GoodStuff.Repositories.MsSql.Tests
         [Fact]
         public void Ctor_NullOptions_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new MySqlConnectionFactory(null));
+            Assert.Throws<ArgumentNullException>(() => new MsSqlConnectionFactory(null));
         }
 
         [Fact]
         public void Ctor_NullReadAndWrite_ThrowsInvalidOperationException()
         {
             Assert.Throws<InvalidOperationException>(() =>
-                new MySqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>()));
+                new MsSqlConnectionFactory(new ConnectionFactoryOptions<MsSqlConnectionOptions>()));
         }
     }
 }
