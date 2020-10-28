@@ -7,9 +7,17 @@
         public MySqlConnectionOptions()
         {
             // Set some sane defaults
-            base.Host = "localhost";
+            Host = "localhost";
             MaximumPoolSize = 25;
             MinimumPoolSize = 1;
+        }
+
+        /// <summary>
+        /// The TCP port on which Server is listening for connections.
+        /// </summary>
+        public ushort? Port
+        {
+            set => SetParameter("port", value.ToString());
         }
 
         /// <summary>

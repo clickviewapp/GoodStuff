@@ -5,44 +5,42 @@
 
     public abstract class RepositoryConnectionOptions
     {
-        protected Dictionary<string, string> Parameters = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
 
         protected void SetParameter(string key, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
-                Parameters.Remove(key);
+                _parameters.Remove(key);
             }
             else
             {
-                Parameters[key] = value;
+                _parameters[key] = value;
             }
         }
 
-        public string GetParameter(string key)
+        protected string GetParameter(string key)
         {
-            Parameters.TryGetValue(key, out var value);
+            _parameters.TryGetValue(key, out var value);
             return value;
         }
 
+        /// <summary>
+        /// The host name or network address of the Server to which to connect
+        /// </summary>
         public virtual string Host
         {
             set => SetParameter("host", value);
         }
 
-        public virtual ushort? Port
-        {
-            set => SetParameter("port", value.ToString());
-        }
-
         public virtual string GetConnectionString()
         {
-            if (Parameters.Count == 0)
+            if (_parameters.Count == 0)
                 return string.Empty;
 
             var sb = new StringBuilder();
 
-            foreach (var option in Parameters)
+            foreach (var option in _parameters)
             {
                 sb.Append(FormatParameter(option.Key, option.Value));
             }
