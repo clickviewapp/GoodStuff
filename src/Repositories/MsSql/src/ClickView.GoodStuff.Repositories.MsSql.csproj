@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
-    <Version>0.0.8</Version>
+    <Version>0.0.9</Version>
     <Company>ClickView</Company>
     <Authors>ClickView</Authors>
     <PackageProjectUrl>https://github.com/clickviewapp/GoodStuff</PackageProjectUrl>
