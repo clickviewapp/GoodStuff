@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Reposit
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MsSql.Tests", "src\Repositories\MsSql\test\ClickView.GoodStuff.Repositories.MsSql.Tests\ClickView.GoodStuff.Repositories.MsSql.Tests.csproj", "{3756676A-A65F-4317-BE7B-E8514D679396}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MySql.TestApp", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.TestApp\ClickView.GoodStuff.Repositories.MySql.TestApp.csproj", "{FCC9314F-2B3C-4DE2-A967-66A457090B74}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +61,10 @@ Global
 		{3756676A-A65F-4317-BE7B-E8514D679396}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3756676A-A65F-4317-BE7B-E8514D679396}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3756676A-A65F-4317-BE7B-E8514D679396}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCC9314F-2B3C-4DE2-A967-66A457090B74}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCC9314F-2B3C-4DE2-A967-66A457090B74}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCC9314F-2B3C-4DE2-A967-66A457090B74}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCC9314F-2B3C-4DE2-A967-66A457090B74}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,6 +79,7 @@ Global
 		{38F6761B-FAA5-479C-9C68-2CA660164D36} = {17A5F05F-B3EB-4011-A58C-BB1BB7995692}
 		{EE991636-363C-4F8E-A783-C91B0281622C} = {38F6761B-FAA5-479C-9C68-2CA660164D36}
 		{3756676A-A65F-4317-BE7B-E8514D679396} = {38F6761B-FAA5-479C-9C68-2CA660164D36}
+		{FCC9314F-2B3C-4DE2-A967-66A457090B74} = {BBBCE886-F029-442F-AC97-EE52C7D64374}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}

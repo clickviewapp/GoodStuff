@@ -1,5 +1,6 @@
 ﻿namespace ClickView.GoodStuff.Repositories.Abstractions
 {
+    using System;
     using Factories;
 
     public abstract class BaseRepository<TConnection>
@@ -8,6 +9,9 @@
 
         protected BaseRepository(IConnectionFactory<TConnection> connectionFactory)
         {
+            if (connectionFactory == null)
+                throw new ArgumentNullException(nameof(connectionFactory));
+
             _connectionFactory = connectionFactory;
         }
 
