@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation
 {
     using System;
     using System.Collections.Generic;
@@ -14,7 +14,7 @@
     using Newtonsoft.Json.Linq;
     using JsonWebKeySet = IdentityModel.Jwk.JsonWebKeySet;
 
-    public class TokenValidator : ITokenValidator
+    internal sealed class TokenValidator : ITokenValidator
     {
         private readonly ILogger<TokenValidator> _logger;
         private readonly TokenValidatorOptions _options;

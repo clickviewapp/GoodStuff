@@ -1,8 +1,8 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation
 {
     using System;
 
-    public class TokenValidatorOptions
+    internal sealed class TokenValidatorOptions
     {
         public Uri? Authority { get; set; }
         public string? DefaultAudience { get; set; }

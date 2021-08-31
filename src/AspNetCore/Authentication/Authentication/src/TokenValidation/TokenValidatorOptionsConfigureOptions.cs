@@ -1,9 +1,9 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation
 {
     using System;
     using Microsoft.Extensions.Options;
 
-    public class TokenValidatorOptionsConfigureOptions : IPostConfigureOptions<TokenValidatorOptions>
+    internal sealed class TokenValidatorOptionsConfigureOptions : IPostConfigureOptions<TokenValidatorOptions>
     {
         private readonly OpenIdConnectSessionHandlerOptions _handlerOptions;
 

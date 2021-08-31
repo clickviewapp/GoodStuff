@@ -1,11 +1,13 @@
 ﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Abstractions
 {
+    using System;
+
     public sealed class UserSession
     {
         public UserSession(string key, byte[] ticket)
         {
-            Key = key;
-            Ticket = ticket;
+            Key = key ?? throw new ArgumentNullException(nameof(key));
+            Ticket = ticket ?? throw new ArgumentNullException(nameof(ticket));
         }
 
         public string Key { get; }

@@ -1,6 +1,8 @@
 ﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
 {
     using System.Threading.Tasks;
+    using Endpoints;
+    using Infrastructure;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Routing;

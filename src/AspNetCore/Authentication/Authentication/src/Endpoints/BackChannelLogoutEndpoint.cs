@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Endpoints
 {
     using System;
     using System.Linq;
@@ -6,10 +6,12 @@
     using System.Threading.Tasks;
     using Abstractions;
     using IdentityModel;
+    using Infrastructure;
     using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.Logging;
+    using TokenValidation;
 
-    public class BackChannelLogoutEndpoint : IEndpoint
+    internal sealed class BackChannelLogoutEndpoint : IEndpoint
     {
         private readonly ITokenValidator _tokenValidator;
         private readonly IUserSessionStore _sessionStore;

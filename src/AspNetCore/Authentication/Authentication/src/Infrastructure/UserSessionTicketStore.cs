@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure
 {
     using System;
     using System.Threading.Tasks;
@@ -7,7 +7,7 @@
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.Extensions.Logging;
 
-    public class UserSessionTicketStore : IUserSessionTicketStore
+    internal sealed class UserSessionTicketStore : IUserSessionTicketStore
     {
         private readonly IUserSessionStore _userSessionStore;
         private readonly IDataSerializer<AuthenticationTicket> _ticketSerializer;

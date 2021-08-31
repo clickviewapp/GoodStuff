@@ -1,9 +1,9 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure
 {
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.Extensions.Options;
 
-    public class PostCookieAuthenticationOptions : IPostConfigureOptions<CookieAuthenticationOptions>
+    internal sealed class PostCookieAuthenticationOptions : IPostConfigureOptions<CookieAuthenticationOptions>
     {
         private readonly IUserSessionTicketStore _ticketStore;
 

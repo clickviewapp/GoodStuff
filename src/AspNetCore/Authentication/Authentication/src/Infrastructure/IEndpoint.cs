@@ -1,10 +1,10 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure
 {
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;
 
-    public interface IEndpoint
+    internal interface IEndpoint
     {
         Task ProcessAsync(HttpContext context, CancellationToken token = default);
     }
