@@ -81,7 +81,8 @@
             return new UserSession(key, _ticketSerializer.Serialize(ticket))
             {
                 Subject = subject,
-                SessionId = sessionId
+                SessionId = sessionId,
+                Expiry = ticket.Properties.ExpiresUtc
             };
         }
     }
