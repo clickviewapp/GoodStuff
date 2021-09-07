@@ -99,7 +99,7 @@
 
             token.ThrowIfCancellationRequested();
 
-            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), session.Expiry.ToUtcTimeSpan()))
+            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), session.Expiry.ToRedisExpiryTimeSpan()))
                 await AddSessionIdAsync(session, token);
         }
 
@@ -110,7 +110,7 @@
 
             token.ThrowIfCancellationRequested();
 
-            return _database.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, session.Expiry.ToUtcTimeSpan());
+            return _database.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, session.Expiry.ToRedisExpiryTimeSpan());
         }
 
         private Task RemoveSessionIdAsync(UserSession? session, CancellationToken token = default)
