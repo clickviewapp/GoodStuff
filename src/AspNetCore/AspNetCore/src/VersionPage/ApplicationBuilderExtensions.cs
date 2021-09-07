@@ -41,11 +41,10 @@ namespace ClickView.GoodStuff.AspNetCore.VersionPage
         private static void UseVersionPageCore(this IApplicationBuilder app,
             PathString path, object[] args)
         {
-            Func<HttpContext, bool> predicate = c =>
-                c.Request.Path.StartsWithSegments(path, out var remaining) &&
-                string.IsNullOrEmpty(remaining);
+            bool Predicate(HttpContext c) => c.Request.Path.StartsWithSegments(path, out var remaining) &&
+                                             string.IsNullOrEmpty(remaining);
 
-            app.MapWhen(predicate, b => b.UseMiddleware<VersionPageMiddleware>(args));
+            app.MapWhen(Predicate, b => b.UseMiddleware<VersionPageMiddleware>(args));
         }
     }
 }

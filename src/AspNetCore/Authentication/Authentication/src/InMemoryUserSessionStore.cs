@@ -21,7 +21,17 @@
 
             _sessions.TryGetValue(key, out var session);
 
-            return Task.FromResult(session);
+            if (session == null)
+                return Task.FromResult<UserSession?>(null);
+
+            if (session.Expiry != null && session.Expiry <= DateTimeOffset.UtcNow)
+            {
+                // Session expired. Remove from the store and return null
+                _sessions.TryRemove(key, out _);
+                return Task.FromResult<UserSession?>(null);
+            }
+
+            return Task.FromResult<UserSession?>(session);
         }
 
         public Task AddAsync(UserSession session, CancellationToken token = default)
