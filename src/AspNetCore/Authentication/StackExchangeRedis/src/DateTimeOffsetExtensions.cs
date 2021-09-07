@@ -4,12 +4,13 @@
 
     public static class DateTimeOffSetExtensions
     {
-        public static TimeSpan? ToUtcTimeSpan(this DateTimeOffset? value)
+        public static TimeSpan? ToRedisExpiryTimeSpan(this DateTimeOffset? value)
         {
             if (value == null) return null;
 
             var dif = value.Value.Subtract(DateTimeOffset.UtcNow);
 
+            //redis setex command expects the time to be positive
             if (dif.TotalSeconds <= 0)
                 throw new Exception("Time already expired");
 
