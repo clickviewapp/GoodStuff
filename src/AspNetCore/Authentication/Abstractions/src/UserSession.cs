@@ -14,5 +14,10 @@
         public byte[] Ticket { get; }
         public string? SessionId { get; set; }
         public string? Subject { get; set; }
+
+        /// <summary>
+        /// The time at which the user session expires
+        /// </summary>
+        public DateTimeOffset? Expiry { get; set; }
     }
 }
