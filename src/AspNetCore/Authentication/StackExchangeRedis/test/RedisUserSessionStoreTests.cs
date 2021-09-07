@@ -1,7 +1,6 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Tests
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.Tests
 {
-    using Authentication;
-    using Authentication.Abstractions;
+    using Abstractions;
     using Microsoft.Extensions.DependencyInjection;
     using StackExchange.Redis;
     using System;

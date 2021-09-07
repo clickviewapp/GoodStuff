@@ -11,33 +11,37 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Reposit
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MySql", "MySql", "{BBBCE886-F029-442F-AC97-EE52C7D64374}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MySql.Tests", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.Tests\ClickView.GoodStuff.Repositories.MySql.Tests.csproj", "{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.MySql.Tests", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.Tests\ClickView.GoodStuff.Repositories.MySql.Tests.csproj", "{51EB1C69-AF7E-45FA-A66A-CCE36E8B1054}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{AB082902-29A9-4B30-8FBE-FF66F3DE31FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Tests.Abstractions", "src\Tests\Abstractions\src\ClickView.GoodStuff.Tests.Abstractions.csproj", "{9D37CE28-5836-49AA-8D4A-AFA9D5F28066}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Tests.Abstractions", "src\Tests\Abstractions\src\ClickView.GoodStuff.Tests.Abstractions.csproj", "{9D37CE28-5836-49AA-8D4A-AFA9D5F28066}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Tests.xUnit", "src\Tests\xUnit\src\ClickView.GoodStuff.Tests.xUnit.csproj", "{646A2DE4-1378-4CA8-A860-540B9020A4E4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Tests.xUnit", "src\Tests\xUnit\src\ClickView.GoodStuff.Tests.xUnit.csproj", "{646A2DE4-1378-4CA8-A860-540B9020A4E4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MsSql", "MsSql", "{38F6761B-FAA5-479C-9C68-2CA660164D36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MsSql", "src\Repositories\MsSql\src\ClickView.GoodStuff.Repositories.MsSql.csproj", "{EE991636-363C-4F8E-A783-C91B0281622C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.MsSql", "src\Repositories\MsSql\src\ClickView.GoodStuff.Repositories.MsSql.csproj", "{EE991636-363C-4F8E-A783-C91B0281622C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MsSql.Tests", "src\Repositories\MsSql\test\ClickView.GoodStuff.Repositories.MsSql.Tests\ClickView.GoodStuff.Repositories.MsSql.Tests.csproj", "{3756676A-A65F-4317-BE7B-E8514D679396}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.MsSql.Tests", "src\Repositories\MsSql\test\ClickView.GoodStuff.Repositories.MsSql.Tests\ClickView.GoodStuff.Repositories.MsSql.Tests.csproj", "{3756676A-A65F-4317-BE7B-E8514D679396}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.MySql.TestApp", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.TestApp\ClickView.GoodStuff.Repositories.MySql.TestApp.csproj", "{FCC9314F-2B3C-4DE2-A967-66A457090B74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.Repositories.MySql.TestApp", "src\Repositories\MySql\test\ClickView.GoodStuff.Repositories.MySql.TestApp\ClickView.GoodStuff.Repositories.MySql.TestApp.csproj", "{FCC9314F-2B3C-4DE2-A967-66A457090B74}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AspNetCore", "AspNetCore", "{3D5037A8-592E-4EF8-AAC4-BA763CACBF1B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.AspNetCore", "src\AspNetCore\AspNetCore\src\ClickView.GoodStuff.AspNetCore.csproj", "{74A3CF27-CBE9-4C90-9AD5-E72440C320E7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore", "src\AspNetCore\AspNetCore\src\ClickView.GoodStuff.AspNetCore.csproj", "{74A3CF27-CBE9-4C90-9AD5-E72440C320E7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.AspNetCore.Tests", "src\AspNetCore\AspNetCore\test\ClickView.GoodStuff.AspNetCore.Tests.csproj", "{4E7C5178-8392-4BBF-9E48-606FDE5812E6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore.Tests", "src\AspNetCore\AspNetCore\test\ClickView.GoodStuff.AspNetCore.Tests.csproj", "{4E7C5178-8392-4BBF-9E48-606FDE5812E6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Authentication", "Authentication", "{750E529F-6E4B-4F52-9391-434D53454ACC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.AspNetCore.Authentication.Abstractions", "src\AspNetCore\Authentication\Abstractions\src\ClickView.GoodStuff.AspNetCore.Authentication.Abstractions.csproj", "{7BA37D6F-75A1-43EF-A322-1181D3510277}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore.Authentication.Abstractions", "src\AspNetCore\Authentication\Abstractions\src\ClickView.GoodStuff.AspNetCore.Authentication.Abstractions.csproj", "{7BA37D6F-75A1-43EF-A322-1181D3510277}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.AspNetCore.Authentication", "src\AspNetCore\Authentication\Authentication\src\ClickView.GoodStuff.AspNetCore.Authentication.csproj", "{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore.Authentication", "src\AspNetCore\Authentication\Authentication\src\ClickView.GoodStuff.AspNetCore.Authentication.csproj", "{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis", "src\AspNetCore\Authentication\StackExchangeRedis\src\ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.csproj", "{71977E1E-18F8-474D-B176-DEEF2EA15B86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.Tests", "src\AspNetCore\Authentication\StackExchangeRedis\test\ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.Tests.csproj", "{FCBBE773-D8EE-4A32-B33F-49C2023DB09E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -93,6 +97,14 @@ Global
 		{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68}.Release|Any CPU.Build.0 = Release|Any CPU
+		{71977E1E-18F8-474D-B176-DEEF2EA15B86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71977E1E-18F8-474D-B176-DEEF2EA15B86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71977E1E-18F8-474D-B176-DEEF2EA15B86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71977E1E-18F8-474D-B176-DEEF2EA15B86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCBBE773-D8EE-4A32-B33F-49C2023DB09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCBBE773-D8EE-4A32-B33F-49C2023DB09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCBBE773-D8EE-4A32-B33F-49C2023DB09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCBBE773-D8EE-4A32-B33F-49C2023DB09E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +125,8 @@ Global
 		{750E529F-6E4B-4F52-9391-434D53454ACC} = {3D5037A8-592E-4EF8-AAC4-BA763CACBF1B}
 		{7BA37D6F-75A1-43EF-A322-1181D3510277} = {750E529F-6E4B-4F52-9391-434D53454ACC}
 		{EDA2C10A-BA5C-4DDE-A07D-46A17787CA68} = {750E529F-6E4B-4F52-9391-434D53454ACC}
+		{71977E1E-18F8-474D-B176-DEEF2EA15B86} = {750E529F-6E4B-4F52-9391-434D53454ACC}
+		{FCBBE773-D8EE-4A32-B33F-49C2023DB09E} = {750E529F-6E4B-4F52-9391-434D53454ACC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
