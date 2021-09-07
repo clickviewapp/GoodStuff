@@ -11,7 +11,6 @@
     public class RedisUserSessionStore : IUserSessionStore
     {
         private readonly IDatabase _database;
-        private readonly TimeSpan? _expiry;
 
         public RedisUserSessionStore(IOptions<RedisUserSessionCacheOptions> cacheOptions)
         {
@@ -24,7 +23,6 @@
             if (options.Connection == null) throw new ArgumentException(nameof(options.Connection));
 
             _database = options.Connection.GetDatabase();
-            _expiry = options.CacheExpiry;
         }
 
         public Task<UserSession?> GetAsync(string key, CancellationToken token = default)
@@ -101,7 +99,7 @@
 
             token.ThrowIfCancellationRequested();
 
-            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), _expiry))
+            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), session.Expiry.ToUtcTimeSpan()))
                 await AddSessionIdAsync(session, token);
         }
 
@@ -112,7 +110,7 @@
 
             token.ThrowIfCancellationRequested();
 
-            return _database.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, _expiry);
+            return _database.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, session.Expiry.ToUtcTimeSpan());
         }
 
         private Task RemoveSessionIdAsync(UserSession? session, CancellationToken token = default)

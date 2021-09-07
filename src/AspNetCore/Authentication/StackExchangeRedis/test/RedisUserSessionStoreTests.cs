@@ -21,7 +21,6 @@
             services.AddRedisCacheUserSessionStore(options =>
             {
                 options.Connection = redis;
-                options.CacheExpiry = TimeSpan.FromSeconds(10);
             });
 
             // Build
@@ -30,7 +29,8 @@
             var session = new UserSession("1", new byte[] {1, 2})
             {
                 SessionId = "sessionId1",
-                Subject = "subject1"
+                Subject = "subject1",
+                Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
             };
 
             var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
@@ -55,7 +55,6 @@
             services.AddRedisCacheUserSessionStore(options =>
             {
                 options.Connection = redis;
-                options.CacheExpiry = TimeSpan.FromSeconds(10);
             });
 
             // Build
@@ -64,7 +63,8 @@
             var session = new UserSession("2", new byte[] { 3, 4 })
             {
                 SessionId = "sessionId2",
-                Subject = "subject2"
+                Subject = "subject2",
+                Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
             };
 
             var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
@@ -76,7 +76,8 @@
             var newSession = new UserSession("2", new byte[] {5, 6})
             {
                 SessionId = "session3",
-                Subject = "subject3"
+                Subject = "subject3",
+                Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
             };
 
             await sessionStore.UpdateAsync("2", newSession, CancellationToken.None);
@@ -102,7 +103,6 @@
             services.AddRedisCacheUserSessionStore(options =>
             {
                 options.Connection = redis;
-                options.CacheExpiry = TimeSpan.FromSeconds(10);
             });
 
             // Build
@@ -137,7 +137,6 @@
             services.AddRedisCacheUserSessionStore(options =>
             {
                 options.Connection = redis;
-                options.CacheExpiry = TimeSpan.FromSeconds(10);
             });
 
             // Build
@@ -172,7 +171,6 @@
             services.AddRedisCacheUserSessionStore(options =>
             {
                 options.Connection = redis;
-                options.CacheExpiry = TimeSpan.FromSeconds(1);
             });
 
             // Build
@@ -181,7 +179,8 @@
             var session = new UserSession("5", new byte[] { 1, 2 })
             {
                 SessionId = "sessionId5",
-                Subject = "subject5"
+                Subject = "subject5",
+                Expiry = DateTimeOffset.UtcNow.AddSeconds(1)
             };
 
             var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
@@ -196,6 +195,36 @@
             var retrievedSessionAgain = await sessionStore.GetAsync("5", CancellationToken.None);
 
             Assert.Null(retrievedSessionAgain);
+        }
+
+        [Fact]
+        public async Task Add_Expired_Session_ThrowsException()
+        {
+            var ex = await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                var services = new ServiceCollection();
+
+                //redis
+                var redis = ConnectionMultiplexer.Connect("localhost:6379");
+
+                services.AddRedisCacheUserSessionStore(options =>
+                {
+                    options.Connection = redis;
+                });
+
+                // Build
+                var serviceProvider = services.BuildServiceProvider();
+
+                var session = new UserSession("6", new byte[] { 1, 2 })
+                {
+                    SessionId = "sessionId6",
+                    Subject = "subject6",
+                    Expiry = DateTimeOffset.UtcNow.AddSeconds(-10)
+                };
+
+                var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+                await sessionStore.AddAsync(session, CancellationToken.None);
+            });
         }
     }
 }

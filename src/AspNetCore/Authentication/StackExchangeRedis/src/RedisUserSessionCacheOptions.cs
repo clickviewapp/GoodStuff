@@ -6,7 +6,6 @@
     public class RedisUserSessionCacheOptions
     {
         public IConnectionMultiplexer? Connection { get; set; }
-        public TimeSpan? CacheExpiry { get; set; }
 
         public void Validate()
         {
