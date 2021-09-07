@@ -44,16 +44,21 @@
         {
             var claims = await ValidateJwtAsync(logoutToken, validAudience);
 
-            if (claims.FindFirst("sub") == null && claims.FindFirst("sid") == null)
-                throw new Exception("Invalid logout token. sub or sid missing");
+            if (claims.FindFirst(JwtClaimTypes.Subject) == null && claims.FindFirst(JwtClaimTypes.SessionId) == null)
+            {
+                throw new Exception(
+                    $"Invalid logout token. {JwtClaimTypes.Subject} or {JwtClaimTypes.SessionId} missing");
+            }
 
-            var nonce = claims.FindFirst("nonce")?.Value;
+            var nonce = claims.FindFirst(JwtClaimTypes.Nonce)?.Value;
+
             if (!string.IsNullOrWhiteSpace(nonce))
-                throw new Exception("Invalid logout token. nonce missing");
+                throw new Exception($"Invalid logout token. {JwtClaimTypes.Nonce} missing");
 
-            var eventsJson = claims.FindFirst("events")?.Value;
+            var eventsJson = claims.FindFirst(JwtClaimTypes.Events)?.Value;
+
             if (string.IsNullOrWhiteSpace(eventsJson))
-                throw new Exception("Invalid logout token. events missing");
+                throw new Exception($"Invalid logout token. {JwtClaimTypes.Events} missing");
 
             var events = JObject.Parse(eventsJson);
 
