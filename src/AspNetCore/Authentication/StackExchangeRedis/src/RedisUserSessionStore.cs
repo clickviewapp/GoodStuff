@@ -2,9 +2,9 @@
 {
     using Abstractions;
     using Microsoft.Extensions.Options;
-    using Newtonsoft.Json;
     using StackExchange.Redis;
     using System;
+    using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
 
@@ -91,7 +91,7 @@
             token.ThrowIfCancellationRequested();
 
             var session = await _database.StringGetAsync(key);
-            return session.HasValue ? JsonConvert.DeserializeObject<UserSession>(session.ToString()) : null;
+            return session.HasValue ? JsonSerializer.Deserialize<UserSession>(session.ToString()) : null;
         }
 
         public async Task AddInternalAsync(string key, UserSession session, CancellationToken token = default)
@@ -101,7 +101,7 @@
 
             token.ThrowIfCancellationRequested();
 
-            if (await _database.StringSetAsync(key, JsonConvert.SerializeObject(session), _expiry))
+            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), _expiry))
                 await AddSessionIdAsync(session, token);
         }
 
