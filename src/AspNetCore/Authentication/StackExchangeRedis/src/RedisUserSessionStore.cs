@@ -15,6 +15,8 @@
 
         public RedisUserSessionStore(IOptions<RedisUserSessionCacheOptions> cacheOptions)
         {
+            if (cacheOptions == null) throw new ArgumentException(nameof(cacheOptions));
+
             var options = cacheOptions.Value;
 
             if(options == null) throw new ArgumentNullException(nameof(options));
