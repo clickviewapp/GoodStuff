@@ -23,7 +23,8 @@ namespace ClickView.GoodStuff.Tests.xUnit
 
         public string SkipReason => "This test is skipped on CI. " + _reason;
 
-        public static bool IsOnCI() => IsOnTeamCity();
+        public static bool IsOnCI() => IsOnTeamCity() || IsOnAppVeyor();
         public static bool IsOnTeamCity() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+        public static bool IsOnAppVeyor() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR"));
     }
 }
