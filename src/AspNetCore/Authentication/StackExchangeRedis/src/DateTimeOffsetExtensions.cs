@@ -2,13 +2,14 @@
 {
     using System;
 
-    public static class DateTimeOffSetExtensions
+    internal static class DateTimeOffSetExtensions
     {
-        public static TimeSpan? ToRedisExpiryTimeSpan(this DateTimeOffset? value)
+        public static TimeSpan ToRedisExpiryTimeSpan(this DateTimeOffset value)
         {
-            if (value == null) return null;
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
 
-            var dif = value.Value.Subtract(DateTimeOffset.UtcNow);
+            var dif = value.Subtract(DateTimeOffset.UtcNow);
 
             //redis setex command expects the time to be positive
             if (dif.TotalSeconds <= 0)
