@@ -19,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Tests\xUnit\src\ClickView.GoodStuff.Tests.xUnit.csproj" />
     <ProjectReference Include="..\..\Abstractions\src\ClickView.GoodStuff.AspNetCore.Authentication.Abstractions.csproj" />
     <ProjectReference Include="..\src\ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.csproj" />
   </ItemGroup>

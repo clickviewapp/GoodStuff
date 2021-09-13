@@ -6,11 +6,16 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
+    using GoodStuff.Tests.xUnit;
+    using McMaster.Extensions.Xunit;
     using Xunit;
 
     public class RedisUserSessionStoreTests
     {
-        [Fact]
+        private const string SkipCiReason = "Redis server is needed";
+
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Can_Add_UserSession_To_Redis()
         {
             var services = new ServiceCollection();
@@ -44,7 +49,8 @@
             Assert.Equal(session.Subject, retrievedSession.Subject);
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Can_Update_UserSession_To_Same_key()
         {
             var services = new ServiceCollection();
@@ -92,7 +98,8 @@
             Assert.NotEqual(session.Subject, updatedSession.Subject);
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Can_Delete_UserSession_By_key()
         {
             var services = new ServiceCollection();
@@ -126,7 +133,8 @@
             Assert.Null(nullSession);
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Can_Delete_UserSession_By_SessionId()
         {
             var services = new ServiceCollection();
@@ -160,7 +168,8 @@
             Assert.Null(nullSession);
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Can_Expire_UserSession_Key()
         {
             var services = new ServiceCollection();
@@ -197,7 +206,8 @@
             Assert.Null(retrievedSessionAgain);
         }
 
-        [Fact]
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
         public async Task Add_Expired_Session_ThrowsException()
         {
             var ex = await Assert.ThrowsAsync<Exception>(async () =>
