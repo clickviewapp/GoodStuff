@@ -30,9 +30,19 @@
             return GetInternalAsync(key, token);
         }
 
-        public Task AddAsync(UserSession session, CancellationToken token = default)
+        public async Task AddAsync(UserSession session, CancellationToken token = default)
         {
-            return AddInternalAsync(session.Key, session, token);
+            if (session == null)
+                throw new ArgumentNullException(nameof(session));
+
+            token.ThrowIfCancellationRequested();
+
+            // Create a transaction so we set both values at the same time
+            var transaction = _database.CreateTransaction();
+
+            AddInternal(transaction, session.Key, session);
+
+            await transaction.ExecuteAsync();
         }
 
         public async Task UpdateAsync(string key, UserSession session, CancellationToken token = default)
@@ -46,9 +56,16 @@
             token.ThrowIfCancellationRequested();
 
             var oldSession = await GetInternalAsync(key, token);
-            await RemoveSessionIdAsync(oldSession, token);
 
-            await AddInternalAsync(key, session, token);
+            var transaction = _database.CreateTransaction();
+
+            // if we have an existing session, delete the id key
+            if (oldSession?.SessionId != null)
+                _ = transaction.KeyDeleteAsync(GetSessionIdKey(oldSession.SessionId));
+
+            AddInternal(transaction, key, session);
+
+            await transaction.ExecuteAsync();
         }
 
         public async Task DeleteAsync(string key, CancellationToken token = default)
@@ -60,8 +77,12 @@
 
             var session = await GetInternalAsync(key, token);
 
-            if (await _database.KeyDeleteAsync(key))
-                await RemoveSessionIdAsync(session, token);
+            RedisKey[] keysToDelete = session?.SessionId == null
+                ? new RedisKey[] {key}
+                : new RedisKey[] {key, GetSessionIdKey(session.SessionId)};
+
+            // Delete both the session and the session id lookup
+            await _database.KeyDeleteAsync(keysToDelete);
         }
 
         public async Task DeleteBySessionIdAsync(string sessionId, CancellationToken token = default)
@@ -75,13 +96,17 @@
 
             if (!sessionKey.HasValue) return;
 
-            await _database.KeyDeleteAsync(sessionKey.ToString());
+            var keys = new RedisKey[]
+            {
+                sessionKey.ToString(),
+                GetSessionIdKey(sessionId),
+            };
 
-            //delete the session id lookup
-            await _database.KeyDeleteAsync(GetSessionIdKey(sessionId));
+            // Delete both the session and the session id lookup
+            await _database.KeyDeleteAsync(keys);
         }
 
-        public async Task<UserSession?> GetInternalAsync(string key, CancellationToken token = default)
+        private async Task<UserSession?> GetInternalAsync(string key, CancellationToken token = default)
         {
             if (key == null)
                 throw new ArgumentNullException(nameof(key));
@@ -89,43 +114,22 @@
             token.ThrowIfCancellationRequested();
 
             var session = await _database.StringGetAsync(key);
-            return session.HasValue ? JsonSerializer.Deserialize<UserSession>(session.ToString()) : null;
+            return session.HasValue ? Deserialize(session) : null;
         }
 
-        public async Task AddInternalAsync(string key, UserSession session, CancellationToken token = default)
+        private void AddInternal(ITransaction transaction, string key, UserSession session)
         {
-            if (session == null)
-                throw new ArgumentNullException(nameof(session));
+            var expireTimeSpan = session.Expiry?.ToRedisExpiryTimeSpan();
 
-            token.ThrowIfCancellationRequested();
+            _ = transaction.StringSetAsync(key, Serialize(session), expireTimeSpan);
 
-            if (await _database.StringSetAsync(key, JsonSerializer.Serialize(session), session.Expiry.ToRedisExpiryTimeSpan()))
-                await AddSessionIdAsync(session, token);
+            if (!string.IsNullOrWhiteSpace(session.SessionId))
+                _ = transaction.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, expireTimeSpan);
         }
 
-        private Task AddSessionIdAsync(UserSession? session, CancellationToken token = default)
-        {
-            if (string.IsNullOrWhiteSpace(session?.SessionId))
-                return Task.CompletedTask;
+        private static UserSession? Deserialize(byte[] value) => JsonSerializer.Deserialize<UserSession>(value);
+        private static byte[] Serialize(UserSession userSession) => JsonSerializer.SerializeToUtf8Bytes(userSession);
 
-            token.ThrowIfCancellationRequested();
-
-            return _database.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, session.Expiry.ToRedisExpiryTimeSpan());
-        }
-
-        private Task RemoveSessionIdAsync(UserSession? session, CancellationToken token = default)
-        {
-            if (string.IsNullOrWhiteSpace(session?.SessionId))
-                return Task.CompletedTask;
-
-            token.ThrowIfCancellationRequested();
-
-            return _database.KeyDeleteAsync(GetSessionIdKey(session.SessionId));
-        }
-
-        private static string GetSessionIdKey(string sessionId)
-        {
-            return $"sessionId:{sessionId}";
-        }
+        private static string GetSessionIdKey(string sessionId) => "sessionId:" + sessionId;
     }
 }
