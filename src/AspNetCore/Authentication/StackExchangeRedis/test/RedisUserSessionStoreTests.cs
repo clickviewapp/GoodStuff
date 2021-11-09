@@ -19,11 +19,12 @@
         public async Task Can_Add_UserSession_To_Redis()
         {
             var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
             //redis
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-            services.AddRedisCacheUserSessionStore(options =>
+            builder.AddStackExchangeRedisUserSessionStore(options =>
             {
                 options.Connection = redis;
             });
@@ -54,11 +55,12 @@
         public async Task Can_Update_UserSession_To_Same_key()
         {
             var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
             //redis
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-            services.AddRedisCacheUserSessionStore(options =>
+            builder.AddStackExchangeRedisUserSessionStore(options =>
             {
                 options.Connection = redis;
             });
@@ -103,11 +105,12 @@
         public async Task Can_Delete_UserSession_By_key()
         {
             var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
             //redis
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-            services.AddRedisCacheUserSessionStore(options =>
+            builder.AddStackExchangeRedisUserSessionStore(options =>
             {
                 options.Connection = redis;
             });
@@ -138,11 +141,12 @@
         public async Task Can_Delete_UserSession_By_SessionId()
         {
             var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
             //redis
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-            services.AddRedisCacheUserSessionStore(options =>
+            builder.AddStackExchangeRedisUserSessionStore(options =>
             {
                 options.Connection = redis;
             });
@@ -173,11 +177,12 @@
         public async Task Can_Expire_UserSession_Key()
         {
             var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
             //redis
             var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-            services.AddRedisCacheUserSessionStore(options =>
+            builder.AddStackExchangeRedisUserSessionStore(options =>
             {
                 options.Connection = redis;
             });
@@ -210,14 +215,15 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Add_Expired_Session_ThrowsException()
         {
-            var ex = await Assert.ThrowsAsync<Exception>(async () =>
+            await Assert.ThrowsAsync<Exception>(async () =>
             {
                 var services = new ServiceCollection();
+                var builder = new OpenIdConnectSessionHandlerBuilder(services);
 
                 //redis
                 var redis = ConnectionMultiplexer.Connect("localhost:6379");
 
-                services.AddRedisCacheUserSessionStore(options =>
+                builder.AddStackExchangeRedisUserSessionStore(options =>
                 {
                     options.Connection = redis;
                 });
