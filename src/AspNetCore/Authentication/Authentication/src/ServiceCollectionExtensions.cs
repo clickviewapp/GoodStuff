@@ -12,7 +12,16 @@
 
     public static class ServiceCollectionExtensions
     {
-        public static void AddOpenIdConnectSessionHandler(this IServiceCollection services, Action<OpenIdConnectSessionHandlerOptions> configure)
+        /// <summary>
+        /// Adds OpenIdConnection session handling to the specified <see cref="IServiceCollection" />
+        /// </summary>
+        /// <param name="services"></param>
+        /// <param name="configure"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        public static OpenIdConnectSessionHandlerBuilder AddOpenIdConnectSessionHandler(
+            this IServiceCollection services,
+            Action<OpenIdConnectSessionHandlerOptions> configure)
         {
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
@@ -45,6 +54,8 @@
 
             services.TryAddEnumerable(ServiceDescriptor
                 .Singleton<IPostConfigureOptions<TokenValidatorOptions>, TokenValidatorOptionsConfigureOptions>());
+
+            return new OpenIdConnectSessionHandlerBuilder(services);
         }
     }
 }

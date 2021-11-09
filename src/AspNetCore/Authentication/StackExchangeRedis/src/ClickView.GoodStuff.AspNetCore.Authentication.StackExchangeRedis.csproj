@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Abstractions\src\ClickView.GoodStuff.AspNetCore.Authentication.Abstractions.csproj" />
+    <ProjectReference Include="..\..\Authentication\src\ClickView.GoodStuff.AspNetCore.Authentication.csproj" />
   </ItemGroup>
 
 </Project>
