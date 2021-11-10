@@ -14,13 +14,13 @@
 
         public RedisUserSessionStore(IOptions<RedisUserSessionCacheOptions> cacheOptions)
         {
-            if (cacheOptions == null) throw new ArgumentException(nameof(cacheOptions));
+            if (cacheOptions == null) throw new ArgumentNullException(nameof(cacheOptions));
 
             var options = cacheOptions.Value;
 
-            if(options == null) throw new ArgumentNullException(nameof(options));
+            if (options == null) throw new ArgumentException("Options cannot be null");
 
-            if (options.Connection == null) throw new ArgumentException(nameof(options.Connection));
+            if (options.Connection == null) throw new ArgumentException("Connection cannot be null");
 
             _database = options.Connection.GetDatabase();
         }
@@ -77,7 +77,7 @@
 
             var session = await GetInternalAsync(key, token);
 
-            RedisKey[] keysToDelete = session?.SessionId == null
+            var keysToDelete = session?.SessionId == null
                 ? new RedisKey[] {key}
                 : new RedisKey[] {key, GetSessionIdKey(session.SessionId)};
 
@@ -99,7 +99,7 @@
             var keys = new RedisKey[]
             {
                 sessionKey.ToString(),
-                GetSessionIdKey(sessionId),
+                GetSessionIdKey(sessionId)
             };
 
             // Delete both the session and the session id lookup
@@ -117,7 +117,7 @@
             return session.HasValue ? Deserialize(session) : null;
         }
 
-        private void AddInternal(ITransaction transaction, string key, UserSession session)
+        private static void AddInternal(ITransaction transaction, string key, UserSession session)
         {
             var expireTimeSpan = session.Expiry?.ToRedisExpiryTimeSpan();
 
