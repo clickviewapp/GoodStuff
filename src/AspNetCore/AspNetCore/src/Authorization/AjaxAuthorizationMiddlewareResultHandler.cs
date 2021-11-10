@@ -33,7 +33,7 @@
 
             var ajaxAttribute = endpoint.Metadata.GetMetadata<AjaxControllerAttribute>();
 
-            // If we have attribute endpoint, fall back to the default handler
+            // If we have no attribute, fall back to the default handler
             if (ajaxAttribute == null)
                 return _handler.HandleAsync(next, context, policy, authorizeResult);
 
