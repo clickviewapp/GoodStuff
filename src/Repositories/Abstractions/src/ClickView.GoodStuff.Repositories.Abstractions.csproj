@@ -3,13 +3,6 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
     <Version>0.0.9</Version>
-    <Company>ClickView</Company>
-    <Authors>ClickView</Authors>
-    <PackageProjectUrl>https://github.com/clickviewapp/GoodStuff</PackageProjectUrl>
-    <PackageIconUrl>https://static.clickview.com.au/assets/images/nugetlogo-64x64.png</PackageIconUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
 </Project>
