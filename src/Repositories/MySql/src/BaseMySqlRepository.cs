@@ -147,7 +147,7 @@
         {
             return _retryPolicy.ExecuteAsync(async () =>
             {
-                #if NETSTANDARD2_1
+                #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
                 await using var connection = write ? GetWriteConnection() : GetReadConnection();
                 #else
                 // ReSharper disable once UseAwaitUsing

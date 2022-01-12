@@ -13,7 +13,7 @@
         /// <summary>
         /// The function that provides the duration to wait for for a particular fail-over retry attempt
         /// </summary>
-        public Func<int, TimeSpan> FailOverRetryTimeout { get; set; } = retry => TimeSpan.FromSeconds(2);
+        public Func<int, TimeSpan> FailOverRetryTimeout { get; set; } = _ => TimeSpan.FromSeconds(2);
 
         public ILoggerFactory LoggerFactory { get; set; }
     }

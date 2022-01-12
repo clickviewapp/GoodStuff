@@ -7,6 +7,7 @@ namespace ClickView.GoodStuff.Tests.xUnit
     /// Skip test if running on CI
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class, AllowMultiple = false)]
+    // ReSharper disable once InconsistentNaming
     public class SkipOnCIAttribute : Attribute, ITestCondition
     {
         private readonly string _reason;
