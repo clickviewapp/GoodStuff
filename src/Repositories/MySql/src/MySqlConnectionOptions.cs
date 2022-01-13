@@ -12,7 +12,7 @@
             MinimumPoolSize = 1;
 
             // Disable pipelining for now as Aurora does not support it
-            SetParameter("Pipelining", "False");
+            SetParameter("pipelining", "false");
         }
 
         /// <summary>

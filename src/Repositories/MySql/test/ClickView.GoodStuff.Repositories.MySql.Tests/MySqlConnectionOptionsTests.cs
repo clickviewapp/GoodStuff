@@ -14,7 +14,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
 
             var connString = options.GetConnectionString();
 
-            Assert.Equal("host=localhost;maxpoolsize=25;minpoolsize=1;", connString);
+            Assert.Equal("host=localhost;maxpoolsize=25;minpoolsize=1;pipelining=false;", connString);
         }
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             var connString = options.GetConnectionString();
 
             Assert.Equal(
-                "host=why;maxpoolsize=11;minpoolsize=2;database=do you;password=only call me;port=8888;username=when you're high?;loadbalance=leastconnections;",
+                "host=why;maxpoolsize=11;minpoolsize=2;pipelining=false;database=do you;password=only call me;port=8888;username=when you're high?;loadbalance=leastconnections;",
                 connString);
         }
     }
