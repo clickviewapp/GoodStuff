@@ -10,6 +10,9 @@
             Host = "localhost";
             MaximumPoolSize = 25;
             MinimumPoolSize = 1;
+
+            // Disable pipelining for now as Aurora does not support it
+            SetParameter("pipelining", "false");
         }
 
         /// <summary>

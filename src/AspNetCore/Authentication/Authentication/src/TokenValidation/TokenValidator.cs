@@ -5,31 +5,27 @@
     using System.IdentityModel.Tokens.Jwt;
     using System.Security.Claims;
     using System.Security.Cryptography;
+    using System.Text.Json;
     using System.Threading.Tasks;
     using IdentityModel;
     using IdentityModel.Client;
-    using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Tokens;
-    using Newtonsoft.Json.Linq;
     using JsonWebKeySet = IdentityModel.Jwk.JsonWebKeySet;
 
     internal sealed class TokenValidator : ITokenValidator
     {
-        private readonly ILogger<TokenValidator> _logger;
         private readonly TokenValidatorOptions _options;
         private readonly DiscoveryCache _discoveryCache;
 
         private const string BackChannelScheme = "http://schemas.openid.net/event/backchannel-logout";
 
-        public TokenValidator(IOptions<TokenValidatorOptions> options, ILogger<TokenValidator> logger)
+        public TokenValidator(IOptions<TokenValidatorOptions> options)
         {
             var o = options.Value ?? throw new ArgumentNullException(nameof(options));
 
             if (o.Authority == null)
                 throw new ArgumentException("Authority must be set");
-
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
             _options = o;
             _discoveryCache = new DiscoveryCache(o.Authority.AbsoluteUri);
@@ -60,14 +56,13 @@
             if (string.IsNullOrWhiteSpace(eventsJson))
                 throw new Exception($"Invalid logout token. {JwtClaimTypes.Events} missing");
 
-            var events = JObject.Parse(eventsJson);
+            var events = JsonDocument.Parse(eventsJson).RootElement;
+            var logoutEvent = events.TryGetString(BackChannelScheme);
 
-            if (events.TryGetValue(BackChannelScheme, out var logoutTokenData))
-                return claims;
+            if (logoutEvent == null)
+                throw new Exception("Invalid logout token");
 
-            _logger.LogWarning("Invalid backchannel logout token {LogoutTokenData}", logoutTokenData);
-
-            throw new Exception("Invalid logout token");
+            return claims;
         }
 
         private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience)

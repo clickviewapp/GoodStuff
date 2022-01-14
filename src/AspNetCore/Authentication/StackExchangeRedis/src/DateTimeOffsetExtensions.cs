@@ -6,9 +6,6 @@
     {
         public static TimeSpan ToRedisExpiryTimeSpan(this DateTimeOffset value)
         {
-            if (value == null)
-                throw new ArgumentNullException(nameof(value));
-
             var dif = value.Subtract(DateTimeOffset.UtcNow);
 
             //redis setex command expects the time to be positive

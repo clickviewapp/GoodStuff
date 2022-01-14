@@ -44,7 +44,11 @@
             return _userSessionStore.UpdateAsync(key, userSession);
         }
 
+#if NET6_0_OR_GREATER
+        public async Task<AuthenticationTicket?> RetrieveAsync(string key)
+#else
         public async Task<AuthenticationTicket> RetrieveAsync(string key)
+#endif
         {
             var userSession = await _userSessionStore.GetAsync(key);
             if (userSession == null)
@@ -55,7 +59,8 @@
                 return ticket;
 
             // the ticket is bad, so remove from the store to clean up
-            _logger.LogWarning("Authentication ticket could not be deserialized. Deleting UserSession with key: {Key}", key);
+            _logger.LogWarning("Authentication ticket could not be deserialized. Deleting UserSession with key: {Key}",
+                key);
 
             await RemoveAsync(key);
 
