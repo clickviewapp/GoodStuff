@@ -18,6 +18,7 @@
         public ushort? Port
         {
             set => SetParameter("port", value?.ToString());
+            get => GetParameter<ushort>("port");
         }
 
         /// <summary>
@@ -26,6 +27,7 @@
         public string? Database
         {
             set => SetParameter("database", value);
+            get => GetParameter("database");
         }
 
         /// <summary>
@@ -34,6 +36,7 @@
         public string? Username
         {
             set => SetParameter("username", value);
+            get => GetParameter("username");
         }
 
         /// <summary>
@@ -42,6 +45,7 @@
         public string? Password
         {
             set => SetParameter("password", value);
+            get => GetParameter("password");
         }
 
         /// <summary>
@@ -50,6 +54,7 @@
         public int? MaximumPoolSize
         {
             set => SetParameter("maxpoolsize", value?.ToString());
+            get => GetParameter<int>("maxpoolsize");
         }
 
         /// <summary>
@@ -58,6 +63,7 @@
         public int? MinimumPoolSize
         {
             set => SetParameter("minpoolsize", value?.ToString());
+            get => GetParameter<int>("minpoolsize");
         }
 
         /// <summary>
@@ -66,6 +72,7 @@
         public LoadBalance? LoadBalance
         {
             set => SetParameter("loadbalance", value?.ToString());
+            get => GetParameter<LoadBalance>("loadbalance");
         }
 
         /// <summary>
@@ -74,14 +81,16 @@
         public int? CommandTimeout
         {
             set => SetParameter("command timeout", value?.ToString());
+            get => GetParameter<int>("command timeout");
         }
 
         /// <summary>
         /// Enables query pipelining
         /// </summary>
-        public bool Pipelining
+        public bool? Pipelining
         {
-            set => SetParameter("pipeliing", value.ToString());
+            set => SetParameter("pipelining", value?.ToString());
+            get => GetParameter<bool>("pipelining");
         }
     }
 }
