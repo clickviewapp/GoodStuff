@@ -71,7 +71,7 @@
         /// </summary>
         public LoadBalance? LoadBalance
         {
-            set => SetParameter("loadbalance", value?.ToString());
+            set => SetParameter("loadbalance", value?.ToString().ToLowerInvariant());
             get => GetParameter<LoadBalance>("loadbalance");
         }
 
@@ -89,7 +89,7 @@
         /// </summary>
         public bool? Pipelining
         {
-            set => SetParameter("pipelining", value?.ToString());
+            set => SetParameter("pipelining", value?.ToString().ToLowerInvariant());
             get => GetParameter<bool>("pipelining");
         }
     }
