@@ -63,9 +63,9 @@
         /// <summary>
         /// The load-balancing strategy to use when Host contains multiple, comma-delimited, host names
         /// </summary>
-        public LoadBalance.LoadBalanceOption? LoadBalance
+        public LoadBalance? LoadBalance
         {
-            set => SetParameter("loadbalance", value?.Value);
+            set => SetParameter("loadbalance", value?.ToString());
         }
 
         /// <summary>
