@@ -17,7 +17,7 @@
         /// <summary>
         /// Specifies the name of the database in use for the connection being established
         /// </summary>
-        public string Database
+        public string? Database
         {
             set => SetParameter("Database", value);
         }
@@ -25,7 +25,7 @@
         /// <summary>
         /// Specifies the User ID to be used when connecting with SQL Server Authentication
         /// </summary>
-        public string Username
+        public string? Username
         {
             set => SetParameter("User ID", value);
         }
@@ -33,7 +33,7 @@
         /// <summary>
         /// Specifies the password associated with the User ID to be used when connecting with SQL Server Authentication
         /// </summary>
-        public string Password
+        public string? Password
         {
             set => SetParameter("Password", value);
         }
@@ -41,7 +41,7 @@
         /// <summary>
         /// The SQL Server instance to connect to
         /// </summary>
-        public override string Host
+        public override string? Host
         {
             set => SetParameter("Server", value);
         }

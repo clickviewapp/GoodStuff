@@ -12,7 +12,7 @@
     public abstract class BaseMySqlRepository : BaseRepository<MySqlConnection>
     {
         private readonly IAsyncPolicy _retryPolicy;
-        private readonly ILogger<BaseMySqlRepository> _logger;
+        private readonly ILogger<BaseMySqlRepository>? _logger;
 
         protected BaseMySqlRepository(IMySqlConnectionFactory connectionFactory)
             : this(connectionFactory, new MySqlRepositoryOptions())
@@ -26,7 +26,7 @@
                 throw new ArgumentNullException(nameof(options));
 
             // try to create a logger
-            if (options.LoggerFactory != null)
+            if (options.LoggerFactory is not null)
                 _logger = options.LoggerFactory.CreateLogger<BaseMySqlRepository>();
 
             _retryPolicy = Policy
@@ -59,7 +59,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<int> ExecuteAsync(string sql, object param = null)
+        protected Task<int> ExecuteAsync(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.ExecuteAsync(s, p),
                 write: true,
@@ -74,7 +74,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<T> ExecuteScalarAsync<T>(string sql, object param = null)
+        protected Task<T> ExecuteScalarAsync<T>(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
                 write: true,
@@ -89,7 +89,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<T> QueryScalarValueAsync<T>(string sql, object param = null)
+        protected Task<T> QueryScalarValueAsync<T>(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
                 write: false,
@@ -104,7 +104,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<T> QueryFirstAsync<T>(string sql, object param = null)
+        protected Task<T> QueryFirstAsync<T>(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.QueryFirstOrDefaultAsync<T>(s, p),
                 write: false,
@@ -119,7 +119,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<T> QuerySingleAsync<T>(string sql, object param = null)
+        protected Task<T> QuerySingleAsync<T>(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.QuerySingleOrDefaultAsync<T>(s, p),
                 write: false,
@@ -134,7 +134,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
         {
             return WrapAsync((c, s, p) => c.QueryAsync<T>(s, p),
                 write: false,
@@ -142,8 +142,8 @@
                 param: param);
         }
 
-        private Task<T> WrapAsync<T>(Func<MySqlConnection, string, object, Task<T>> func,
-            bool write, string sql, object param = null)
+        private Task<T> WrapAsync<T>(Func<MySqlConnection, string, object?, Task<T>> func,
+            bool write, string sql, object? param = null)
         {
             return _retryPolicy.ExecuteAsync(async () =>
             {

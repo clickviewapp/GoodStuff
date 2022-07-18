@@ -35,7 +35,7 @@ namespace ClickView.GoodStuff.Repositories.MsSql.Tests
         [Fact]
         public void Ctor_NullOptions_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new MsSqlConnectionFactory(null));
+            Assert.Throws<ArgumentNullException>(() => new MsSqlConnectionFactory(null!));
         }
 
         [Fact]

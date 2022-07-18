@@ -15,6 +15,6 @@
         /// </summary>
         public Func<int, TimeSpan> FailOverRetryTimeout { get; set; } = _ => TimeSpan.FromSeconds(2);
 
-        public ILoggerFactory LoggerFactory { get; set; }
+        public ILoggerFactory? LoggerFactory { get; set; }
     }
 }

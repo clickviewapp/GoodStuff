@@ -35,7 +35,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
         [Fact]
         public void Ctor_NullOptions_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new MySqlConnectionFactory(null));
+            Assert.Throws<ArgumentNullException>(() => new MySqlConnectionFactory(null!));
         }
 
         [Fact]

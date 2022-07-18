@@ -5,8 +5,8 @@
     public abstract class ConnectionFactory<TConnection, TOptions> : IConnectionFactory<TConnection>
         where TOptions : RepositoryConnectionOptions
     {
-        protected readonly string ReadConnectionString;
-        protected readonly string WriteConnectionString;
+        protected readonly string? ReadConnectionString;
+        protected readonly string? WriteConnectionString;
 
         protected ConnectionFactory(ConnectionFactoryOptions<TOptions> options)
         {
