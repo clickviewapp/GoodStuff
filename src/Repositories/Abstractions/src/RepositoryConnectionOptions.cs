@@ -1,11 +1,12 @@
-﻿namespace ClickView.GoodStuff.Repositories.Abstractions
+namespace ClickView.GoodStuff.Repositories.Abstractions
 {
+    using System;
     using System.Collections.Generic;
     using System.Text;
 
     public abstract class RepositoryConnectionOptions
     {
-        private readonly Dictionary<string, string> _parameters = new();
+        private readonly Dictionary<string, string> _parameters = new(StringComparer.OrdinalIgnoreCase);
 
         protected void SetParameter(string key, string? value)
         {
