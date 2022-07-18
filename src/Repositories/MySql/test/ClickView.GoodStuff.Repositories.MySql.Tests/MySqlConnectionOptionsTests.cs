@@ -72,6 +72,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Equal("db", options.Database);
             Assert.Equal("pw", options.Password);
             Assert.Equal((ushort?)123, options.Port);
+            Assert.Equal("user", options.Username);
             Assert.Equal(true, options.Pipelining);
             Assert.Equal(LoadBalance.LeastConnections, options.LoadBalance);
             Assert.Equal(111, options.CommandTimeout);
@@ -91,6 +92,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Null(options.Database);
             Assert.Null(options.Password);
             Assert.Null(options.Port);
+            Assert.Null(options.Username);
             Assert.Null(options.Pipelining);
             Assert.Null(options.LoadBalance);
             Assert.Null(options.CommandTimeout);
