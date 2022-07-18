@@ -10,9 +10,6 @@
             Host = "localhost";
             MaximumPoolSize = 25;
             MinimumPoolSize = 1;
-
-            // Disable pipelining for now as Aurora does not support it
-            SetParameter("pipelining", "false");
         }
 
         /// <summary>
@@ -77,6 +74,14 @@
         public int? CommandTimeout
         {
             set => SetParameter("command timeout", value?.ToString());
+        }
+
+        /// <summary>
+        /// Enables query pipelining
+        /// </summary>
+        public bool Pipelining
+        {
+            set => SetParameter("pipeliing", value.ToString());
         }
     }
 }
