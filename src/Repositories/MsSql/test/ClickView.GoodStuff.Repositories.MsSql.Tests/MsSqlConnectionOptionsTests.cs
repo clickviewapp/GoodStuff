@@ -40,5 +40,34 @@ namespace ClickView.GoodStuff.Repositories.MsSql.Tests
                 "Integrated Security=False;Database=do you;Password=only call me;User ID=when you're high?;",
                 connString);
         }
+
+        [Fact]
+        public void PropertiesSet_AreEqual()
+        {
+            var options = new MsSqlConnectionOptions
+            {
+                Host = "hello",
+                Database = "db",
+                Password = "pw",
+                Username = "user",
+            };
+
+            Assert.Equal("hello", options.Host);
+            Assert.Equal("db", options.Database);
+            Assert.Equal("pw", options.Password);
+            Assert.Equal("user", options.Username);
+        }
+
+        [Fact]
+        public void PropertiesDefault_DoesNotThrow()
+        {
+            var options = new MsSqlConnectionOptions();
+
+            Assert.Equal("localhost", options.Host);
+
+            Assert.Null(options.Database);
+            Assert.Null(options.Password);
+            Assert.Null(options.Username);
+        }
     }
 }

@@ -1,11 +1,13 @@
 ﻿namespace ClickView.GoodStuff.Repositories.Abstractions
 {
+    using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Text;
 
     public abstract class RepositoryConnectionOptions
     {
-        private readonly Dictionary<string, string> _parameters = new();
+        private readonly Dictionary<string, string> _parameters = new(StringComparer.OrdinalIgnoreCase);
 
         protected void SetParameter(string key, string? value)
         {
@@ -27,12 +29,44 @@
             return value;
         }
 
+        protected T? GetParameter<T>(string key) where T : struct
+        {
+            var value = GetParameter(key);
+
+            if (value is null)
+                return default;
+
+            var type = typeof(T);
+
+            if (type.IsEnum)
+            {
+                try
+                {
+                    return (T)Enum.Parse(typeof(T), value, ignoreCase: true);
+                }
+                catch (Exception ex) when (ex is not ArgumentException)
+                {
+                    throw new ArgumentException($"Value '{value}' not supported for option '{type.Name}'.", ex);
+                }
+            }
+
+            try
+            {
+                return (T) Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Invalid value '{value}' for '{key}' connection string option.", ex);
+            }
+        }
+
         /// <summary>
         /// The host name or network address of the Server to which to connect
         /// </summary>
         public virtual string? Host
         {
             set => SetParameter("host", value);
+            get => GetParameter("host");
         }
 
         public virtual string GetConnectionString()

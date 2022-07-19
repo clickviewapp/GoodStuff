@@ -10,9 +10,6 @@
             Host = "localhost";
             MaximumPoolSize = 25;
             MinimumPoolSize = 1;
-
-            // Disable pipelining for now as Aurora does not support it
-            SetParameter("pipelining", "false");
         }
 
         /// <summary>
@@ -21,6 +18,7 @@
         public ushort? Port
         {
             set => SetParameter("port", value?.ToString());
+            get => GetParameter<ushort>("port");
         }
 
         /// <summary>
@@ -29,6 +27,7 @@
         public string? Database
         {
             set => SetParameter("database", value);
+            get => GetParameter("database");
         }
 
         /// <summary>
@@ -37,6 +36,7 @@
         public string? Username
         {
             set => SetParameter("username", value);
+            get => GetParameter("username");
         }
 
         /// <summary>
@@ -45,6 +45,7 @@
         public string? Password
         {
             set => SetParameter("password", value);
+            get => GetParameter("password");
         }
 
         /// <summary>
@@ -53,6 +54,7 @@
         public int? MaximumPoolSize
         {
             set => SetParameter("maxpoolsize", value?.ToString());
+            get => GetParameter<int>("maxpoolsize");
         }
 
         /// <summary>
@@ -61,14 +63,16 @@
         public int? MinimumPoolSize
         {
             set => SetParameter("minpoolsize", value?.ToString());
+            get => GetParameter<int>("minpoolsize");
         }
 
         /// <summary>
         /// The load-balancing strategy to use when Host contains multiple, comma-delimited, host names
         /// </summary>
-        public LoadBalance.LoadBalanceOption? LoadBalance
+        public LoadBalance? LoadBalance
         {
-            set => SetParameter("loadbalance", value?.Value);
+            set => SetParameter("loadbalance", value?.ToString().ToLowerInvariant());
+            get => GetParameter<LoadBalance>("loadbalance");
         }
 
         /// <summary>
@@ -77,6 +81,16 @@
         public int? CommandTimeout
         {
             set => SetParameter("command timeout", value?.ToString());
+            get => GetParameter<int>("command timeout");
+        }
+
+        /// <summary>
+        /// Enables query pipelining
+        /// </summary>
+        public bool? Pipelining
+        {
+            set => SetParameter("pipelining", value?.ToString().ToLowerInvariant());
+            get => GetParameter<bool>("pipelining");
         }
     }
 }

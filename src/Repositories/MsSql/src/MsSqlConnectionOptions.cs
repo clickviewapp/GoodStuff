@@ -20,6 +20,7 @@
         public string? Database
         {
             set => SetParameter("Database", value);
+            get => GetParameter("Database");
         }
 
         /// <summary>
@@ -28,6 +29,7 @@
         public string? Username
         {
             set => SetParameter("User ID", value);
+            get => GetParameter("User ID");
         }
 
         /// <summary>
@@ -36,6 +38,7 @@
         public string? Password
         {
             set => SetParameter("Password", value);
+            get => GetParameter("Password");
         }
 
         /// <summary>
@@ -44,6 +47,7 @@
         public override string? Host
         {
             set => SetParameter("Server", value);
+            get => GetParameter("Server");
         }
     }
 }
