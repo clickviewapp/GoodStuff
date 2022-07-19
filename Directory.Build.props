@@ -10,6 +10,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
+        <Version>1.1.0</Version>
+    </PropertyGroup>
+
+    <PropertyGroup>
         <LangVersion>10.0</LangVersion>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
 </Project>

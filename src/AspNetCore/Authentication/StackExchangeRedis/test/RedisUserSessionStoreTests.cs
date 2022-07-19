@@ -44,7 +44,7 @@
             var retrievedSession = await sessionStore.GetAsync("1", CancellationToken.None);
 
             Assert.NotNull(retrievedSession);
-            Assert.Equal(session.Key, retrievedSession.Key);
+            Assert.Equal(session.Key, retrievedSession!.Key);
             Assert.Equal(session.Ticket, retrievedSession.Ticket);
             Assert.Equal(session.SessionId, retrievedSession.SessionId);
             Assert.Equal(session.Subject, retrievedSession.Subject);
@@ -93,7 +93,7 @@
 
             Assert.NotNull(updatedSession);
 
-            Assert.Equal(session.Key, updatedSession.Key);
+            Assert.Equal(session.Key, updatedSession!.Key);
 
             Assert.NotEqual(session.Ticket, updatedSession.Ticket);
             Assert.NotEqual(session.SessionId, updatedSession.SessionId);
