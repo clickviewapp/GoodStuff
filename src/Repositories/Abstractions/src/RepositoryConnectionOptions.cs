@@ -5,11 +5,13 @@
 
     public abstract class RepositoryConnectionOptions
     {
-        private readonly Dictionary<string, string> _parameters = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _parameters = new();
 
-        protected void SetParameter(string key, string value)
+        protected void SetParameter(string key, string? value)
         {
-            if (string.IsNullOrWhiteSpace(value))
+            // null check here is because of warnings in older .net versions
+            // once we remove netstandard2.0 targets this null can be removed
+            if (value is null || string.IsNullOrEmpty(value))
             {
                 _parameters.Remove(key);
             }
@@ -19,7 +21,7 @@
             }
         }
 
-        protected string GetParameter(string key)
+        protected string? GetParameter(string key)
         {
             _parameters.TryGetValue(key, out var value);
             return value;
@@ -28,7 +30,7 @@
         /// <summary>
         /// The host name or network address of the Server to which to connect
         /// </summary>
-        public virtual string Host
+        public virtual string? Host
         {
             set => SetParameter("host", value);
         }

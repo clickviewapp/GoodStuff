@@ -20,13 +20,13 @@
         /// </summary>
         public ushort? Port
         {
-            set => SetParameter("port", value.ToString());
+            set => SetParameter("port", value?.ToString());
         }
 
         /// <summary>
         /// The case-sensitive name of the initial database to use
         /// </summary>
-        public string Database
+        public string? Database
         {
             set => SetParameter("database", value);
         }
@@ -34,7 +34,7 @@
         /// <summary>
         /// The MySQL user ID
         /// </summary>
-        public string Username
+        public string? Username
         {
             set => SetParameter("username", value);
         }
@@ -42,7 +42,7 @@
         /// <summary>
         /// The password for the MySQL user
         /// </summary>
-        public string Password
+        public string? Password
         {
             set => SetParameter("password", value);
         }

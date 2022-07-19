@@ -18,7 +18,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<int> ExecuteAsync(string sql, object param = null)
+        protected async Task<int> ExecuteAsync(string sql, object? param = null)
         {
             using var conn = GetWriteConnection();
             return await conn.ExecuteAsync(sql, param);
@@ -31,7 +31,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> ExecuteScalarAsync<T>(string sql, object param = null)
+        protected async Task<T> ExecuteScalarAsync<T>(string sql, object? param = null)
         {
             using var conn = GetWriteConnection();
             return await conn.ExecuteScalarAsync<T>(sql, param);
@@ -44,7 +44,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QueryScalarValueAsync<T>(string sql, object param = null)
+        protected async Task<T> QueryScalarValueAsync<T>(string sql, object? param = null)
         {
             using var conn = GetReadConnection();
             return await conn.ExecuteScalarAsync<T>(sql, param);
@@ -57,7 +57,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QueryFirstAsync<T>(string sql, object param = null)
+        protected async Task<T> QueryFirstAsync<T>(string sql, object? param = null)
         {
             using var conn = GetReadConnection();
             return await conn.QueryFirstOrDefaultAsync<T>(sql, param);
@@ -70,7 +70,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<T> QuerySingleAsync<T>(string sql, object param = null)
+        protected async Task<T> QuerySingleAsync<T>(string sql, object? param = null)
         {
             using var conn = GetReadConnection();
             return await conn.QuerySingleOrDefaultAsync<T>(sql, param);
@@ -83,7 +83,7 @@
         /// <param name="sql"></param>
         /// <param name="param"></param>
         /// <returns></returns>
-        protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object param = null)
+        protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
         {
             using var conn = GetReadConnection();
             return await conn.QueryAsync<T>(sql, param);

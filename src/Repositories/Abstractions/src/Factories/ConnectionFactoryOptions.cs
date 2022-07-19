@@ -2,7 +2,7 @@
 {
     public class ConnectionFactoryOptions<TOptions> where TOptions : RepositoryConnectionOptions
     {
-        public TOptions Read { get; set; }
-        public TOptions Write { get; set; }
+        public TOptions? Read { get; set; }
+        public TOptions? Write { get; set; }
     }
 }
