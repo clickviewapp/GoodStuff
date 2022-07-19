@@ -114,7 +114,7 @@
             token.ThrowIfCancellationRequested();
 
             var session = await _database.StringGetAsync(key);
-            return session.HasValue ? Deserialize(session) : null;
+            return session.HasValue ? Deserialize(session!) : null;
         }
 
         private static void AddInternal(ITransaction transaction, string key, UserSession session)
