@@ -9,10 +9,7 @@
 
         protected BaseRepository(IConnectionFactory<TConnection> connectionFactory)
         {
-            if (connectionFactory == null)
-                throw new ArgumentNullException(nameof(connectionFactory));
-
-            _connectionFactory = connectionFactory;
+            _connectionFactory = connectionFactory ?? throw new ArgumentNullException(nameof(connectionFactory));
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
     using Abstractions;
     using Dapper;
@@ -58,13 +59,15 @@
         /// </summary>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<int> ExecuteAsync(string sql, object? param = null)
+        protected Task<int> ExecuteAsync(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.ExecuteAsync(s, p),
+            return WrapAsync((con, cd) => con.ExecuteAsync(cd),
                 write: true,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
         /// <summary>
@@ -73,13 +76,15 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> ExecuteScalarAsync<T>(string sql, object? param = null)
+        protected Task<T> ExecuteScalarAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
+            return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
                 write: true,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
         /// <summary>
@@ -88,13 +93,15 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QueryScalarValueAsync<T>(string sql, object? param = null)
+        protected Task<T> QueryScalarValueAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.ExecuteScalarAsync<T>(s, p),
+            return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
                 write: false,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
         /// <summary>
@@ -103,13 +110,15 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QueryFirstAsync<T>(string sql, object? param = null)
+        protected Task<T> QueryFirstAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.QueryFirstOrDefaultAsync<T>(s, p),
+            return WrapAsync((con, cd) => con.QueryFirstOrDefaultAsync<T>(cd),
                 write: false,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
         /// <summary>
@@ -118,13 +127,15 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QuerySingleAsync<T>(string sql, object? param = null)
+        protected Task<T> QuerySingleAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.QuerySingleOrDefaultAsync<T>(s, p),
+            return WrapAsync((con, cd) => con.QuerySingleOrDefaultAsync<T>(cd),
                 write: false,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
         /// <summary>
@@ -133,41 +144,45 @@
         /// <typeparam name="T"></typeparam>
         /// <param name="sql"></param>
         /// <param name="param"></param>
+        /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
+        protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
-            return WrapAsync((c, s, p) => c.QueryAsync<T>(s, p),
+            return WrapAsync((con, cd) => con.QueryAsync<T>(cd),
                 write: false,
                 sql: sql,
-                param: param);
+                param: param,
+                token: token);
         }
 
-        private Task<T> WrapAsync<T>(Func<MySqlConnection, string, object?, Task<T>> func,
-            bool write, string sql, object? param = null)
+        private Task<T> WrapAsync<T>(Func<MySqlConnection, CommandDefinition, Task<T>> func,
+            bool write, string sql, object? param, CancellationToken token)
         {
-            return _retryPolicy.ExecuteAsync(async () =>
+            return _retryPolicy.ExecuteAsync(async cancellationToken =>
             {
-                #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
                 await using var connection = write ? GetWriteConnection() : GetReadConnection();
-                #else
+#else
                 // ReSharper disable once UseAwaitUsing
                 using var connection = write ? GetWriteConnection() : GetReadConnection();
-                #endif
+#endif
 
                 try
                 {
-                    return await func(connection, sql, param);
+                    var command = new CommandDefinition(sql, param, cancellationToken: cancellationToken);
+
+                    return await func(connection, command);
                 }
                 catch (MySqlException ex) when (MySqlUtils.IsFailoverException(ex))
                 {
                     _logger?.LogWarning("Clearing current connection pool because a fail-over exception occurred");
 
                     // catch the fail-over exceptions, remove the connection from the Pool
-                    await MySqlConnection.ClearPoolAsync(connection);
+                    await MySqlConnection.ClearPoolAsync(connection, cancellationToken);
 
                     throw;
                 }
-            });
+            }, token);
         }
     }
 }
