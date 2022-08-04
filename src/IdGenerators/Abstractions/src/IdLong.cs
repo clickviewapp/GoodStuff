@@ -7,6 +7,8 @@ using System;
 /// </summary>
 public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLong>
 {
+    private const char Prefix = '_';
+
     private readonly long _value;
 
     /// <summary>
@@ -22,6 +24,32 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     /// An empty IdLong with a value of 0
     /// </summary>
     public static readonly IdLong Empty = new(0);
+
+    /// <summary>
+    /// Parse a <see cref="IdLong"/> from a string
+    /// </summary>
+    /// <param name="value"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentNullException"></exception>
+    /// <exception cref="FormatException"></exception>
+    public static IdLong Parse(string value)
+    {
+        if (value is null)
+            throw new ArgumentNullException(nameof(value));
+
+        if (value[0] == Prefix)
+        {
+#if NETSTANDARD2_0
+            var idPart = value.Substring(1);
+#else
+            var idPart = value[1..];
+#endif
+
+            return new IdLong(long.Parse(idPart));
+        }
+
+        throw new FormatException("Invalid string");
+    }
 
     /// <inheritdoc />
     public int CompareTo(object? value)
@@ -72,7 +100,7 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     /// <inheritdoc />
     public override string ToString()
     {
-        return "_" + _value.ToString();
+        return Prefix + _value.ToString();
     }
 
     /// <summary>

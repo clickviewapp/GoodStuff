@@ -67,6 +67,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.IdGener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.IdGenerators.IdGen.Tests", "src\IdGenerators\IdGen\test\ClickView.GoodStuff.IdGenerators.IdGen.Tests.csproj", "{FED685BF-255A-4ED1-80ED-B7596ABC337B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.IdGenerators.Abstractions.Tests", "src\IdGenerators\Abstractions\test\ClickView.GoodStuff.IdGenerators.Abstractions.Tests.csproj", "{292AD84D-B42C-4DB6-882A-509860B4754F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -145,6 +147,10 @@ Global
 		{FED685BF-255A-4ED1-80ED-B7596ABC337B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FED685BF-255A-4ED1-80ED-B7596ABC337B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FED685BF-255A-4ED1-80ED-B7596ABC337B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{292AD84D-B42C-4DB6-882A-509860B4754F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{292AD84D-B42C-4DB6-882A-509860B4754F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{292AD84D-B42C-4DB6-882A-509860B4754F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{292AD84D-B42C-4DB6-882A-509860B4754F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -175,6 +181,7 @@ Global
 		{C5B19524-40C1-4003-AFCE-328F5CD034E9} = {0578918C-A83D-4FB0-BFD8-50639DB46AF0}
 		{A76E8A82-AF0E-4706-8A42-70FEE0D128A5} = {E164F5C1-C2B7-42BF-A147-EB15C7CCB8E3}
 		{FED685BF-255A-4ED1-80ED-B7596ABC337B} = {0578918C-A83D-4FB0-BFD8-50639DB46AF0}
+		{292AD84D-B42C-4DB6-882A-509860B4754F} = {046FE4C7-4E48-4CD5-BF39-3AF8110DA1C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
