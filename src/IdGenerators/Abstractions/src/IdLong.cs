@@ -18,6 +18,11 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
         _value = value;
     }
 
+    /// <summary>
+    /// An empty IdLong with a value of 0
+    /// </summary>
+    public static readonly IdLong Empty = new(0);
+
     /// <inheritdoc />
     public int CompareTo(object? value)
     {
