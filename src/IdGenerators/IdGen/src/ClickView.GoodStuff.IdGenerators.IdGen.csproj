@@ -5,4 +5,17 @@
         <IsPackable>true</IsPackable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Abstractions\src\ClickView.GoodStuff.IdGenerators.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IdGen" Version="3.0.1" />
+      <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+    </ItemGroup>
+
 </Project>
