@@ -1,5 +1,6 @@
 ﻿namespace ClickView.GoodStuff.IdGenerators.IdGen;
 
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Abstractions;
@@ -19,12 +20,19 @@ public class IdGenGenerator : Abstractions.IIdGenerator<IdLong>
     /// <param name="logger"></param>
     public IdGenGenerator(ILogger<IdGenGenerator> logger)
     {
-        var defaultOptions = new IdGeneratorOptions();
+        // Define our own new epoch
+        var epoch = new DateTime(2022, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+        // Create default options
+        var defaultOptions = new IdGeneratorOptions(IdStructure.Default, new DefaultTimeSource(epoch));
+
+        // Create our generator id
         var generatorId = GeneratorIdSource.GetId(defaultOptions.IdStructure.GeneratorIdBits);
 
-        _idGenerator = new IdGenerator(generatorId, defaultOptions);
+        // Log for debug purposes
+        logger.LogDebug("GeneratorId: {GeneratorId}", generatorId);
 
-        logger.LogDebug("GeneratorId: {GeneratorId}", _idGenerator.Id);
+        _idGenerator = new IdGenerator(generatorId, defaultOptions);
     }
 
     /// <inheritdoc />
