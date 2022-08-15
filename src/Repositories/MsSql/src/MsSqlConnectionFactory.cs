@@ -21,18 +21,22 @@
 
         public override SqlConnection GetReadConnection()
         {
-            if (string.IsNullOrEmpty(ReadConnectionString))
+            var cs = ReadConnectionString;
+
+            if (string.IsNullOrEmpty(cs))
                 throw new InvalidOperationException("Read is not allowed. No read connection options defined");
 
-            return new SqlConnection(ReadConnectionString);
+            return new SqlConnection(cs);
         }
 
         public override SqlConnection GetWriteConnection()
         {
-            if (string.IsNullOrEmpty(WriteConnectionString))
+            var cs = WriteConnectionString;
+
+            if (string.IsNullOrEmpty(cs))
                 throw new InvalidOperationException("Write is not allowed. No write connection options defined");
 
-            return new SqlConnection(WriteConnectionString);
+            return new SqlConnection(cs);
         }
     }
 }

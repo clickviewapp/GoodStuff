@@ -11,8 +11,8 @@
         private readonly ApplicationInformation _applicationInformation;
         private readonly VersionPageOptions _options;
 
-        public VersionPageMiddleware(
-            RequestDelegate next, ApplicationInformation applicationInformation, IOptions<VersionPageOptions> options)
+        public VersionPageMiddleware(RequestDelegate next, ApplicationInformation applicationInformation,
+            IOptions<VersionPageOptions> options)
         {
             if (next == null)
                 throw new ArgumentNullException(nameof(next));

@@ -21,7 +21,7 @@ public class GeneratorIdSourceTests
         Assert.NotNull(ipAddress);
 
         // Use the string representation for my little bird brain
-        var lastOctet = int.Parse(ipAddress!.ToString().Split('.')[3]);
+        var lastOctet = int.Parse(ipAddress.ToString().Split('.')[3]);
 
         var id = GeneratorIdSource.GetId(8);
 
