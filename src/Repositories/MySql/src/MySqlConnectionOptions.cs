@@ -92,5 +92,15 @@
             set => SetParameter("pipelining", value?.ToString().ToLowerInvariant());
             get => GetParameter<bool>("pipelining");
         }
+
+        /// <summary>
+        /// The DateTimeKind used when MySqlDataReader returns a DateTime.
+        /// If set to Utc or Local, a MySqlException will be thrown if a DateTime command parameter has a Kind of Local or Utc, respectively.
+        /// </summary>
+        public MySqlDateTimeKind? DateTimeKind
+        {
+            set => SetParameter("dateTimeKind", value.ToString());
+            get => GetParameter<MySqlDateTimeKind>("dateTimeKind");
+        }
     }
 }
