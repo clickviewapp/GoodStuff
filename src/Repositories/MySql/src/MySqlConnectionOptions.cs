@@ -10,6 +10,7 @@
             Host = "localhost";
             MaximumPoolSize = 25;
             MinimumPoolSize = 1;
+            DateTimeKind = MySqlDateTimeKind.Utc;
         }
 
         /// <summary>
