@@ -100,7 +100,7 @@
         /// </summary>
         public MySqlDateTimeKind? DateTimeKind
         {
-            set => SetParameter("dateTimeKind", value.ToString());
+            set => SetParameter("dateTimeKind", value?.ToString());
             get => GetParameter<MySqlDateTimeKind>("dateTimeKind");
         }
     }

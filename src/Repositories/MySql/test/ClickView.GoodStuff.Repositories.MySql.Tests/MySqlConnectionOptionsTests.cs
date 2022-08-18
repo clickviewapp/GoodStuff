@@ -102,5 +102,28 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Null(options.CommandTimeout);
             Assert.Null(options.DateTimeKind);
         }
+
+        [Fact]
+        public void PropertiesSet_Null_DoesNotThrow()
+        {
+            var options = new MySqlConnectionOptions
+            {
+                Host = null,
+                Database = null,
+                MaximumPoolSize = null,
+                MinimumPoolSize = null,
+                Password = null,
+                Port = null,
+                Username = null,
+                LoadBalance = null,
+                Pipelining = null,
+                DateTimeKind = null,
+                CommandTimeout = null
+            };
+
+            var connString = options.GetConnectionString();
+
+            Assert.Equal(string.Empty, connString);
+        }
     }
 }
