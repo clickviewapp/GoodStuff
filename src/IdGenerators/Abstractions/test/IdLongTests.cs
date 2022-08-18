@@ -18,13 +18,31 @@ public class IdLongTests
     {
         var id = IdLong.Parse("_1234");
 
-        Assert.Equal(1234, id);
+        Assert.Equal(1234, (long)id);
+    }
+
+    [Theory]
+    [InlineData("1234")]
+    [InlineData("")]
+    public void Parse_MalformedId_ThrowsFormatException(string str)
+    {
+        Assert.Throws<FormatException>(() => IdLong.Parse(str));
     }
 
     [Fact]
-    public void Parse_MalformedId_ThrowsFormatException()
+    public void TryParse_ReturnsTrue()
     {
-        Assert.Throws<FormatException>(() => IdLong.Parse("1234"));
+        Assert.True(IdLong.TryParse("_1234", out var value));
+        Assert.Equal(1234, (long)value);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("1234")]
+    [InlineData("")]
+    public void TryParse_MalformedId_ReturnsFalse(string? str)
+    {
+        Assert.False(IdLong.TryParse(str, out _));
     }
 
     [Fact]
@@ -37,5 +55,12 @@ public class IdLongTests
     public void Compare_DifferentValue_NotEqual()
     {
         Assert.NotEqual(new IdLong(455), new IdLong(555));
+    }
+
+    [Fact]
+    public void Value_Returns()
+    {
+        var id = new IdLong(666);
+        Assert.Equal(666, id.Value);
     }
 }

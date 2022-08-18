@@ -1,15 +1,19 @@
 ﻿namespace ClickView.GoodStuff.IdGenerators.Abstractions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Id which is based on a <see cref="long"/>
 /// </summary>
-public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLong>
+public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdLong>
 {
     private const char Prefix = '_';
 
-    private readonly long _value;
+    /// <summary>
+    /// The inner <see cref="long"/> value of the <see cref="IdLong"/>
+    /// </summary>
+    public long Value { get; }
 
     /// <summary>
     /// Create a new instance of <see cref="IdLong"/> with the given <paramref name="value"/>
@@ -17,7 +21,7 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     /// <param name="value"></param>
     public IdLong(long value)
     {
-        _value = value;
+        Value = value;
     }
 
     /// <summary>
@@ -37,18 +41,49 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
-        if (value[0] == Prefix)
+        if (value.Length > 0 && value[0] == Prefix)
         {
 #if NETSTANDARD2_0
             var idPart = value.Substring(1);
 #else
-            var idPart = value[1..];
+            var idPart = value.AsSpan(1);
 #endif
 
             return new IdLong(long.Parse(idPart));
         }
 
         throw new FormatException("Invalid string");
+    }
+
+    /// <summary>
+    /// Try to parse a <see cref="IdLong"/> from a string. A return value indicates whether the conversion succeeded or failed.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+#if NETSTANDARD2_0
+    public static bool TryParse(string? value, out IdLong result)
+#else
+    public static bool TryParse([NotNullWhen(true)] string? value, out IdLong result)
+#endif
+    {
+        if (value is { Length: > 0 } && value[0] == Prefix)
+        {
+#if NETSTANDARD2_0
+            var idPart = value.Substring(1);
+#else
+            var idPart = value.AsSpan(1);
+#endif
+
+            if (long.TryParse(idPart, out var longValue))
+            {
+                result = new IdLong(longValue);
+                return true;
+            }
+        }
+
+        result = Empty;
+        return false;
     }
 
     /// <inheritdoc />
@@ -61,8 +96,8 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
         // to positive for very large neg numbers, etc.
         if (value is IdLong i)
         {
-            if (_value < i._value) return -1;
-            if (_value > i._value) return 1;
+            if (Value < i.Value) return -1;
+            if (Value > i.Value) return 1;
             return 0;
         }
 
@@ -74,15 +109,15 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     {
         // Need to use compare because subtraction will wrap
         // to positive for very large neg numbers, etc.
-        if (_value < other._value) return -1;
-        if (_value > other._value) return 1;
+        if (Value < other.Value) return -1;
+        if (Value > other.Value) return 1;
         return 0;
     }
 
     /// <inheritdoc />
     public bool Equals(IdLong other)
     {
-        return _value == other._value;
+        return Value == other.Value;
     }
 
     /// <inheritdoc />
@@ -94,31 +129,31 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return _value.GetHashCode();
+        return Value.GetHashCode();
     }
 
     /// <inheritdoc />
     public override string ToString()
     {
-        return Prefix + _value.ToString();
+        return Prefix + Value.ToString();
     }
 
     /// <summary>
-    /// Implicitly returns the inner <see cref="long"/> value
+    /// Explicitly returns the inner <see cref="long"/> value
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static implicit operator long(IdLong value)
+    public static explicit operator long(IdLong value)
     {
-        return value._value;
+        return value.Value;
     }
 
     /// <summary>
-    /// Implicitly creates a new <see cref="IdLong"/> from the given <paramref name="value"/>
+    /// Explicitly creates a new <see cref="IdLong"/> from the given <paramref name="value"/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static implicit operator IdLong(long value)
+    public static explicit operator IdLong(long value)
     {
         return new IdLong(value);
     }
