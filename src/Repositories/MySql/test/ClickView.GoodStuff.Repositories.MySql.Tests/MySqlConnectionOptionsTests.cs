@@ -33,7 +33,8 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
                 Port = 8888,
                 Username = "when you're high?",
                 LoadBalance = LoadBalance.LeastConnections,
-                Pipelining = false
+                Pipelining = false,
+                DateTimeKind = MySqlDateTimeKind.Utc
             };
 
             var connString = options.GetConnectionString();
@@ -47,7 +48,8 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
                 "port=8888;" +
                 "username=when you're high?;" +
                 "loadbalance=leastconnections;" +
-                "pipelining=false;",
+                "pipelining=false;" +
+                "dateTimeKind=Utc;",
                 connString);
         }
 
@@ -65,7 +67,8 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
                 LoadBalance = LoadBalance.LeastConnections,
                 CommandTimeout = 111,
                 MaximumPoolSize = 222,
-                MinimumPoolSize = 333
+                MinimumPoolSize = 333,
+                DateTimeKind = MySqlDateTimeKind.Utc
             };
 
             Assert.Equal("hello", options.Host);
@@ -78,6 +81,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Equal(111, options.CommandTimeout);
             Assert.Equal(222, options.MaximumPoolSize);
             Assert.Equal(333, options.MinimumPoolSize);
+            Assert.Equal(MySqlDateTimeKind.Utc, options.DateTimeKind);
         }
 
         [Fact]
@@ -96,6 +100,30 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Null(options.Pipelining);
             Assert.Null(options.LoadBalance);
             Assert.Null(options.CommandTimeout);
+            Assert.Null(options.DateTimeKind);
+        }
+
+        [Fact]
+        public void PropertiesSet_Null_DoesNotThrow()
+        {
+            var options = new MySqlConnectionOptions
+            {
+                Host = null,
+                Database = null,
+                MaximumPoolSize = null,
+                MinimumPoolSize = null,
+                Password = null,
+                Port = null,
+                Username = null,
+                LoadBalance = null,
+                Pipelining = null,
+                DateTimeKind = null,
+                CommandTimeout = null
+            };
+
+            var connString = options.GetConnectionString();
+
+            Assert.Equal(string.Empty, connString);
         }
     }
 }
