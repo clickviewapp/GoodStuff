@@ -18,7 +18,7 @@ public class IdLongTests
     {
         var id = IdLong.Parse("_1234");
 
-        Assert.Equal(1234, id);
+        Assert.Equal(1234, (long)id);
     }
 
     [Fact]

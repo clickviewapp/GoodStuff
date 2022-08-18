@@ -5,7 +5,7 @@ using System;
 /// <summary>
 /// Id which is based on a <see cref="long"/>
 /// </summary>
-public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLong>
+public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdLong>
 {
     private const char Prefix = '_';
 
@@ -104,21 +104,21 @@ public readonly struct IdLong: IComparable, IComparable<IdLong>, IEquatable<IdLo
     }
 
     /// <summary>
-    /// Implicitly returns the inner <see cref="long"/> value
+    /// Explicitly returns the inner <see cref="long"/> value
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static implicit operator long(IdLong value)
+    public static explicit operator long(IdLong value)
     {
         return value._value;
     }
 
     /// <summary>
-    /// Implicitly creates a new <see cref="IdLong"/> from the given <paramref name="value"/>
+    /// Explicitly creates a new <see cref="IdLong"/> from the given <paramref name="value"/>
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static implicit operator IdLong(long value)
+    public static explicit operator IdLong(long value)
     {
         return new IdLong(value);
     }
