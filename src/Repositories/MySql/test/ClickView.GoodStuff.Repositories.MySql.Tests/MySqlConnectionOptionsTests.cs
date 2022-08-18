@@ -14,7 +14,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
 
             var connString = options.GetConnectionString();
 
-            Assert.Equal("host=localhost;maxpoolsize=25;minpoolsize=1;", connString);
+            Assert.Equal("host=localhost;maxpoolsize=25;minpoolsize=1;dateTimeKind=Utc;", connString);
         }
 
         /// <summary>
@@ -43,13 +43,13 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
                 "host=why;" +
                 "maxpoolsize=11;" +
                 "minpoolsize=2;" +
+                "dateTimeKind=Utc;" +
                 "database=do you;" +
                 "password=only call me;" +
                 "port=8888;" +
                 "username=when you're high?;" +
                 "loadbalance=leastconnections;" +
-                "pipelining=false;" +
-                "dateTimeKind=Utc;",
+                "pipelining=false;",
                 connString);
         }
 
@@ -92,6 +92,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Equal("localhost", options.Host);
             Assert.Equal(25, options.MaximumPoolSize);
             Assert.Equal(1, options.MinimumPoolSize);
+            Assert.Equal(MySqlDateTimeKind.Utc, options.DateTimeKind);
 
             Assert.Null(options.Database);
             Assert.Null(options.Password);
@@ -100,7 +101,6 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Null(options.Pipelining);
             Assert.Null(options.LoadBalance);
             Assert.Null(options.CommandTimeout);
-            Assert.Null(options.DateTimeKind);
         }
 
         [Fact]
