@@ -21,10 +21,12 @@ public class IdLongTests
         Assert.Equal(1234, (long)id);
     }
 
-    [Fact]
-    public void Parse_MalformedId_ThrowsFormatException()
+    [Theory]
+    [InlineData("1234")]
+    [InlineData("")]
+    public void Parse_MalformedId_ThrowsFormatException(string str)
     {
-        Assert.Throws<FormatException>(() => IdLong.Parse("1234"));
+        Assert.Throws<FormatException>(() => IdLong.Parse(str));
     }
 
     [Fact]

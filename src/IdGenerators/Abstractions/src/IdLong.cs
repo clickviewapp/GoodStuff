@@ -37,7 +37,7 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
         if (value is null)
             throw new ArgumentNullException(nameof(value));
 
-        if (value[0] == Prefix)
+        if (value.Length > 0 && value[0] == Prefix)
         {
 #if NETSTANDARD2_0
             var idPart = value.Substring(1);
