@@ -10,7 +10,10 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
 {
     private const char Prefix = '_';
 
-    private readonly long _value;
+    /// <summary>
+    /// The inner <see cref="long"/> value of the <see cref="IdLong"/>
+    /// </summary>
+    public long Value { get; }
 
     /// <summary>
     /// Create a new instance of <see cref="IdLong"/> with the given <paramref name="value"/>
@@ -18,7 +21,7 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     /// <param name="value"></param>
     public IdLong(long value)
     {
-        _value = value;
+        Value = value;
     }
 
     /// <summary>
@@ -93,8 +96,8 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
         // to positive for very large neg numbers, etc.
         if (value is IdLong i)
         {
-            if (_value < i._value) return -1;
-            if (_value > i._value) return 1;
+            if (Value < i.Value) return -1;
+            if (Value > i.Value) return 1;
             return 0;
         }
 
@@ -106,15 +109,15 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     {
         // Need to use compare because subtraction will wrap
         // to positive for very large neg numbers, etc.
-        if (_value < other._value) return -1;
-        if (_value > other._value) return 1;
+        if (Value < other.Value) return -1;
+        if (Value > other.Value) return 1;
         return 0;
     }
 
     /// <inheritdoc />
     public bool Equals(IdLong other)
     {
-        return _value == other._value;
+        return Value == other.Value;
     }
 
     /// <inheritdoc />
@@ -126,13 +129,13 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return _value.GetHashCode();
+        return Value.GetHashCode();
     }
 
     /// <inheritdoc />
     public override string ToString()
     {
-        return Prefix + _value.ToString();
+        return Prefix + Value.ToString();
     }
 
     /// <summary>
@@ -142,7 +145,7 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     /// <returns></returns>
     public static explicit operator long(IdLong value)
     {
-        return value._value;
+        return value.Value;
     }
 
     /// <summary>

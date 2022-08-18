@@ -56,4 +56,11 @@ public class IdLongTests
     {
         Assert.NotEqual(new IdLong(455), new IdLong(555));
     }
+
+    [Fact]
+    public void Value_Returns()
+    {
+        var id = new IdLong(666);
+        Assert.Equal(666, id.Value);
+    }
 }
