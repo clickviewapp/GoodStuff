@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.Abstractions;
+namespace ClickView.GoodStuff.IdGenerators.Abstractions;
 
 using System;
 
@@ -42,7 +42,7 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
 #if NETSTANDARD2_0
             var idPart = value.Substring(1);
 #else
-            var idPart = value[1..];
+            var idPart = value.AsSpan(1);
 #endif
 
             return new IdLong(long.Parse(idPart));
