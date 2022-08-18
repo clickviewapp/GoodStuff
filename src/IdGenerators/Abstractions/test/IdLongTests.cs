@@ -30,6 +30,22 @@ public class IdLongTests
     }
 
     [Fact]
+    public void TryParse_ReturnsTrue()
+    {
+        Assert.True(IdLong.TryParse("_1234", out var value));
+        Assert.Equal(1234, (long)value);
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("1234")]
+    [InlineData("")]
+    public void TryParse_MalformedId_ReturnsFalse(string? str)
+    {
+        Assert.False(IdLong.TryParse(str, out _));
+    }
+
+    [Fact]
     public void Compare_SameValue_Equal()
     {
         Assert.Equal(new IdLong(555), new IdLong(555));

@@ -1,6 +1,7 @@
-namespace ClickView.GoodStuff.IdGenerators.Abstractions;
+﻿namespace ClickView.GoodStuff.IdGenerators.Abstractions;
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 /// <summary>
 /// Id which is based on a <see cref="long"/>
@@ -49,6 +50,37 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
         }
 
         throw new FormatException("Invalid string");
+    }
+
+    /// <summary>
+    /// Try to parse a <see cref="IdLong"/> from a string. A return value indicates whether the conversion succeeded or failed.
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="result"></param>
+    /// <returns></returns>
+#if NETSTANDARD2_0
+    public static bool TryParse(string? value, out IdLong result)
+#else
+    public static bool TryParse([NotNullWhen(true)] string? value, out IdLong result)
+#endif
+    {
+        if (value is { Length: > 0 } && value[0] == Prefix)
+        {
+#if NETSTANDARD2_0
+            var idPart = value.Substring(1);
+#else
+            var idPart = value.AsSpan(1);
+#endif
+
+            if (long.TryParse(idPart, out var longValue))
+            {
+                result = new IdLong(longValue);
+                return true;
+            }
+        }
+
+        result = Empty;
+        return false;
     }
 
     /// <inheritdoc />
