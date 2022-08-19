@@ -1,0 +1,17 @@
+name: Build
+
+on:
+  push:
+    #paths-ignore:
+      #- ".github/workflows/**"
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Verify Format
+        run: dotnet format --verify-no-changes
