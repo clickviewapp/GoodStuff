@@ -68,6 +68,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.IdGener
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.IdGenerators.Abstractions.Tests", "src\IdGenerators\Abstractions\test\ClickView.GoodStuff.IdGenerators.Abstractions.Tests.csproj", "{292AD84D-B42C-4DB6-882A-509860B4754F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHub", "GitHub", "{63D140DE-F2A6-4644-9A1A-ABA3F2314C0A}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build.yaml = .github\workflows\build.yaml
+		.github\workflows\release.yaml = .github\workflows\release.yaml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +187,7 @@ Global
 		{A76E8A82-AF0E-4706-8A42-70FEE0D128A5} = {E164F5C1-C2B7-42BF-A147-EB15C7CCB8E3}
 		{FED685BF-255A-4ED1-80ED-B7596ABC337B} = {0578918C-A83D-4FB0-BFD8-50639DB46AF0}
 		{292AD84D-B42C-4DB6-882A-509860B4754F} = {046FE4C7-4E48-4CD5-BF39-3AF8110DA1C9}
+		{63D140DE-F2A6-4644-9A1A-ABA3F2314C0A} = {A9533DB9-A1E9-4376-806E-926176FD9B13}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
