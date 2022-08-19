@@ -1,4 +1,4 @@
-name: Build
+name: Build and Test
 
 on:
   push:
@@ -6,16 +6,6 @@ on:
       #- ".github/workflows/**"
 
 jobs:
-  # lint:
-  #   name: Lint
-  #   runs-on: ubuntu-22.04
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v3
-
-  #     - name: Verify Format
-  #       run: dotnet format --verify-no-changes
-
   build:
     name: Build
     runs-on: ubuntu-22.04
@@ -37,7 +27,7 @@ jobs:
       - name: Test
         run: dotnet test --no-build --logger trx --results-directory ./test-results/
 
-      - name: Upload dotnet test results
+      - name: Upload test results
         uses: actions/upload-artifact@v3
         with:
           name: Test Results
