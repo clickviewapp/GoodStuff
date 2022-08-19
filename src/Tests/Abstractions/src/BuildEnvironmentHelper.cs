@@ -11,19 +11,26 @@ public static class BuildEnvironmentHelper
     /// Checks to see if the current environment is any known build server
     /// </summary>
     /// <returns></returns>
-    public static bool IsBuildEnvironment() => IsOnTeamCity() || IsOnAppVeyor();
+    public static bool IsBuildEnvironment() => IsOnTeamCity() || IsOnAppVeyor() || IsOnGitHubActions();
 
     /// <summary>
     /// Checks to see if the current environment is TeamCity
     /// </summary>
     /// <returns></returns>
-    public static bool IsOnTeamCity() =>
-        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
+    public static bool IsOnTeamCity() => HasEnvironmentVariable("TEAMCITY_PROJECT_NAME");
 
     /// <summary>
     /// Checks to see if the current environment is AppVeyor
     /// </summary>
     /// <returns></returns>
-    public static bool IsOnAppVeyor() =>
-        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR"));
+    public static bool IsOnAppVeyor() => HasEnvironmentVariable("APPVEYOR");
+
+    /// <summary>
+    /// Checks to see if the current environment is GitHub actions
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsOnGitHubActions() => HasEnvironmentVariable("GITHUB_ACTIONS");
+
+    private static bool HasEnvironmentVariable(string name) =>
+        !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(name));
 }
