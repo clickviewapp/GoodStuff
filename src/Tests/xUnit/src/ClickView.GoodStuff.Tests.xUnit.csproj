@@ -9,4 +9,8 @@
       <PackageReference Include="McMaster.Extensions.Xunit" Version="0.1.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Abstractions\src\ClickView.GoodStuff.Tests.Abstractions.csproj" />
+    </ItemGroup>
+
 </Project>
