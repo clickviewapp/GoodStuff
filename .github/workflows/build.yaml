@@ -6,15 +6,15 @@ on:
       #- ".github/workflows/**"
 
 jobs:
-  lint:
-    name: Lint
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+  # lint:
+  #   name: Lint
+  #   runs-on: ubuntu-22.04
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v3
 
-      - name: Verify Format
-        run: dotnet format --verify-no-changes
+  #     - name: Verify Format
+  #       run: dotnet format --verify-no-changes
 
   build:
     name: Build
