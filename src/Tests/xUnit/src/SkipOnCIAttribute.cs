@@ -1,6 +1,7 @@
 namespace ClickView.GoodStuff.Tests.xUnit
 {
     using System;
+    using Abstractions;
     using McMaster.Extensions.Xunit;
 
     /// <summary>
@@ -20,12 +21,8 @@ namespace ClickView.GoodStuff.Tests.xUnit
             _reason = reason;
         }
 
-        public bool IsMet => !IsOnCI();
+        public bool IsMet => !BuildEnvironmentHelper.IsBuildEnvironment();
 
         public string SkipReason => "This test is skipped on CI. " + _reason;
-
-        public static bool IsOnCI() => IsOnTeamCity() || IsOnAppVeyor();
-        public static bool IsOnTeamCity() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TEAMCITY_PROJECT_NAME"));
-        public static bool IsOnAppVeyor() => !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPVEYOR"));
     }
 }
