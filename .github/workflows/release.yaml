@@ -36,4 +36,4 @@ jobs:
           path: ./build-output/
 
       - name: Publish
-        run: dotnet nuget push "./build-output/*.nupkg" --api-key ${{ secrets.NUGET_TOKEN }}
+        run: dotnet nuget push "./build-output/*.nupkg" --source nuget.org --api-key ${{ secrets.NUGET_TOKEN }}
