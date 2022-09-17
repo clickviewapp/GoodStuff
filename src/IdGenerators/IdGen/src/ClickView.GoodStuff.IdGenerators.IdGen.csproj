@@ -10,7 +10,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="IdGen" Version="3.0.1" />
+      <PackageReference Include="IdGen" Version="3.0.2" />
       <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.2" />
     </ItemGroup>
 
