@@ -3,13 +3,12 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Abstractions;
-    using Abstractions.Factories;
     using Dapper;
     using global::Snowflake.Data.Client;
 
     public class BaseSnowflakeRepository : BaseRepository<SnowflakeDbConnection>
     {
-        public BaseSnowflakeRepository(IConnectionFactory<SnowflakeDbConnection> connectionFactory) : base(
+        public BaseSnowflakeRepository(ISnowflakeConnectionFactory connectionFactory) : base(
             connectionFactory)
         {
         }
