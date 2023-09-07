@@ -67,13 +67,13 @@
 
         private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience)
         {
-            var disco = await _discoveryCache.GetAsync();
+            var discoveryDocument = await _discoveryCache.GetAsync();
 
             var parameters = new TokenValidationParameters
             {
-                ValidIssuer = disco.Issuer,
+                ValidIssuer = discoveryDocument.Issuer,
                 ValidAudience = validAudience,
-                IssuerSigningKeys = GetSecurityKeys(disco.KeySet),
+                IssuerSigningKeys = GetSecurityKeys(discoveryDocument.KeySet),
 
                 NameClaimType = JwtClaimTypes.Name,
                 RoleClaimType = JwtClaimTypes.Role
@@ -85,8 +85,11 @@
             return handler.ValidateToken(jwt, parameters, out _);
         }
 
-        private static IEnumerable<SecurityKey> GetSecurityKeys(JsonWebKeySet keySet)
+        private static IEnumerable<SecurityKey> GetSecurityKeys(JsonWebKeySet? keySet)
         {
+            if (keySet is null)
+                yield break;
+
             foreach (var webKey in keySet.Keys)
             {
                 var e = Base64Url.Decode(webKey.E);
