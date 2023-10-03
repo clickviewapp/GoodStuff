@@ -14,14 +14,9 @@
         public VersionPageMiddleware(RequestDelegate next, ApplicationInformation applicationInformation,
             IOptions<VersionPageOptions> options)
         {
-            if (next == null)
-                throw new ArgumentNullException(nameof(next));
-
-            if (applicationInformation == null)
-                throw new ArgumentNullException(nameof(applicationInformation));
-
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
+            ArgumentNullException.ThrowIfNull(next);
+            ArgumentNullException.ThrowIfNull(applicationInformation);
+            ArgumentNullException.ThrowIfNull(options);
 
             _next = next;
             _applicationInformation = applicationInformation;
@@ -30,8 +25,7 @@
 
         public async Task InvokeAsync(HttpContext httpContext)
         {
-            if (httpContext == null)
-                throw new ArgumentNullException(nameof(httpContext));
+            ArgumentNullException.ThrowIfNull(httpContext);
 
             httpContext.Response.StatusCode = 200;
 

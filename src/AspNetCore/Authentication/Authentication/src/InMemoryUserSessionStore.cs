@@ -9,8 +9,7 @@
 
     public class InMemoryUserSessionStore : IUserSessionStore
     {
-        private readonly ConcurrentDictionary<string, UserSession> _sessions =
-            new ConcurrentDictionary<string, UserSession>();
+        private readonly ConcurrentDictionary<string, UserSession> _sessions = new();
 
         public Task<UserSession?> GetAsync(string key, CancellationToken token = default)
         {
