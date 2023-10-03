@@ -16,11 +16,8 @@
             this OpenIdConnectSessionHandlerBuilder builder,
             Action<RedisUserSessionCacheOptions> configure)
         {
-            if (builder == null)
-                throw new ArgumentNullException(nameof(builder));
-
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
+            ArgumentNullException.ThrowIfNull(builder);
+            ArgumentNullException.ThrowIfNull(configure);
 
             builder.Services.AddOptions<RedisUserSessionCacheOptions>()
                 .Validate(o =>

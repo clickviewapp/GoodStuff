@@ -13,8 +13,7 @@
 
         public Task<UserSession?> GetAsync(string key, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             token.ThrowIfCancellationRequested();
 
@@ -35,8 +34,7 @@
 
         public Task AddAsync(UserSession session, CancellationToken token = default)
         {
-            if (session == null)
-                throw new ArgumentNullException(nameof(session));
+            ArgumentNullException.ThrowIfNull(session);
 
             token.ThrowIfCancellationRequested();
 
@@ -47,11 +45,8 @@
 
         public Task UpdateAsync(string key, UserSession session, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            if (session == null)
-                throw new ArgumentNullException(nameof(session));
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(session);
 
             token.ThrowIfCancellationRequested();
 
@@ -62,8 +57,7 @@
 
         public Task DeleteAsync(string key, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             token.ThrowIfCancellationRequested();
 
@@ -74,8 +68,7 @@
 
         public Task DeleteBySessionIdAsync(string sessionId, CancellationToken token = default)
         {
-            if (sessionId == null)
-                throw new ArgumentNullException(nameof(sessionId));
+            ArgumentNullException.ThrowIfNull(sessionId);
 
             token.ThrowIfCancellationRequested();
 

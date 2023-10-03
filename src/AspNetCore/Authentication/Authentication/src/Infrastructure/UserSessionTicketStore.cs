@@ -77,8 +77,7 @@
             if (string.IsNullOrWhiteSpace(key))
                 throw new InvalidOperationException("Invalid key");
 
-            if (ticket == null)
-                throw new ArgumentNullException(nameof(ticket));
+            ArgumentNullException.ThrowIfNull(ticket);
 
             var subject = ticket.Principal.FindFirst(JwtClaimTypes.Subject)?.Value;
             var sessionId = ticket.Principal.FindFirst(JwtClaimTypes.SessionId)?.Value;

@@ -16,8 +16,7 @@
         /// <exception cref="ArgumentNullException"></exception>
         public static void AddAjaxServices(this IServiceCollection services)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
+            ArgumentNullException.ThrowIfNull(services);
 
             // Register the 401/403 handler
             services.AddTransient<IAuthorizationMiddlewareResultHandler, AjaxAuthorizationMiddlewareResultHandler>();

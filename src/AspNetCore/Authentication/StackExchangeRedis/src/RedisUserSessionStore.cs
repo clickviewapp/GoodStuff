@@ -14,12 +14,11 @@
 
         public RedisUserSessionStore(IOptions<RedisUserSessionCacheOptions> cacheOptions)
         {
-            if (cacheOptions == null) throw new ArgumentNullException(nameof(cacheOptions));
+            ArgumentNullException.ThrowIfNull(cacheOptions);
 
             var options = cacheOptions.Value;
 
             if (options == null) throw new ArgumentException("Options cannot be null");
-
             if (options.Connection == null) throw new ArgumentException("Connection cannot be null");
 
             _database = options.Connection.GetDatabase();
@@ -32,8 +31,7 @@
 
         public async Task AddAsync(UserSession session, CancellationToken token = default)
         {
-            if (session == null)
-                throw new ArgumentNullException(nameof(session));
+            ArgumentNullException.ThrowIfNull(session);
 
             token.ThrowIfCancellationRequested();
 
@@ -47,11 +45,8 @@
 
         public async Task UpdateAsync(string key, UserSession session, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
-
-            if (session == null)
-                throw new ArgumentNullException(nameof(session));
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(session);
 
             token.ThrowIfCancellationRequested();
 
@@ -70,8 +65,7 @@
 
         public async Task DeleteAsync(string key, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             token.ThrowIfCancellationRequested();
 
@@ -87,8 +81,7 @@
 
         public async Task DeleteBySessionIdAsync(string sessionId, CancellationToken token = default)
         {
-            if (sessionId == null)
-                throw new ArgumentNullException(nameof(sessionId));
+            ArgumentNullException.ThrowIfNull(sessionId);
 
             token.ThrowIfCancellationRequested();
 
@@ -108,8 +101,7 @@
 
         private async Task<UserSession?> GetInternalAsync(string key, CancellationToken token = default)
         {
-            if (key == null)
-                throw new ArgumentNullException(nameof(key));
+            ArgumentNullException.ThrowIfNull(key);
 
             token.ThrowIfCancellationRequested();
 
