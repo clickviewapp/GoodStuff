@@ -78,7 +78,7 @@
         /// <param name="param"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> ExecuteScalarAsync<T>(string sql, object? param = null, CancellationToken token = default)
+        protected Task<T?> ExecuteScalarAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
             return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
                 write: true,
@@ -95,7 +95,7 @@
         /// <param name="param"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QueryScalarValueAsync<T>(string sql, object? param = null, CancellationToken token = default)
+        protected Task<T?> QueryScalarValueAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
             return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
                 write: false,
@@ -112,7 +112,7 @@
         /// <param name="param"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QueryFirstAsync<T>(string sql, object? param = null, CancellationToken token = default)
+        protected Task<T?> QueryFirstAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
             return WrapAsync((con, cd) => con.QueryFirstOrDefaultAsync<T>(cd),
                 write: false,
@@ -129,7 +129,7 @@
         /// <param name="param"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        protected Task<T> QuerySingleAsync<T>(string sql, object? param = null, CancellationToken token = default)
+        protected Task<T?> QuerySingleAsync<T>(string sql, object? param = null, CancellationToken token = default)
         {
             return WrapAsync((con, cd) => con.QuerySingleOrDefaultAsync<T>(cd),
                 write: false,
