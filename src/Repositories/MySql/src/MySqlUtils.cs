@@ -13,7 +13,7 @@
         {
             return mySqlException.Number == (int) MySqlErrorCode.UnableToConnectToHost ||
                    mySqlException.Number == (int) MySqlErrorCode.OptionPreventsStatement ||
-                   mySqlException.Number == 0 && mySqlException.HResult == -2147467259;
+                   mySqlException is { Number: 0, HResult: -2147467259 };
         }
     }
 }

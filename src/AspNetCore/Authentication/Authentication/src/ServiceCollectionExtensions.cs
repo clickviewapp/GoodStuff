@@ -23,11 +23,8 @@
             this IServiceCollection services,
             Action<OpenIdConnectSessionHandlerOptions> configure)
         {
-            if (services == null)
-                throw new ArgumentNullException(nameof(services));
-
-            if (configure == null)
-                throw new ArgumentNullException(nameof(configure));
+            ArgumentNullException.ThrowIfNull(services);
+            ArgumentNullException.ThrowIfNull(configure);
 
             services.AddOptions<OpenIdConnectSessionHandlerOptions>()
                 .Validate(o =>

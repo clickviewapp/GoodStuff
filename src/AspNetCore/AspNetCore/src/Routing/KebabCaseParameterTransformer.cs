@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Routing;
 /// </summary>
 public class KebabCaseParameterTransformer : IOutboundParameterTransformer
 {
+    private static readonly Regex ReplacerRegex = new("([a-z])([A-Z])", RegexOptions.Compiled);
+
     /// <inheritdoc />
     public string? TransformOutbound(object? value)
     {
@@ -17,6 +19,6 @@ public class KebabCaseParameterTransformer : IOutboundParameterTransformer
             return null;
 
         // Slugify value
-        return Regex.Replace(str, "([a-z])([A-Z])", "$1-$2");
+        return ReplacerRegex.Replace(str, "$1-$2");
     }
 }
