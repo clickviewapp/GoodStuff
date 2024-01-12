@@ -18,20 +18,6 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Can_Add_UserSession_To_Redis()
         {
-            var services = new ServiceCollection();
-            var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-            //redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.AddStackExchangeRedisUserSessionStore(options =>
-            {
-                options.Connection = redis;
-            });
-
-            // Build
-            var serviceProvider = services.BuildServiceProvider();
-
             var session = new UserSession("1", new byte[] {1, 2})
             {
                 SessionId = "sessionId1",
@@ -39,7 +25,34 @@
                 Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
             };
 
-            var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+            var sessionStore = await GetUserSessionStoreAsync();
+
+            await sessionStore.AddAsync(session, CancellationToken.None);
+            var retrievedSession = await sessionStore.GetAsync("1", CancellationToken.None);
+
+            Assert.NotNull(retrievedSession);
+            Assert.Equal(session.Key, retrievedSession.Key);
+            Assert.Equal(session.Ticket, retrievedSession.Ticket);
+            Assert.Equal(session.SessionId, retrievedSession.SessionId);
+            Assert.Equal(session.Subject, retrievedSession.Subject);
+        }
+
+        [SkippableFact]
+        [SkipOnCI(SkipCiReason)]
+        public async Task AddAsync_InstanceName()
+        {
+            var session = new UserSession("1", new byte[] {1, 2})
+            {
+                SessionId = "sessionId1",
+                Subject = "subject1",
+                Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
+            };
+
+            var sessionStore = await GetUserSessionStoreAsync(o =>
+            {
+                o.InstanceName = "test_";
+            });
+
             await sessionStore.AddAsync(session, CancellationToken.None);
             var retrievedSession = await sessionStore.GetAsync("1", CancellationToken.None);
 
@@ -54,20 +67,6 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Can_Update_UserSession_To_Same_key()
         {
-            var services = new ServiceCollection();
-            var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-            //redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.AddStackExchangeRedisUserSessionStore(options =>
-            {
-                options.Connection = redis;
-            });
-
-            // Build
-            var serviceProvider = services.BuildServiceProvider();
-
             var session = new UserSession("2", new byte[] { 3, 4 })
             {
                 SessionId = "sessionId2",
@@ -75,7 +74,8 @@
                 Expiry = DateTimeOffset.UtcNow.AddSeconds(10)
             };
 
-            var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+            var sessionStore = await GetUserSessionStoreAsync();
+
             await sessionStore.AddAsync(session, CancellationToken.None);
             var retrievedSession = await sessionStore.GetAsync("2", CancellationToken.None);
 
@@ -104,27 +104,14 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Can_Delete_UserSession_By_key()
         {
-            var services = new ServiceCollection();
-            var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-            //redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.AddStackExchangeRedisUserSessionStore(options =>
-            {
-                options.Connection = redis;
-            });
-
-            // Build
-            var serviceProvider = services.BuildServiceProvider();
-
             var session = new UserSession("3", new byte[] { 7, 8 })
             {
                 SessionId = "sessionId3",
                 Subject = "subject3"
             };
 
-            var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+            var sessionStore = await GetUserSessionStoreAsync();
+
             await sessionStore.AddAsync(session, CancellationToken.None);
             var retrievedSession = await sessionStore.GetAsync("3", CancellationToken.None);
 
@@ -140,27 +127,14 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Can_Delete_UserSession_By_SessionId()
         {
-            var services = new ServiceCollection();
-            var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-            //redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.AddStackExchangeRedisUserSessionStore(options =>
-            {
-                options.Connection = redis;
-            });
-
-            // Build
-            var serviceProvider = services.BuildServiceProvider();
-
             var session = new UserSession("4", new byte[] { 9, 10 })
             {
                 SessionId = "sessionId4",
                 Subject = "subject4"
             };
 
-            var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+            var sessionStore = await GetUserSessionStoreAsync();
+
             await sessionStore.AddAsync(session, CancellationToken.None);
             var retrievedSession = await sessionStore.GetAsync("4", CancellationToken.None);
 
@@ -176,20 +150,6 @@
         [SkipOnCI(SkipCiReason)]
         public async Task Can_Expire_UserSession_Key()
         {
-            var services = new ServiceCollection();
-            var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-            //redis
-            var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-            builder.AddStackExchangeRedisUserSessionStore(options =>
-            {
-                options.Connection = redis;
-            });
-
-            // Build
-            var serviceProvider = services.BuildServiceProvider();
-
             var session = new UserSession("5", new byte[] { 1, 2 })
             {
                 SessionId = "sessionId5",
@@ -197,7 +157,8 @@
                 Expiry = DateTimeOffset.UtcNow.AddSeconds(1)
             };
 
-            var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+            var sessionStore = await GetUserSessionStoreAsync();
+
             await sessionStore.AddAsync(session, CancellationToken.None);
             var retrievedSession = await sessionStore.GetAsync("5", CancellationToken.None);
 
@@ -217,20 +178,6 @@
         {
             await Assert.ThrowsAsync<Exception>(async () =>
             {
-                var services = new ServiceCollection();
-                var builder = new OpenIdConnectSessionHandlerBuilder(services);
-
-                //redis
-                var redis = ConnectionMultiplexer.Connect("localhost:6379");
-
-                builder.AddStackExchangeRedisUserSessionStore(options =>
-                {
-                    options.Connection = redis;
-                });
-
-                // Build
-                var serviceProvider = services.BuildServiceProvider();
-
                 var session = new UserSession("6", new byte[] { 1, 2 })
                 {
                     SessionId = "sessionId6",
@@ -238,9 +185,31 @@
                     Expiry = DateTimeOffset.UtcNow.AddSeconds(-10)
                 };
 
-                var sessionStore = serviceProvider.GetRequiredService<IUserSessionStore>();
+                var sessionStore = await GetUserSessionStoreAsync();
+
                 await sessionStore.AddAsync(session, CancellationToken.None);
             });
+        }
+
+        private static async Task<IUserSessionStore> GetUserSessionStoreAsync(
+            Action<RedisUserSessionCacheOptions>? configure = null)
+        {
+            var services = new ServiceCollection();
+            var builder = new OpenIdConnectSessionHandlerBuilder(services);
+
+            //redis
+            var redis = await ConnectionMultiplexer.ConnectAsync("localhost:6379");
+
+            builder.AddStackExchangeRedisUserSessionStore(options =>
+            {
+                options.Connection = redis;
+
+                configure?.Invoke(options);
+            });
+
+            // Build
+            var serviceProvider = services.BuildServiceProvider();
+            return serviceProvider.GetRequiredService<IUserSessionStore>();
         }
     }
 }

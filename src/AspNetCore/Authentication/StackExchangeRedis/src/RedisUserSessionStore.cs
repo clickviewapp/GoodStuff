@@ -4,6 +4,7 @@
     using Microsoft.Extensions.Options;
     using StackExchange.Redis;
     using System;
+    using System.Text;
     using System.Text.Json;
     using System.Threading;
     using System.Threading.Tasks;
@@ -11,6 +12,7 @@
     public class RedisUserSessionStore : IUserSessionStore
     {
         private readonly IDatabase _database;
+        private readonly RedisKey _keyPrefix;
 
         public RedisUserSessionStore(IOptions<RedisUserSessionCacheOptions> cacheOptions)
         {
@@ -22,6 +24,10 @@
             if (options.Connection == null) throw new ArgumentException("Connection cannot be null");
 
             _database = options.Connection.GetDatabase();
+
+            var instanceName = options.InstanceName;
+            if (!string.IsNullOrEmpty(instanceName))
+                _keyPrefix = (RedisKey)Encoding.UTF8.GetBytes(instanceName);
         }
 
         public Task<UserSession?> GetAsync(string key, CancellationToken token = default)
@@ -72,8 +78,8 @@
             var session = await GetInternalAsync(key, token);
 
             var keysToDelete = session?.SessionId == null
-                ? new RedisKey[] {key}
-                : new RedisKey[] {key, GetSessionIdKey(session.SessionId)};
+                ? new[] { _keyPrefix.Append(key) }
+                : new[] { _keyPrefix.Append(key), GetSessionIdKey(session.SessionId) };
 
             // Delete both the session and the session id lookup
             await _database.KeyDeleteAsync(keysToDelete);
@@ -89,11 +95,7 @@
 
             if (!sessionKey.HasValue) return;
 
-            var keys = new RedisKey[]
-            {
-                sessionKey.ToString(),
-                GetSessionIdKey(sessionId)
-            };
+            var keys = new[] { _keyPrefix.Append(sessionKey.ToString()), GetSessionIdKey(sessionId) };
 
             // Delete both the session and the session id lookup
             await _database.KeyDeleteAsync(keys);
@@ -105,15 +107,15 @@
 
             token.ThrowIfCancellationRequested();
 
-            var session = await _database.StringGetAsync(key);
+            var session = await _database.StringGetAsync(_keyPrefix.Append(key));
             return session.HasValue ? Deserialize(session!) : null;
         }
 
-        private static void AddInternal(ITransaction transaction, string key, UserSession session)
+        private void AddInternal(ITransaction transaction, string key, UserSession session)
         {
             var expireTimeSpan = session.Expiry?.ToRedisExpiryTimeSpan();
 
-            _ = transaction.StringSetAsync(key, Serialize(session), expireTimeSpan);
+            _ = transaction.StringSetAsync(_keyPrefix.Append(key), Serialize(session), expireTimeSpan);
 
             if (!string.IsNullOrWhiteSpace(session.SessionId))
                 _ = transaction.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, expireTimeSpan);
@@ -122,6 +124,6 @@
         private static UserSession? Deserialize(byte[] value) => JsonSerializer.Deserialize<UserSession>(value);
         private static byte[] Serialize(UserSession userSession) => JsonSerializer.SerializeToUtf8Bytes(userSession);
 
-        private static string GetSessionIdKey(string sessionId) => "sessionId:" + sessionId;
+        private RedisKey GetSessionIdKey(string sessionId) => _keyPrefix.Append("sessionId:" + sessionId);
     }
 }
