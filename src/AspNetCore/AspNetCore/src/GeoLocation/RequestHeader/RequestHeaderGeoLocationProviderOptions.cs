@@ -8,9 +8,9 @@ public class RequestHeaderGeoLocationProviderOptions
     public string? CountryCodeHeader { get; set; }
 
     /// <summary>
-    /// The header key for the region code
+    /// The header key for the subdivision code
     /// </summary>
-    public string? RegionCodeHeader { get; set; }
+    public string? SubdivisionCodeHeader { get; set; }
 
     /// <summary>
     /// The header key for the continent code

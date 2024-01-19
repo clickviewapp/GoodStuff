@@ -27,49 +27,64 @@ public class RequestHeaderGeoLocationProvider : IGeoLocationProvider
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 
-        string? countryCode = null;
-        string? continentCode = null;
-        string? regionCode = null;
-
-        if (_options.CountryCodeHeader is not null)
-        {
-            countryCode = GetHeaderValue(httpContext, _options.CountryCodeHeader);
-
-            if (string.IsNullOrEmpty(countryCode))
-                _logger.LogDebug("No CountryCode found for header {HeaderKey}", _options.CountryCodeHeader);
-        }
-
-        if (_options.ContinentCodeHeader is not null)
-        {
-            continentCode = GetHeaderValue(httpContext, _options.ContinentCodeHeader);
-
-            if (string.IsNullOrEmpty(continentCode))
-                _logger.LogDebug("No ContinentCode found for header {HeaderKey}", _options.ContinentCodeHeader);
-        }
-
-        if (_options.RegionCodeHeader is not null)
-        {
-            regionCode = GetHeaderValue(httpContext, _options.RegionCodeHeader);
-
-            if (string.IsNullOrEmpty(regionCode))
-                _logger.LogDebug("No RegionCode found for header {HeaderKey}", _options.RegionCodeHeader);
-        }
+        var countryCode = GetCountryCode(httpContext);
+        var continentCode = GetContinentCode(httpContext);
+        var subdivisionCode = GetSubdivisionCode(httpContext);
 
         // If we have no data, then return null so the next handler will be used
         if (string.IsNullOrEmpty(countryCode) &&
             string.IsNullOrEmpty(continentCode) &&
-            string.IsNullOrEmpty(regionCode))
+            string.IsNullOrEmpty(subdivisionCode))
             return Task.FromResult<GeoLocationInfo?>(null);
 
         return Task.FromResult<GeoLocationInfo?>(new GeoLocationInfo
         {
             CountryCode = countryCode?.ToUpper(),
             ContinentCode = continentCode?.ToUpper(),
-            SubdivisionCode = regionCode?.ToUpper()
+            SubdivisionCode = subdivisionCode?.ToUpper()
         });
     }
 
-    private static string? GetHeaderValue(HttpContext httpContext, string headerKey)
+    protected virtual string? GetCountryCode(HttpContext httpContext)
+    {
+        if (_options.CountryCodeHeader is null)
+            return null;
+
+        var countryCode = GetHeaderValue(httpContext, _options.CountryCodeHeader);
+
+        if (string.IsNullOrEmpty(countryCode))
+            _logger.LogDebug("No CountryCode found for header {HeaderKey}", _options.CountryCodeHeader);
+
+        return countryCode;
+    }
+
+    protected virtual string? GetContinentCode(HttpContext httpContext)
+    {
+        if (_options.ContinentCodeHeader is null)
+            return null;
+
+        var continentCode = GetHeaderValue(httpContext, _options.ContinentCodeHeader);
+
+        if (string.IsNullOrEmpty(continentCode))
+            _logger.LogDebug("No ContinentCode found for header {HeaderKey}", _options.ContinentCodeHeader);
+
+        return continentCode;
+    }
+
+    protected virtual string? GetSubdivisionCode(HttpContext httpContext)
+    {
+        if (_options.SubdivisionCodeHeader is null)
+            return null;
+
+        var subdivisionCode = GetHeaderValue(httpContext, _options.SubdivisionCodeHeader);
+
+        if (string.IsNullOrEmpty(subdivisionCode))
+            _logger.LogDebug("No SubdivisionCode found for header {HeaderKey}", _options.SubdivisionCodeHeader);
+
+        return subdivisionCode;
+    }
+
+    protected static string? GetHeaderValue(HttpContext httpContext, string headerKey)
     {
         if (httpContext.Request.Headers.TryGetValue(headerKey, out var values) && values.Count > 0)
             return values[0];
