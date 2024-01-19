@@ -6,6 +6,7 @@
     public class RedisUserSessionCacheOptions
     {
         public IConnectionMultiplexer? Connection { get; set; }
+        public string? InstanceName { get; set; }
 
         public void Validate()
         {
