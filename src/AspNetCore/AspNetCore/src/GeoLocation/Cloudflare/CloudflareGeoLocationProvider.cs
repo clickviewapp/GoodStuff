@@ -10,7 +10,7 @@ public class CloudflareGeoLocationProvider : RequestHeaderGeoLocationProvider
 {
     private readonly ILogger<RequestHeaderGeoLocationProvider> _logger;
 
-    public CloudflareGeoLocationProvider(ILogger<RequestHeaderGeoLocationProvider> logger,
+    public CloudflareGeoLocationProvider(ILogger<CloudflareGeoLocationProvider> logger,
         IOptions<CloudflareGeoLocationProviderOptions> options)
         : base(logger, options)
     {
