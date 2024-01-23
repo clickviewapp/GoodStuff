@@ -35,7 +35,7 @@ public class RequestHeaderGeoLocationProvider : IGeoLocationProvider
         if (string.IsNullOrEmpty(countryCode) &&
             string.IsNullOrEmpty(continentCode) &&
             string.IsNullOrEmpty(subdivisionCode))
-            return Task.FromResult<GeoLocationInfo?>(null);
+            return GeoLocationHelpers.NullValue;
 
         return Task.FromResult<GeoLocationInfo?>(new GeoLocationInfo
         {
