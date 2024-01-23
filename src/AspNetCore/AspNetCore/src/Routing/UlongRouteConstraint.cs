@@ -4,11 +4,12 @@ using System;
 using System.Globalization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Matching;
 
 /// <summary>
 /// Constrains a route parameter to represent only unsigned 64-bit integer values.
 /// </summary>
-public class UlongRouteConstraint : IRouteConstraint
+public class UlongRouteConstraint : IRouteConstraint, IParameterLiteralNodeMatchingPolicy
 {
     /// <inheritdoc />
     public bool Match(
@@ -40,4 +41,10 @@ public class UlongRouteConstraint : IRouteConstraint
 
     private static bool CheckConstraintCore(string? valueString) =>
         ulong.TryParse(valueString, NumberStyles.Integer, CultureInfo.InvariantCulture, out _);
+
+    /// <inheritdoc />
+    public bool MatchesLiteral(string parameterName, string literal)
+    {
+        return CheckConstraintCore(literal);
+    }
 }
