@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net6.0</TargetFramework>
+        <IsPackable>true</IsPackable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="ClickView.Extensions.Primitives" Version="1.5.0-rc2" />
+        <PackageReference Include="ClickView.Extensions.Utilities" Version="1.5.0-rc2" />
+        <PackageReference Include="MaxMind.GeoIP2" Version="5.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\AspNetCore\src\ClickView.GoodStuff.AspNetCore.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+    
+</Project>
