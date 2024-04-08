@@ -1,0 +1,181 @@
+namespace ClickView.GoodStuff.Queues.RabbitMq;
+
+using Internal;
+using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
+
+public class RabbitMqClient : IQueueClient, IAsyncDisposable
+{
+    private readonly RabbitMqClientOptions _options;
+    private readonly ConnectionFactory _connectionFactory;
+    private readonly SemaphoreSlim _connectionLock = new(1, 1);
+    private readonly ActiveSubscriptions _activeSubscriptions = new();
+
+    private IConnection? _connection;
+    private bool _disposed;
+
+    public RabbitMqClient(IOptions<RabbitMqClientOptions> options)
+    {
+        _options = options.Value;
+        _connectionFactory = CreateConnectionFactory(_options);
+    }
+
+    public async Task EnqueueAsync<TData>(string exchange, TData data, EnqueueOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(exchange);
+        ArgumentNullException.ThrowIfNull(data);
+
+        CheckDisposed();
+
+        // If no options are passed in, use the defaults
+        options ??= EnqueueOptions.Default;
+
+        // Serialize the data before we try to connect so we throw any exceptions early
+        var message = MessageWrapper<TData>.Create(data);
+        var bytes = _options.Serializer.Serialize(message);
+
+        using var channel = await GetChannelAsync(cancellationToken);
+
+        var properties = channel.CreateBasicProperties();
+        properties.Persistent = options.Persistent;
+
+        channel.BasicPublish(exchange, options.RoutingKey, properties, bytes);
+    }
+
+    public async Task<SubscriptionContext> SubscribeAsync<TData>(string queue,
+        Func<MessageContext<TData>, CancellationToken, Task> callback,
+        SubscribeOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(queue);
+        ArgumentNullException.ThrowIfNull(callback);
+
+        CheckDisposed();
+
+        // If no options are passed in, use the defaults
+        options ??= SubscribeOptions.Default;
+
+        // Don't dispose channel, dispose the SubscriptionContext instead
+        var channel = await GetChannelAsync(cancellationToken);
+
+        try
+        {
+            var subContext = new SubscriptionContext(channel, _activeSubscriptions);
+            var consumer = new RabbitMqCallbackConsumer<TData>(
+                subContext,
+                callback,
+                _options.Serializer
+            );
+
+            channel.BasicQos(0, options.PrefetchCount, false);
+
+            var consumerTag = channel.BasicConsume(
+                queue: queue,
+                autoAck: options.AutoAcknowledge,
+                consumer: consumer);
+
+            subContext.SetConsumerTag(consumerTag);
+
+            // track our active subscriptions
+            _activeSubscriptions.Add(subContext);
+
+            return subContext;
+        }
+        catch
+        {
+            // on any exception, dispose the channel so we dont leak memory
+            channel.Dispose();
+
+            throw;
+        }
+    }
+
+    private ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+    {
+        CheckDisposed();
+        cancellationToken.ThrowIfCancellationRequested();
+
+        var connection = _connection;
+        if (connection is not null)
+            return new ValueTask<IConnection>(connection);
+
+        return ConnectSlowAsync(cancellationToken);
+    }
+
+    private async ValueTask<IConnection> ConnectSlowAsync(CancellationToken token)
+    {
+        await _connectionLock.WaitAsync(token);
+
+        try
+        {
+            var connection = _connection ?? _connectionFactory.CreateConnection();
+            _connection = connection;
+            return connection;
+        }
+        finally
+        {
+            _connectionLock.Release();
+        }
+    }
+
+    private async ValueTask<IModel> GetChannelAsync(CancellationToken cancellationToken = default)
+    {
+        var connection = await GetConnectionAsync(cancellationToken);
+        return connection.CreateModel();
+    }
+
+    private void CheckDisposed()
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+    }
+
+    private static ConnectionFactory CreateConnectionFactory(RabbitMqClientOptions options)
+    {
+        var factory = new ConnectionFactory
+        {
+            HostName = options.Host,
+            Port = options.Port,
+            DispatchConsumersAsync = true,
+            AutomaticRecoveryEnabled = true
+        };
+
+        // Username
+        if (!string.IsNullOrEmpty(options.Username))
+            factory.UserName = options.Username;
+
+        // Password
+        if (!string.IsNullOrEmpty(options.Password))
+            factory.Password = options.Password;
+
+        // RequestedConnectionTimeout
+        if (options.ConnectionTimeout.HasValue)
+            factory.RequestedConnectionTimeout = options.ConnectionTimeout.Value;
+
+        if (options.SslProtocols.HasValue)
+            factory.Ssl.Version = options.SslProtocols.Value;
+
+        return factory;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_disposed)
+            return;
+
+        await DisposeSubscriptionsAsync();
+
+        _disposed = true;
+        _connectionLock.Dispose();
+        _connection?.Dispose();
+    }
+
+    private async Task DisposeSubscriptionsAsync()
+    {
+        // Dispose all active subs
+        var contexts = _activeSubscriptions.GetAll();
+
+        foreach (var context in contexts)
+            await context.DisposeAsync();
+    }
+}

@@ -17,5 +17,6 @@
         <LangVersion>10.0</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
+        <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 </Project>
