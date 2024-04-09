@@ -17,7 +17,7 @@ internal class ActiveSubscriptions
             _list.Remove(context);
     }
 
-    public IEnumerable<SubscriptionContext> GetAll()
+    public IReadOnlyCollection<SubscriptionContext> GetAll()
     {
         lock (_lock)
             return _list.ToList();

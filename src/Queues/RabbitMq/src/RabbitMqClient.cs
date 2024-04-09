@@ -2,9 +2,9 @@ namespace ClickView.GoodStuff.Queues.RabbitMq;
 
 using System.Net.Security;
 using Internal;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
 
 public class RabbitMqClient : IQueueClient, IAsyncDisposable
 {
@@ -12,6 +12,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
     private readonly ConnectionFactory _connectionFactory;
     private readonly SemaphoreSlim _connectionLock = new(1, 1);
     private readonly ActiveSubscriptions _activeSubscriptions = new();
+    private readonly ILogger<RabbitMqClient> _logger;
 
     private IConnection? _connection;
     private bool _disposed;
@@ -19,6 +20,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
     public RabbitMqClient(IOptions<RabbitMqClientOptions> options)
     {
         _options = options.Value;
+        _logger = _options.LoggerFactory.CreateLogger<RabbitMqClient>();
         _connectionFactory = CreateConnectionFactory(_options);
     }
 
@@ -67,7 +69,8 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
             var consumer = new RabbitMqCallbackConsumer<TData>(
                 subContext,
                 callback,
-                _options.Serializer
+                _options.Serializer,
+                _options.LoggerFactory.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );
 
             channel.BasicQos(0, options.PrefetchCount, false);
@@ -82,6 +85,8 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
             // track our active subscriptions
             _activeSubscriptions.Add(subContext);
 
+            _logger.LogDebug("Successfully subscribed to queue {QueueName}", queue);
+
             return subContext;
         }
         catch
@@ -95,10 +100,15 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
     public async Task UnsubscribeAllAsync(CancellationToken cancellationToken = default)
     {
-        var exceptions = new List<Exception>();
-
         // Dispose all active subs
         var contexts = _activeSubscriptions.GetAll();
+
+        if (contexts.Count == 0)
+            return;
+
+        _logger.LogDebug("Unsubscribing {Count} listeners", contexts.Count);
+
+        var exceptions = new List<Exception>();
 
         foreach (var context in contexts)
         {
@@ -135,8 +145,33 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
         try
         {
-            var connection = _connection ?? _connectionFactory.CreateConnection();
+            if (_connection is not null)
+                return _connection;
+
+            _logger.LogDebug("Connecting to RabbitMQ...");
+
+            // Create a new connection
+            var connection = _connectionFactory.CreateConnection();
+
+            // Setup logging
+            connection.CallbackException += (_, args) =>
+                _logger.LogError(args.Exception, "Exception thrown in RabbitMQ callback");
+            connection.ConnectionBlocked += (_, _) => _logger.LogDebug("RabbitMQ connection blocked");
+            connection.ConnectionUnblocked += (_, _) => _logger.LogDebug("RabbitMQ connection unblocked");
+            connection.ConnectionShutdown += (_, _) => _logger.LogDebug("RabbitMQ connection shutdown");
+
+            if (connection is IAutorecoveringConnection autorecoveringConnection)
+            {
+                autorecoveringConnection.RecoveringConsumer += (_, _) => _logger.LogDebug("RecoveringConsumer");
+                autorecoveringConnection.RecoverySucceeded += (_, _) => _logger.LogDebug("RecoverySucceeded");
+                autorecoveringConnection.ConnectionRecoveryError += (_, args) =>
+                    _logger.LogError(args.Exception, "ConnectionRecoveryError");
+            }
+
             _connection = connection;
+
+            _logger.LogDebug("Connection to RabbitMQ successful");
+
             return connection;
         }
         finally
@@ -164,7 +199,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
             HostName = options.Host,
             Port = options.Port,
             DispatchConsumersAsync = true,
-            AutomaticRecoveryEnabled = true,
+            AutomaticRecoveryEnabled = true
         };
 
         // Username

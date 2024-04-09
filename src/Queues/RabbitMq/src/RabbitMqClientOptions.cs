@@ -1,6 +1,8 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
 using System.Security.Authentication;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Serialization;
 
@@ -12,9 +14,9 @@ public class RabbitMqClientOptions : IOptions<RabbitMqClientOptions>
     public string? Password { get; set; }
     public TimeSpan? ConnectionTimeout { get; set; }
     public IMessageSerializer Serializer { get; set; } = NewtonsoftJsonMessageSerializer.Default;
-
     public bool EnableSsl { get; set; }
     public SslProtocols? SslProtocols { get; set; }
+    public ILoggerFactory LoggerFactory { get; set; } = NullLoggerFactory.Instance;
 
     public RabbitMqClientOptions Value => this;
 }
