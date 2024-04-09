@@ -65,10 +65,19 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
         try
         {
-            var subContext = new SubscriptionContext(channel, _activeSubscriptions);
+            var shutdownTaskWaiter = new CountWaiter();
+
+            var subContext = new SubscriptionContext(
+                queueName: queue,
+                channel: channel,
+                subscriptions: _activeSubscriptions,
+                taskWaiter: shutdownTaskWaiter,
+                logger: _options.LoggerFactory.CreateLogger<SubscriptionContext>());
+
             var consumer = new RabbitMqCallbackConsumer<TData>(
                 subContext,
                 callback,
+                shutdownTaskWaiter,
                 _options.Serializer,
                 _options.LoggerFactory.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );

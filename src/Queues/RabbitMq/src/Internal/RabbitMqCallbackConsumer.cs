@@ -8,16 +8,19 @@ internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
 {
     private readonly SubscriptionContext _subscriptionContext;
     private readonly Func<MessageContext<TData>, CancellationToken, Task> _callback;
+    private readonly CountWaiter _taskWaiter;
     private readonly IMessageSerializer _serializer;
     private readonly ILogger<RabbitMqCallbackConsumer<TData>> _logger;
 
     public RabbitMqCallbackConsumer(SubscriptionContext subscriptionContext,
         Func<MessageContext<TData>, CancellationToken, Task> callback,
+        CountWaiter taskWaiter,
         IMessageSerializer serializer,
         ILogger<RabbitMqCallbackConsumer<TData>> logger)
     {
         _subscriptionContext = subscriptionContext;
         _callback = callback;
+        _taskWaiter = taskWaiter;
         _serializer = serializer;
         _logger = logger;
     }
@@ -49,12 +52,17 @@ internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
                 subscriptionContext: _subscriptionContext
             );
 
+            _taskWaiter.Increment();
             await _callback(context, CancellationToken.None);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception when processing queue message");
             throw;
+        }
+        finally
+        {
+            _taskWaiter.Decrement();
         }
     }
 }
