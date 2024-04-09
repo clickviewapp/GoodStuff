@@ -225,9 +225,14 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
         // SSL
         factory.Ssl.Enabled = options.EnableSsl;
+        factory.Ssl.Version = options.SslVersion;
 
-        if (options.SslProtocols.HasValue)
-            factory.Ssl.Version = options.SslProtocols.Value;
+        if (options.IgnoreSslErrors)
+        {
+            factory.Ssl.AcceptablePolicyErrors = SslPolicyErrors.RemoteCertificateNotAvailable |
+                                                 SslPolicyErrors.RemoteCertificateChainErrors |
+                                                 SslPolicyErrors.RemoteCertificateNameMismatch;
+        }
 
         return factory;
     }
