@@ -2,14 +2,21 @@ namespace ClickView.GoodStuff.Queues.RabbitMq;
 
 public class MessageWrapper<TData>
 {
-    public required string Id { get; init; }
-    public required TData Data { get; init; }
-    public required long Timestamp { get; init; }
-
-    public static MessageWrapper<TData> Create(TData data) => new()
+    public MessageWrapper(string id, TData data, long timestamp)
     {
-        Id = Guid.NewGuid().ToString(),
-        Data = data,
-        Timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds()
-    };
+        Id = id;
+        Data = data;
+        Timestamp = timestamp;
+    }
+
+    public string Id { get; init; }
+    public TData Data { get; init; }
+    public long Timestamp { get; init; }
+
+    public static MessageWrapper<TData> New(TData data) => new
+    (
+        id: Guid.NewGuid().ToString(),
+        data: data,
+        timestamp: DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+    );
 }

@@ -1,8 +1,10 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
+using System.Net.Security;
 using Internal;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 
 public class RabbitMqClient : IQueueClient, IAsyncDisposable
 {
@@ -32,7 +34,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         options ??= EnqueueOptions.Default;
 
         // Serialize the data before we try to connect so we throw any exceptions early
-        var message = MessageWrapper<TData>.Create(data);
+        var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
         using var channel = await GetChannelAsync(cancellationToken);
@@ -91,6 +93,30 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         }
     }
 
+    public async Task UnsubscribeAllAsync(CancellationToken cancellationToken = default)
+    {
+        var exceptions = new List<Exception>();
+
+        // Dispose all active subs
+        var contexts = _activeSubscriptions.GetAll();
+
+        foreach (var context in contexts)
+        {
+            try
+            {
+                await context.DisposeAsync();
+                _activeSubscriptions.Remove(context);
+            }
+            catch (Exception ex)
+            {
+                exceptions.Add(ex);
+            }
+        }
+
+        if (exceptions.Count > 0)
+            throw new AggregateException("Failed to unsubscribe from queues", exceptions);
+    }
+
     private ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
     {
         CheckDisposed();
@@ -127,7 +153,8 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
     private void CheckDisposed()
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().Name);
     }
 
     private static ConnectionFactory CreateConnectionFactory(RabbitMqClientOptions options)
@@ -137,7 +164,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
             HostName = options.Host,
             Port = options.Port,
             DispatchConsumersAsync = true,
-            AutomaticRecoveryEnabled = true
+            AutomaticRecoveryEnabled = true,
         };
 
         // Username
@@ -152,6 +179,9 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         if (options.ConnectionTimeout.HasValue)
             factory.RequestedConnectionTimeout = options.ConnectionTimeout.Value;
 
+        // SSL
+        factory.Ssl.Enabled = options.EnableSsl;
+
         if (options.SslProtocols.HasValue)
             factory.Ssl.Version = options.SslProtocols.Value;
 
@@ -163,19 +193,10 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         if (_disposed)
             return;
 
-        await DisposeSubscriptionsAsync();
+        await UnsubscribeAllAsync();
 
         _disposed = true;
         _connectionLock.Dispose();
         _connection?.Dispose();
-    }
-
-    private async Task DisposeSubscriptionsAsync()
-    {
-        // Dispose all active subs
-        var contexts = _activeSubscriptions.GetAll();
-
-        foreach (var context in contexts)
-            await context.DisposeAsync();
     }
 }

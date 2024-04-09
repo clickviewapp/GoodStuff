@@ -20,7 +20,7 @@ public class SubscriptionContext : IAsyncDisposable
 
     public Task AcknowledgeAsync(ulong deliveryTag, bool multiple = false)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        CheckDisposed();
 
         _channel.BasicAck(
             deliveryTag: deliveryTag,
@@ -31,7 +31,7 @@ public class SubscriptionContext : IAsyncDisposable
 
     public Task NegativeAcknowledgeAsync(ulong deliveryTag, bool multiple = false, bool requeue = true)
     {
-        ObjectDisposedException.ThrowIf(_disposed, this);
+        CheckDisposed();
 
         _channel.BasicNack(
             deliveryTag: deliveryTag,
@@ -46,14 +46,21 @@ public class SubscriptionContext : IAsyncDisposable
         if (_disposed)
             return ValueTask.CompletedTask;
 
-        _disposed = true;
-
+        // Cancel first
         _channel.BasicCancel(_consumerTag);
         _channel.Close();
+
+        _disposed = true;
         _channel.Dispose();
 
         _subscriptions.Remove(this);
 
         return ValueTask.CompletedTask;
+    }
+
+    private void CheckDisposed()
+    {
+        if (_disposed)
+            throw new ObjectDisposedException(GetType().Name);
     }
 }

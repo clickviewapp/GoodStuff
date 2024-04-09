@@ -20,13 +20,11 @@ public class MessageContext<TData>
 
     public Task AcknowledgeAsync()
     {
-        _subscriptionContext.AcknowledgeAsync(deliveryTag: DeliveryTag);
-        return Task.CompletedTask;
+        return _subscriptionContext.AcknowledgeAsync(deliveryTag: DeliveryTag);
     }
 
     public Task NegativeAcknowledgeAsync(bool requeue = true)
     {
-        _subscriptionContext.NegativeAcknowledgeAsync(deliveryTag: DeliveryTag, requeue: requeue);
-        return Task.CompletedTask;
+        return _subscriptionContext.NegativeAcknowledgeAsync(deliveryTag: DeliveryTag, requeue: requeue);
     }
 }

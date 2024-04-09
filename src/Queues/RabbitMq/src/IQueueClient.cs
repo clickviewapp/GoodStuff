@@ -1,6 +1,6 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
-public interface IQueueClient
+public interface IQueueClient : IAsyncDisposable
 {
     Task EnqueueAsync<TData>(string exchange, TData data, EnqueueOptions? options = null,
         CancellationToken cancellationToken = default);
@@ -9,4 +9,6 @@ public interface IQueueClient
         Func<MessageContext<TData>, CancellationToken, Task> callback,
         SubscribeOptions? options = null,
         CancellationToken cancellationToken = default);
+
+    Task UnsubscribeAllAsync(CancellationToken cancellationToken = default);
 }
