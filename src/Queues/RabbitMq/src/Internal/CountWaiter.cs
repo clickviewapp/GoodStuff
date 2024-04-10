@@ -33,13 +33,12 @@ internal class CountWaiter
 
         lock (_pendingLock)
         {
-            if (_pendingAwaiters.Count > 0)
-            {
-                foreach (var awaiter in _pendingAwaiters)
-                    awaiter.SetResult();
+            if (_pendingAwaiters.Count <= 0) return;
 
-                _pendingAwaiters.Clear();
-            }
+            foreach (var awaiter in _pendingAwaiters)
+                awaiter.SetResult();
+
+            _pendingAwaiters.Clear();
         }
     }
 }
