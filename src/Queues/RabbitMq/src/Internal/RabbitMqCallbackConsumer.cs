@@ -53,16 +53,19 @@ internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
             );
 
             _taskWaiter.Increment();
-            await _callback(context, CancellationToken.None);
+            try
+            {
+                await _callback(context, CancellationToken.None);
+            }
+            finally
+            {
+                _taskWaiter.Decrement();
+            }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception when processing queue message");
             throw;
-        }
-        finally
-        {
-            _taskWaiter.Decrement();
         }
     }
 }
