@@ -68,7 +68,8 @@ public class RabbitMqClient : IQueueClient
         // If no options are passed in, use the defaults
         options ??= SubscribeOptions.Default;
 
-        // Don't dispose channel, dispose the SubscriptionContext instead
+        // We don't want to dispose the channel here (unless an exception is thrown, see below).
+        // The returned SubscriptionContext is the object that should be disposed (which disposes the channel)
         var channel = await GetChannelAsync(cancellationToken);
 
         try
@@ -108,7 +109,7 @@ public class RabbitMqClient : IQueueClient
         }
         catch
         {
-            // on any exception, dispose the channel so we dont leak memory
+            // On any exception, dispose the channel so we dont leak memory
             channel.Dispose();
 
             throw;
