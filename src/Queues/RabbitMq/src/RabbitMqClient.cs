@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
-public class RabbitMqClient : IQueueClient, IAsyncDisposable
+public class RabbitMqClient : IQueueClient
 {
     private readonly RabbitMqClientOptions _options;
     private readonly ConnectionFactory _connectionFactory;
@@ -24,6 +24,13 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         _connectionFactory = CreateConnectionFactory(_options);
     }
 
+    /// <inheritdoc />
+    public async Task ConnectAsync(CancellationToken cancellationToken = default)
+    {
+        await GetConnectionAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
     public async Task EnqueueAsync<TData>(string exchange, TData data, EnqueueOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -47,6 +54,7 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         channel.BasicPublish(exchange, options.RoutingKey, properties, bytes);
     }
 
+    /// <inheritdoc />
     public async Task<SubscriptionContext> SubscribeAsync<TData>(string queue,
         Func<MessageContext<TData>, CancellationToken, Task> callback,
         SubscribeOptions? options = null,
@@ -107,8 +115,11 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
         }
     }
 
+    /// <inheritdoc />
     public async Task UnsubscribeAllAsync(CancellationToken cancellationToken = default)
     {
+        CheckDisposed();
+
         // Dispose all active subs
         var contexts = _activeSubscriptions.GetAll();
 
@@ -117,23 +128,12 @@ public class RabbitMqClient : IQueueClient, IAsyncDisposable
 
         _logger.LogDebug("Unsubscribing {Count} listeners", contexts.Count);
 
-        var exceptions = new List<Exception>();
-
-        foreach (var context in contexts)
+        // Unsubscribe all at once
+        await Task.WhenAll(contexts.Select(async c =>
         {
-            try
-            {
-                await context.DisposeAsync();
-                _activeSubscriptions.Remove(context);
-            }
-            catch (Exception ex)
-            {
-                exceptions.Add(ex);
-            }
-        }
-
-        if (exceptions.Count > 0)
-            throw new AggregateException("Failed to unsubscribe from queues", exceptions);
+            await c.DisposeAsync();
+            _activeSubscriptions.Remove(c);
+        }));
     }
 
     private ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)

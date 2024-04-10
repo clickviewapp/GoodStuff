@@ -11,10 +11,10 @@ internal class ActiveSubscriptions
             _list.Add(context);
     }
 
-    public void Remove(SubscriptionContext context)
+    public bool Remove(SubscriptionContext context)
     {
         lock (_lock)
-            _list.Remove(context);
+            return _list.Remove(context);
     }
 
     public IReadOnlyCollection<SubscriptionContext> GetAll()
