@@ -8,6 +8,8 @@ public static class GeoLocationServiceBuilderExtensions
     public static GeoLocationServiceBuilder AddRequestHeader(this GeoLocationServiceBuilder builder,
         Action<RequestHeaderGeoLocationProviderOptions>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         builder.Services.AddSingleton<IGeoLocationProvider, RequestHeaderGeoLocationProvider>();
 
         if (configure is not null)

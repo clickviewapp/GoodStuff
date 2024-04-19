@@ -8,6 +8,8 @@ public static class GeoLocationServiceBuilderExtensions
     public static GeoLocationServiceBuilder AddCloudflare(this GeoLocationServiceBuilder builder,
         Action<CloudflareGeoLocationProviderOptions>? configure = null)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         builder.Services.AddSingleton<IGeoLocationProvider, CloudflareGeoLocationProvider>();
 
         if (configure is not null)

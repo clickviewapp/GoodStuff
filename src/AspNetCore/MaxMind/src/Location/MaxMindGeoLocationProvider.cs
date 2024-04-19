@@ -26,7 +26,7 @@ internal class MaxMindGeoLocationProvider : IGeoLocationProvider
         _client = client;
     }
 
-    public async Task<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
+    public async ValueTask<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(httpContext);

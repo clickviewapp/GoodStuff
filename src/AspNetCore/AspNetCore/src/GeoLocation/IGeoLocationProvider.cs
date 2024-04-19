@@ -6,5 +6,5 @@ using Microsoft.AspNetCore.Http;
 
 public interface IGeoLocationProvider
 {
-    Task<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext, CancellationToken cancellationToken = default);
+    ValueTask<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext, CancellationToken cancellationToken = default);
 }

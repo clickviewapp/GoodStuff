@@ -18,16 +18,16 @@ public class CookieGeoLocationProvider : IGeoLocationProvider
         _options = options.Value;
     }
 
-    public Task<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
+    public ValueTask<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 
         if (string.IsNullOrEmpty(_options.CookieName))
-            return GeoLocationHelpers.NullValue;
+            return new ValueTask<GeoLocationInfo?>();
 
         if (!httpContext.Request.Cookies.TryGetValue(_options.CookieName, out var value) || string.IsNullOrEmpty(value))
-            return GeoLocationHelpers.NullValue;
+            return new ValueTask<GeoLocationInfo?>();
 
         var values = value.Split(',');
 
@@ -39,9 +39,9 @@ public class CookieGeoLocationProvider : IGeoLocationProvider
         if (string.IsNullOrEmpty(countryCode) &&
             string.IsNullOrEmpty(continentCode) &&
             string.IsNullOrEmpty(subdivisionCode))
-            return GeoLocationHelpers.NullValue;
+            return new ValueTask<GeoLocationInfo?>();
 
-        return Task.FromResult<GeoLocationInfo?>(new GeoLocationInfo
+        return new ValueTask<GeoLocationInfo?>(new GeoLocationInfo
         {
             CountryCode = countryCode,
             ContinentCode = continentCode,

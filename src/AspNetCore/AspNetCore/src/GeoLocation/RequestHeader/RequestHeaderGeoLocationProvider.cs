@@ -22,7 +22,7 @@ public class RequestHeaderGeoLocationProvider : IGeoLocationProvider
         _options = options.Value;
     }
 
-    public Task<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
+    public ValueTask<GeoLocationInfo?> GetGeoLocationInfoAsync(HttpContext httpContext,
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(httpContext);
@@ -35,9 +35,9 @@ public class RequestHeaderGeoLocationProvider : IGeoLocationProvider
         if (string.IsNullOrEmpty(countryCode) &&
             string.IsNullOrEmpty(continentCode) &&
             string.IsNullOrEmpty(subdivisionCode))
-            return GeoLocationHelpers.NullValue;
+            return new ValueTask<GeoLocationInfo?>();
 
-        return Task.FromResult<GeoLocationInfo?>(new GeoLocationInfo
+        return new ValueTask<GeoLocationInfo?>(new GeoLocationInfo
         {
             CountryCode = countryCode?.ToUpper(),
             ContinentCode = continentCode?.ToUpper(),
