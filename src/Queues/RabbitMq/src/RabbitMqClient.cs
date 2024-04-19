@@ -238,6 +238,7 @@ public class RabbitMqClient : IQueueClient
         return factory;
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         if (_disposed)

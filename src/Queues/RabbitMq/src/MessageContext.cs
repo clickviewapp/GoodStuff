@@ -18,13 +18,32 @@ public class MessageContext<TData>
     public DateTime Timestamp { get; set; }
     public string Id { get; set; }
 
-    public Task AcknowledgeAsync()
+    /// <summary>
+    /// Returns true if the RabbitMQ channel is open
+    /// </summary>
+    public bool IsOpen => _subscriptionContext.IsOpen;
+
+    /// <summary>
+    /// Acknowledges one or more messages
+    /// </summary>
+    /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
+    /// <returns></returns>
+    public Task AcknowledgeAsync(bool multiple = false)
     {
-        return _subscriptionContext.AcknowledgeAsync(deliveryTag: DeliveryTag);
+        return _subscriptionContext.AcknowledgeAsync(deliveryTag: DeliveryTag, multiple: multiple);
     }
 
-    public Task NegativeAcknowledgeAsync(bool requeue = true)
+    /// <summary>
+    /// Rejects one or more messages
+    /// </summary>
+    /// <param name="multiple">If true, reject all outstanding delivery tags up to and including the delivery tag</param>
+    /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <see cref="multiple"/> is true)) with the specified delivery tag</param>
+    /// <returns></returns>
+    public Task NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true)
     {
-        return _subscriptionContext.NegativeAcknowledgeAsync(deliveryTag: DeliveryTag, requeue: requeue);
+        return _subscriptionContext.NegativeAcknowledgeAsync(
+            deliveryTag: DeliveryTag,
+            multiple: multiple,
+            requeue: requeue);
     }
 }

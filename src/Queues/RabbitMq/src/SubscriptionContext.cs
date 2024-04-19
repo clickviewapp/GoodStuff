@@ -30,6 +30,17 @@ public class SubscriptionContext : IAsyncDisposable
 
     internal void SetConsumerTag(string consumerTag) => _consumerTag = consumerTag;
 
+    /// <summary>
+    /// Returns true if the RabbitMQ channel is open
+    /// </summary>
+    public bool IsOpen => _channel.IsOpen;
+
+    /// <summary>
+    /// Acknowledges one or more messages
+    /// </summary>
+    /// <param name="deliveryTag">The delivery tag of the message to acknowledge</param>
+    /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
+    /// <returns></returns>
     public Task AcknowledgeAsync(ulong deliveryTag, bool multiple = false)
     {
         CheckDisposed();
@@ -43,6 +54,13 @@ public class SubscriptionContext : IAsyncDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Rejects one or more messages
+    /// </summary>
+    /// <param name="deliveryTag">The delivery tag of the message to acknowledge</param>
+    /// <param name="multiple">If true, reject all outstanding delivery tags up to and including the delivery tag</param>
+    /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <see cref="multiple"/> is true)) with the specified delivery tag</param>
+    /// <returns></returns>
     public Task NegativeAcknowledgeAsync(ulong deliveryTag, bool multiple = false, bool requeue = true)
     {
         CheckDisposed();
@@ -57,6 +75,7 @@ public class SubscriptionContext : IAsyncDisposable
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc />
     public async ValueTask DisposeAsync()
     {
         if (_disposed)
