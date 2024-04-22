@@ -42,10 +42,14 @@ public class MessageContext<TData>
     /// Acknowledges one or more messages
     /// </summary>
     /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
+    /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public Task AcknowledgeAsync(bool multiple = false)
+    public Task AcknowledgeAsync(bool multiple = false, CancellationToken cancellationToken = default)
     {
-        return _subscriptionContext.AcknowledgeAsync(deliveryTag: DeliveryTag, multiple: multiple);
+        return _subscriptionContext.AcknowledgeAsync(
+            deliveryTag: DeliveryTag,
+            multiple: multiple,
+            cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -53,12 +57,14 @@ public class MessageContext<TData>
     /// </summary>
     /// <param name="multiple">If true, reject all outstanding delivery tags up to and including the delivery tag</param>
     /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <see cref="multiple"/> is true)) with the specified delivery tag</param>
+    /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public Task NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true)
+    public Task NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true, CancellationToken cancellationToken = default)
     {
         return _subscriptionContext.NegativeAcknowledgeAsync(
             deliveryTag: DeliveryTag,
             multiple: multiple,
-            requeue: requeue);
+            requeue: requeue,
+            cancellationToken: cancellationToken);
     }
 }
