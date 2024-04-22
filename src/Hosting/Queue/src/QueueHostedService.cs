@@ -54,16 +54,16 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
         {
             await OnMessageAsync(messageContext.Data, cancellationToken);
         }
-        finally
+        catch (OperationCanceledException)
         {
-            if (messageContext.IsOpen)
-            {
-                await messageContext.AcknowledgeAsync();
-            }
-            else
-            {
-                Logger.LogWarning("Cannot acknowledge task. Channel is not open");
-            }
+            // Propagate up to caller to handle
+            throw;
         }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Unhandled exception caught when processing message");
+        }
+
+        await AcknowledgeAsync(messageContext.DeliveryTag, false, cancellationToken);
     }
 }
