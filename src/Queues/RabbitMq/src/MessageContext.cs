@@ -4,7 +4,7 @@ public class MessageContext<TData>
 {
     private readonly SubscriptionContext _subscriptionContext;
 
-    public MessageContext(TData data, ulong deliveryTag, DateTime timestamp, string id, SubscriptionContext subscriptionContext)
+    internal MessageContext(TData data, ulong deliveryTag, DateTime timestamp, string id, SubscriptionContext subscriptionContext)
     {
         _subscriptionContext = subscriptionContext;
         Data = data;
