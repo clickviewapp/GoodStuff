@@ -13,9 +13,24 @@ public class MessageContext<TData>
         Id = id;
     }
 
+    /// <summary>
+    /// The message data
+    /// </summary>
     public TData Data { get; set; }
+
+    /// <summary>
+    /// The RabbitMQ delivery tag
+    /// </summary>
     public ulong DeliveryTag { get; set; }
+
+    /// <summary>
+    /// The timestamp the message was enqueued
+    /// </summary>
     public DateTime Timestamp { get; set; }
+
+    /// <summary>
+    /// The unique ID for this message
+    /// </summary>
     public string Id { get; set; }
 
     /// <summary>
