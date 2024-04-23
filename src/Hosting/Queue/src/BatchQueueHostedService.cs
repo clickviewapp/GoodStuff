@@ -5,6 +5,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Queues.RabbitMq;
 
+/// <summary>
+/// A hosted service that connects to a queue and buffers messages before sending them to <see cref="OnMessagesAsync"/>
+/// </summary>
+/// <typeparam name="TMessage"></typeparam>
+/// <typeparam name="TOptions"></typeparam>
 public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHostedService<TOptions>
     where TOptions : BatchQueueHostedServiceOptions
 {
@@ -96,9 +101,9 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
     protected abstract Task OnMessagesAsync(IEnumerable<TMessage> messages,
         CancellationToken cancellationToken = default);
 
-    private async Task OnMessageAsync(MessageContext<TMessage> context, CancellationToken cancellationToken)
+    private async Task OnMessageAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
     {
-        Logger.QueueMessageReceived();
+        Logger.QueueMessageReceived(messageContext.Id, messageContext.Timestamp);
 
         List<TMessage> snapshot;
         var batchSize = Options.BatchSize;
@@ -109,8 +114,8 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             _lastMessage = Now();
 
             // Add message into buffer
-            _currentBuffer.Add(context.Data);
-            _lastDeliveryTag = context.DeliveryTag;
+            _currentBuffer.Add(messageContext.Data);
+            _lastDeliveryTag = messageContext.DeliveryTag;
 
             // If our buffer is at max size then we need to process the items
             if (_currentBuffer.Count < batchSize)
@@ -123,7 +128,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
 
         Logger.BatchProcessMessageBufferReached(batchSize);
 
-        await ProcessItemsAsync(snapshot, context.DeliveryTag, cancellationToken);
+        await ProcessItemsAsync(snapshot, messageContext.DeliveryTag, cancellationToken);
     }
 
     /// <summary>
