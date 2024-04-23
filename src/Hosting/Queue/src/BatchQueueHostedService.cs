@@ -1,5 +1,6 @@
 namespace ClickView.GoodStuff.Hosting.Queue;
 
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Queues.RabbitMq;
@@ -119,7 +120,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             _lastDeliveryTag = 0;
         }
 
-        Logger.LogDebug("Message buffer {MessageBufferSize} limit reached. Processing items...", Options.BatchSize);
+        Logger.LogInformation("Message buffer limit reached ({MessageBufferSize}). Processing items", Options.BatchSize);
 
         await ProcessItemsAsync(snapshot, context.DeliveryTag, cancellationToken);
     }
@@ -156,7 +157,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     // we'll add an extra second to the wait time to prevent spamming
                     waitTime += TimeSpan.FromSeconds(1);
 
-                    Logger.LogDebug("Last message received {TimeSinceLastMessage} ago. Waiting {WaitTime} to flush...",
+                    Logger.LogDebug("Last message received {TimeSinceLastMessage} ago. Waiting {WaitTime} until next flush interval",
                         timeSinceLastMessage, waitTime);
 
                     await Task.Delay(waitTime, cancellationToken);
@@ -192,6 +193,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                 // if we have 0 items
                 if (snapshot.Count > 0)
                 {
+                    Logger.LogInformation("Last process occured at {LastProcessTime}. Processing items", _lastProcess);
                     await ProcessItemsAsync(snapshot, latestDeliveryTag, cancellationToken);
                 }
                 else
@@ -234,9 +236,13 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
 
         try
         {
-            Logger.LogInformation("Processing {Count} items", messages.Count);
+            Logger.LogInformation("Processing {Count} items...", messages.Count);
+
+            var sw = Stopwatch.StartNew();
 
             await OnMessagesAsync(messages, cancellationToken);
+
+            Logger.LogInformation("Processed {Count} items in {ProcessDuration}", messages.Count, sw.Elapsed);
         }
         catch (OperationCanceledException)
         {
