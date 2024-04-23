@@ -103,7 +103,7 @@ public class RabbitMqClient : IQueueClient
             // track our active subscriptions
             _activeSubscriptions.Add(subContext);
 
-            _logger.LogDebug("Successfully subscribed to queue {QueueName}", queue);
+            _logger.SubscribedToQueue(queue);
 
             return subContext;
         }
@@ -127,7 +127,7 @@ public class RabbitMqClient : IQueueClient
         if (contexts.Count == 0)
             return;
 
-        _logger.LogDebug("Unsubscribing {Count} listeners", contexts.Count);
+        _logger.UnsubscribingListeners(contexts.Count);
 
         // Unsubscribe all at once
         await Task.WhenAll(contexts.Select(async c =>
@@ -158,7 +158,7 @@ public class RabbitMqClient : IQueueClient
             if (_connection is not null)
                 return _connection;
 
-            _logger.LogDebug("Connecting to RabbitMQ...");
+            _logger.ConnectingToRabbitMq();
 
             // Create a new connection
             var connection = _connectionFactory.CreateConnection();
@@ -180,7 +180,7 @@ public class RabbitMqClient : IQueueClient
 
             _connection = connection;
 
-            _logger.LogDebug("Connection to RabbitMQ successful");
+            _logger.ConnectedToRabbitMq();
 
             return connection;
         }

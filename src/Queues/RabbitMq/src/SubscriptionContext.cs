@@ -47,7 +47,7 @@ public class SubscriptionContext : IAsyncDisposable
     {
         CheckDisposed();
 
-        _logger.LogDebug("Sending ack {DeliveryTag}", deliveryTag);
+        _logger.SendingAcknowledge(deliveryTag);
 
         _channel.BasicAck(
             deliveryTag: deliveryTag,
@@ -69,7 +69,7 @@ public class SubscriptionContext : IAsyncDisposable
     {
         CheckDisposed();
 
-        _logger.LogDebug("Sending nack {DeliveryTag}", deliveryTag);
+        _logger.SendingNegativeAcknowledge(deliveryTag);
 
         _channel.BasicNack(
             deliveryTag: deliveryTag,

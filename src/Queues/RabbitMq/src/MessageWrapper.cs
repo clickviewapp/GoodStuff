@@ -13,7 +13,7 @@ public class MessageWrapper<TData>
     public TData Data { get; init; }
     public long Timestamp { get; init; }
 
-    public static MessageWrapper<TData> New(TData data) => new
+    internal static MessageWrapper<TData> New(TData data) => new
     (
         id: Guid.NewGuid().ToString(),
         data: data,

@@ -28,9 +28,7 @@ internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
     public override Task HandleBasicDeliver(string consumerTag, ulong deliveryTag, bool redelivered,
         string exchange, string routingKey, IBasicProperties properties, ReadOnlyMemory<byte> body)
     {
-        _logger.LogDebug(
-            "Queue message received. DeliveryTag: {DeliveryTag}, ConsumerTag: {ConsumerTag}, Exchange: {Exchange}, Redelivered: {Redelivered}",
-            deliveryTag, consumerTag, exchange, redelivered);
+        _logger.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
 
         return HandleBasicDeliverAsync(deliveryTag, body);
     }
