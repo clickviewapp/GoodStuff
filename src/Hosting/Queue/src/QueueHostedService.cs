@@ -11,7 +11,6 @@ using Queues.RabbitMq;
 /// <typeparam name="TMessage"></typeparam>
 /// <typeparam name="TOptions"></typeparam>
 public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedService<TOptions>
-    where TMessage : class, new()
     where TOptions : QueueHostedServiceOptions
 {
     /// <summary>
@@ -48,7 +47,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// <param name="cancellationToken"></param>
     private async Task OnMessageAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
     {
-        Logger.QueueMessageReceived();
+        Logger.QueueMessageReceived(messageContext.Id, messageContext.Timestamp);
 
         try
         {
