@@ -48,7 +48,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// <param name="cancellationToken"></param>
     private async Task OnMessageAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
     {
-        Logger.LogDebug("Queue message received");
+        Logger.QueueMessageReceived();
 
         try
         {

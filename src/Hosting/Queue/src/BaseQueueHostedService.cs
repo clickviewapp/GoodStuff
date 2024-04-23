@@ -72,7 +72,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             _subscriptionLock.Release();
         }
 
-        Logger.LogInformation("Queue service started - {Name}", _name);
+        Logger.QueueServiceStarted(_name);
     }
 
     /// <summary>
@@ -105,7 +105,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             _subscriptionLock.Release();
         }
 
-        Logger.LogInformation("Queue service stopped - {Name}", _name);
+        Logger.QueueServiceStopped(_name);
     }
 
     /// <inheritdoc />
@@ -172,7 +172,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         if (subContext.IsOpen)
             return subContext.AcknowledgeAsync(deliveryTag, multiple, cancellationToken);
 
-        Logger.LogWarning("Cannot acknowledge task. Channel is not open");
+        Logger.AcknowledgeFailureChannelNotOpen(deliveryTag);
         return Task.CompletedTask;
     }
 

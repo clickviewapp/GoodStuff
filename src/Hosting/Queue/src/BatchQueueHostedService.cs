@@ -98,9 +98,10 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
 
     private async Task OnMessageAsync(MessageContext<TMessage> context, CancellationToken cancellationToken)
     {
-        Logger.LogDebug("Queue message received");
+        Logger.QueueMessageReceived();
 
         List<TMessage> snapshot;
+        var batchSize = Options.BatchSize;
 
         lock (_bufferLock)
         {
@@ -112,7 +113,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             _lastDeliveryTag = context.DeliveryTag;
 
             // If our buffer is at max size then we need to process the items
-            if (_currentBuffer.Count < Options.BatchSize)
+            if (_currentBuffer.Count < batchSize)
                 return;
 
             snapshot = _currentBuffer.ToList();
@@ -120,7 +121,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             _lastDeliveryTag = 0;
         }
 
-        Logger.LogInformation("Message buffer limit reached ({MessageBufferSize}). Processing items", Options.BatchSize);
+        Logger.BatchProcessMessageBufferReached(batchSize);
 
         await ProcessItemsAsync(snapshot, context.DeliveryTag, cancellationToken);
     }
@@ -145,8 +146,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                 // First check to make sure that we haven't waited over our maximum allowed time since last process
                 if (maxFlushInterval > TimeSpan.Zero && timeSinceLastProcess > maxFlushInterval)
                 {
-                    Logger.LogDebug("Last process was {TimeSinceLastProcess} ago. Forcing processing...",
-                        timeSinceLastProcess);
+                    Logger.BatchProcessMaxFlushIntervalReached(timeSinceLastProcess);
                 }
                 // Check if we received a message recently and if we have then wait until the next interval
                 else if (minFlushInterval > TimeSpan.Zero && timeSinceLastMessage < minFlushInterval)
@@ -157,8 +157,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     // we'll add an extra second to the wait time to prevent spamming
                     waitTime += TimeSpan.FromSeconds(1);
 
-                    Logger.LogDebug("Last message received {TimeSinceLastMessage} ago. Waiting {WaitTime} until next flush interval",
-                        timeSinceLastMessage, waitTime);
+                    Logger.BatchProcessMinFlushIntervalNotReached(timeSinceLastMessage, waitTime);
 
                     await Task.Delay(waitTime, cancellationToken);
 
@@ -193,7 +192,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                 // if we have 0 items
                 if (snapshot.Count > 0)
                 {
-                    Logger.LogInformation("Last process occured at {LastProcessTime}. Processing items", _lastProcess);
+                    Logger.BatchProcessIntervalReached(_lastProcess);
                     await ProcessItemsAsync(snapshot, latestDeliveryTag, cancellationToken);
                 }
                 else
@@ -201,7 +200,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     _lastProcess = Now();
                 }
 
-                Logger.LogDebug("Waiting {FlushInterval} until next flush interval", minFlushInterval);
+                Logger.BatchProcessIntervalWait(minFlushInterval);
                 await Task.Delay(minFlushInterval, cancellationToken);
             }
             catch (OperationCanceledException)
@@ -236,13 +235,13 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
 
         try
         {
-            Logger.LogInformation("Processing {Count} items...", messages.Count);
+            Logger.BatchProcessStart(messages.Count);
 
             var sw = Stopwatch.StartNew();
 
             await OnMessagesAsync(messages, cancellationToken);
 
-            Logger.LogInformation("Processed {Count} items in {ProcessDuration}", messages.Count, sw.Elapsed);
+            Logger.BatchProcessCompleted(messages.Count, sw.Elapsed);
         }
         catch (OperationCanceledException)
         {
