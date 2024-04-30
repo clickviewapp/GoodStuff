@@ -168,6 +168,10 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     if (_currentBuffer.Count == 0)
                     {
                         snapshotBuffer = false;
+
+                        // We set the last process to now when we have nothing in the buffer
+                        // This is to prevent the MaxFlush check to trigger when we receive a message after a long time
+                        _lastProcess = now;
                     }
                     else
                     {

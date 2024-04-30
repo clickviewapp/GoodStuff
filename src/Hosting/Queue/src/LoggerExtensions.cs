@@ -19,7 +19,7 @@ internal static partial class LoggerExtensions
     [LoggerMessage(5, LogLevel.Debug, "Last process occured at {LastProcessTime}. (Time since last process: {TimeSinceLastProcess})")]
     public static partial void LogLastProcessTime(this ILogger logger, DateTime lastProcessTime, TimeSpan timeSinceLastProcess);
 
-    [LoggerMessage(6, LogLevel.Debug, "Waiting {WaitTime} until next flush interval. (Time since message: {TimeSinceLastMessage})")]
+    [LoggerMessage(6, LogLevel.Debug, "Waiting {WaitTime} until next flush interval. (Time since last message: {TimeSinceLastMessage})")]
     public static partial void BatchProcessIntervalWait(this ILogger logger, TimeSpan waitTime, TimeSpan timeSinceLastMessage);
 
     [LoggerMessage(7, LogLevel.Information, "Processing {Count} items (Reason: {Reason})...")]
