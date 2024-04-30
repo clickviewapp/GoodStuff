@@ -22,7 +22,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
     private readonly object _bufferLock = new();
     private readonly SemaphoreSlim _workerLock = new(1, 1);
     private ulong _lastDeliveryTag;
-    private DateTime _lastMessage = DateTime.MinValue;
+    private DateTime? _lastMessage;
     private DateTime _lastProcess = DateTime.UtcNow;
 
     /// <summary>
@@ -127,17 +127,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             _lastDeliveryTag = 0;
         }
 
-        Logger.BatchProcessMessageBufferReached(batchSize);
-
-        await ProcessItemsAsync(snapshot, messageContext.DeliveryTag, cancellationToken);
-    }
-
-    private enum FlushReason
-    {
-        MaxIntervalReached,
-        IntervalReached,
-        MinIntervalNotReached,
-        EmptyBuffer
+        await ProcessItemsAsync(snapshot, messageContext.DeliveryTag, FlushReason.BufferFull, cancellationToken);
     }
 
     /// <summary>
@@ -161,11 +151,9 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                 TimeSpan timeSinceLastMessage;
                 TimeSpan timeSinceLastProcess;
                 DateTime lastProcess;
+                FlushReason? reason = null;
 
                 var waitTime = minFlushInterval;
-
-                // Store the reason for the flush to avoid logging inside the lock context
-                FlushReason reason;
 
                 lock (_bufferLock)
                 {
@@ -173,14 +161,13 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     bool snapshotBuffer;
 
                     lastProcess = _lastProcess;
-                    timeSinceLastMessage = now - _lastMessage;
+                    timeSinceLastMessage = _lastMessage.HasValue ? now - _lastMessage.Value : TimeSpan.Zero;
                     timeSinceLastProcess = now - lastProcess;
 
                     // We only need to do work if the buffer contains any items
                     if (_currentBuffer.Count == 0)
                     {
                         snapshotBuffer = false;
-                        reason = FlushReason.EmptyBuffer;
                     }
                     else
                     {
@@ -194,7 +181,6 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                         else if (hashMinFlush && timeSinceLastMessage < minFlushInterval)
                         {
                             snapshotBuffer = false;
-                            reason = FlushReason.MinIntervalNotReached;
 
                             // Because Task.Delay is not accurate and may wait shorter than required,
                             // we'll add an extra second to the wait time to prevent spamming
@@ -219,26 +205,18 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     {
                         snapshot = Array.Empty<TMessage>();
                         latestDeliveryTag = 0;
-                        // Update the last processed date as we have checked the buffer and there was nothing to do
-                        _lastProcess = now;
                     }
                 }
 
                 if (snapshot.Count > 0)
                 {
-                    if (reason == FlushReason.MaxIntervalReached)
-                        Logger.BatchProcessMaxFlushIntervalReached(timeSinceLastProcess);
-                    else
-                        Logger.BatchProcessIntervalReached(lastProcess);
+                    Debug.Assert(reason.HasValue);
 
-                    await ProcessItemsAsync(snapshot, latestDeliveryTag, cancellationToken);
+                    Logger.LogLastProcessTime(lastProcess, timeSinceLastProcess);
+                    await ProcessItemsAsync(snapshot, latestDeliveryTag, reason!.Value, cancellationToken);
                 }
 
-                if (reason == FlushReason.MinIntervalNotReached)
-                    Logger.BatchProcessMinFlushIntervalNotReached(timeSinceLastMessage, waitTime);
-                else
-                    Logger.BatchProcessIntervalWait(waitTime);
-
+                Logger.BatchProcessIntervalWait(waitTime, timeSinceLastMessage);
                 await Task.Delay(waitTime, cancellationToken);
             }
             catch (OperationCanceledException)
@@ -258,13 +236,14 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
 
     private async Task ProcessItemsAsync(IReadOnlyCollection<TMessage> messages,
         ulong latestDeliveryTag,
+        FlushReason reason,
         CancellationToken cancellationToken)
     {
         await _workerLock.WaitAsync(cancellationToken);
 
         try
         {
-            Logger.BatchProcessStart(messages.Count);
+            Logger.BatchProcessStart(messages.Count, reason);
 
             var sw = Stopwatch.StartNew();
 
