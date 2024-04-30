@@ -121,6 +121,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             if (_currentBuffer.Count < batchSize)
                 return;
 
+            // Take a snapshot of the buffer and clear the current buffer data
             snapshot = _currentBuffer.ToList();
             _currentBuffer.Clear();
             _lastDeliveryTag = 0;
@@ -129,6 +130,14 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
         Logger.BatchProcessMessageBufferReached(batchSize);
 
         await ProcessItemsAsync(snapshot, messageContext.DeliveryTag, cancellationToken);
+    }
+
+    private enum FlushReason
+    {
+        MaxIntervalReached,
+        IntervalReached,
+        MinIntervalNotReached,
+        EmptyBuffer
     }
 
     /// <summary>
@@ -141,49 +150,64 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
         {
             try
             {
-                var now = Now();
                 var minFlushInterval = Options.MinFlushInterval;
                 var maxFlushInterval = Options.MaxFlushInterval;
 
-                var timeSinceLastMessage = now - _lastMessage;
-                var timeSinceLastProcess = now - _lastProcess;
-
-                // First check to make sure that we haven't waited over our maximum allowed time since last process
-                if (maxFlushInterval > TimeSpan.Zero && timeSinceLastProcess > maxFlushInterval)
-                {
-                    Logger.BatchProcessMaxFlushIntervalReached(timeSinceLastProcess);
-                }
-                // Check if we received a message recently and if we have then wait until the next interval
-                else if (minFlushInterval > TimeSpan.Zero && timeSinceLastMessage < minFlushInterval)
-                {
-                    var waitTime = minFlushInterval - timeSinceLastMessage;
-
-                    // Because Task.Delay is not accurate and may wait shorter than required,
-                    // we'll add an extra second to the wait time to prevent spamming
-                    waitTime += TimeSpan.FromSeconds(1);
-
-                    Logger.BatchProcessMinFlushIntervalNotReached(timeSinceLastMessage, waitTime);
-
-                    await Task.Delay(waitTime, cancellationToken);
-
-                    continue;
-                }
-
-                // We may need to process the items
-                // Lets check the message size and if we have any items then process
+                var hashMinFlush = minFlushInterval > TimeSpan.Zero;
+                var hasMaxFlush = maxFlushInterval > TimeSpan.Zero;
 
                 ulong latestDeliveryTag;
                 IReadOnlyCollection<TMessage> snapshot;
+                TimeSpan timeSinceLastMessage;
+                TimeSpan timeSinceLastProcess;
+                DateTime lastProcess;
+
+                var waitTime = minFlushInterval;
+
+                // Store the reason for the flush to avoid logging inside the lock context
+                FlushReason reason;
 
                 lock (_bufferLock)
                 {
-                    // Nothing in the buffer, therefore nothing to do
+                    var now = Now();
+                    bool snapshotBuffer;
+
+                    lastProcess = _lastProcess;
+                    timeSinceLastMessage = now - _lastMessage;
+                    timeSinceLastProcess = now - lastProcess;
+
+                    // We only need to do work if the buffer contains any items
                     if (_currentBuffer.Count == 0)
                     {
-                        snapshot = Array.Empty<TMessage>();
-                        latestDeliveryTag = 0;
+                        snapshotBuffer = false;
+                        reason = FlushReason.EmptyBuffer;
                     }
                     else
+                    {
+                        // First check to make sure that we haven't waited over our maximum allowed time since last process
+                        if (hasMaxFlush && timeSinceLastProcess > maxFlushInterval)
+                        {
+                            snapshotBuffer = true;
+                            reason = FlushReason.MaxIntervalReached;
+                        }
+                        // Check if we received a message recently and if we have then wait until the next interval
+                        else if (hashMinFlush && timeSinceLastMessage < minFlushInterval)
+                        {
+                            snapshotBuffer = false;
+                            reason = FlushReason.MinIntervalNotReached;
+
+                            // Because Task.Delay is not accurate and may wait shorter than required,
+                            // we'll add an extra second to the wait time to prevent spamming
+                            waitTime = (minFlushInterval - timeSinceLastMessage) + TimeSpan.FromSeconds(1);
+                        }
+                        else
+                        {
+                            snapshotBuffer = true;
+                            reason = FlushReason.IntervalReached;
+                        }
+                    }
+
+                    if (snapshotBuffer)
                     {
                         // Take a copy of the buffer and reset
                         snapshot = _currentBuffer.ToList();
@@ -191,22 +215,31 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                         _currentBuffer.Clear();
                         _lastDeliveryTag = 0;
                     }
+                    else
+                    {
+                        snapshot = Array.Empty<TMessage>();
+                        latestDeliveryTag = 0;
+                        // Update the last processed date as we have checked the buffer and there was nothing to do
+                        _lastProcess = now;
+                    }
                 }
 
-                // Same check exists in ProcessItemsAsync but im doing it here as well to avoid the await overhead
-                // if we have 0 items
                 if (snapshot.Count > 0)
                 {
-                    Logger.BatchProcessIntervalReached(_lastProcess);
+                    if (reason == FlushReason.MaxIntervalReached)
+                        Logger.BatchProcessMaxFlushIntervalReached(timeSinceLastProcess);
+                    else
+                        Logger.BatchProcessIntervalReached(lastProcess);
+
                     await ProcessItemsAsync(snapshot, latestDeliveryTag, cancellationToken);
                 }
-                else
-                {
-                    _lastProcess = Now();
-                }
 
-                Logger.BatchProcessIntervalWait(minFlushInterval);
-                await Task.Delay(minFlushInterval, cancellationToken);
+                if (reason == FlushReason.MinIntervalNotReached)
+                    Logger.BatchProcessMinFlushIntervalNotReached(timeSinceLastMessage, waitTime);
+                else
+                    Logger.BatchProcessIntervalWait(waitTime);
+
+                await Task.Delay(waitTime, cancellationToken);
             }
             catch (OperationCanceledException)
             {
@@ -227,15 +260,6 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
         ulong latestDeliveryTag,
         CancellationToken cancellationToken)
     {
-        if (messages.Count == 0)
-        {
-            // If there's noting to process, update the process time anyway
-            // We do this because if we've not received any items it will have a last process time
-            // in the past which will force the first check to always process whatever is in the buffer
-            _lastProcess = Now();
-            return;
-        }
-
         await _workerLock.WaitAsync(cancellationToken);
 
         try
@@ -267,7 +291,10 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             }
             finally
             {
-                _lastProcess = Now();
+                // Use the buffer lock again to make sure the last Process is not updated by multiple threads
+                lock (_bufferLock)
+                    _lastProcess = Now();
+
                 _workerLock.Release();
             }
         }

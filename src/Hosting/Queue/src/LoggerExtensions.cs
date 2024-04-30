@@ -16,13 +16,13 @@ internal static partial class LoggerExtensions
     [LoggerMessage(4, LogLevel.Warning, "Cannot acknowledge task {DeliveryTag}. Channel is not open")]
     public static partial void AcknowledgeFailureChannelNotOpen(this ILogger logger, ulong deliveryTag);
 
-    [LoggerMessage(5, LogLevel.Information, "Message buffer limit reached ({MessageBufferSize}). Processing items")]
+    [LoggerMessage(5, LogLevel.Information, "Message buffer limit reached ({MessageBufferSize})")]
     public static partial void BatchProcessMessageBufferReached(this ILogger logger, ushort messageBufferSize);
 
-    [LoggerMessage(6, LogLevel.Information, "Last process occured at {LastProcessTime}. Processing items")]
+    [LoggerMessage(6, LogLevel.Information, "Last process occured at {LastProcessTime}")]
     public static partial void BatchProcessIntervalReached(this ILogger logger, DateTime lastProcessTime);
 
-    [LoggerMessage(7, LogLevel.Debug, "Max flush interval reached ({TimeSinceLastProcess})")]
+    [LoggerMessage(7, LogLevel.Information, "Max flush interval reached ({TimeSinceLastProcess})")]
     public static partial void BatchProcessMaxFlushIntervalReached(this ILogger logger, TimeSpan timeSinceLastProcess);
 
     [LoggerMessage(8, LogLevel.Debug, "Last message received {TimeSinceLastMessage} ago. Waiting {WaitTime} until next flush interval")]
