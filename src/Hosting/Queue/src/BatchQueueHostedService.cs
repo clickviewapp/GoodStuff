@@ -46,12 +46,17 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             throw new Exception(
                 $"{nameof(Options.MaxFlushInterval)} must be greater than {nameof(Options.MinFlushInterval)}");
 
-        var subscriptionContext = await queueClient.SubscribeAsync<TMessage>(queueName, OnMessageAsync,
-            new SubscribeOptions
-            {
-                PrefetchCount = Options.BatchSize,
-                AutoAcknowledge = false
-            }, cancellationToken);
+        var subscribeOptions = new SubscribeOptions
+        {
+            PrefetchCount = Options.BatchSize,
+            AutoAcknowledge = false
+        };
+
+        var subscriptionContext = await queueClient.SubscribeAsync<TMessage>(
+            queueName,
+            OnMessageAsync,
+            subscribeOptions,
+            cancellationToken);
 
         // Start background worker task if we have a minimum or a maximum flush interval
         if (minFlushInterval > TimeSpan.Zero || maxFlushInterval > TimeSpan.Zero)

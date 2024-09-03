@@ -6,7 +6,7 @@ namespace ClickView.GoodStuff.Hosting.Queue;
 public abstract class BatchQueueHostedServiceOptions : BaseQueueHostedServiceOptions
 {
     /// <summary>
-    /// The number of tasks to run concurrently.
+    /// The number messages to keep in memory before batching.
     /// </summary>
     public ushort BatchSize { get; set; } = 100;
 
