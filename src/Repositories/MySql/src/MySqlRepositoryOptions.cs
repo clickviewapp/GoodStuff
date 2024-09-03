@@ -8,7 +8,7 @@
         /// <summary>
         /// The number of times to retry a query on a fail-over error
         /// </summary>
-        public int FailOverRetryCount { get; set; } = 0;
+        public int FailOverRetryCount { get; set; }
 
         /// <summary>
         /// The function that provides the duration to wait for for a particular fail-over retry attempt
