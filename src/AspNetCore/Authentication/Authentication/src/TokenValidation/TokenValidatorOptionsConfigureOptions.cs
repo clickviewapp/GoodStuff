@@ -12,7 +12,7 @@
             _handlerOptions = handlerOptions.Value;
         }
 
-        public void PostConfigure(string name, TokenValidatorOptions options)
+        public void PostConfigure(string? name, TokenValidatorOptions options)
         {
             options = options ?? throw new ArgumentNullException(nameof(options));
 
