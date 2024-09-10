@@ -190,7 +190,7 @@ public class RabbitMqClient : IQueueClient
         }
     }
 
-    private async ValueTask<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
+    private async Task<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
     {
         var connection = await GetConnectionAsync(cancellationToken);
         return await connection.CreateChannelAsync(cancellationToken);
