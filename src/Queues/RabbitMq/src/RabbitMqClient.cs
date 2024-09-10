@@ -48,10 +48,15 @@ public class RabbitMqClient : IQueueClient
 
         using var channel = await GetChannelAsync(cancellationToken);
 
-        var properties = channel.CreateBasicProperties();
-        properties.Persistent = options.Persistent;
+        var properties = new BasicProperties {Persistent = options.Persistent};
 
-        channel.BasicPublish(exchange, options.RoutingKey, properties, bytes);
+        await channel.BasicPublishAsync(
+            exchange: exchange,
+            routingKey: options.RoutingKey,
+            mandatory: true,
+            basicProperties: properties,
+            body: bytes,
+            cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -91,12 +96,13 @@ public class RabbitMqClient : IQueueClient
                 _options.LoggerFactory.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );
 
-            channel.BasicQos(0, options.PrefetchCount, false);
+            await channel.BasicQosAsync(0, options.PrefetchCount, false, cancellationToken);
 
-            var consumerTag = channel.BasicConsume(
+            var consumerTag = await channel.BasicConsumeAsync(
                 queue: queue,
                 autoAck: options.AutoAcknowledge,
-                consumer: consumer);
+                consumer: consumer,
+                cancellationToken: cancellationToken);
 
             subContext.SetConsumerTag(consumerTag);
 
@@ -161,22 +167,16 @@ public class RabbitMqClient : IQueueClient
             _logger.ConnectingToRabbitMq();
 
             // Create a new connection
-            var connection = _connectionFactory.CreateConnection();
+            var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             // Setup logging
-            connection.CallbackException += (_, args) =>
-                _logger.LogError(args.Exception, "Exception thrown in RabbitMQ callback");
+            connection.CallbackException += (_, args) => _logger.LogError(args.Exception, "Exception thrown in RabbitMQ callback");
             connection.ConnectionBlocked += (_, _) => _logger.LogDebug("RabbitMQ connection blocked");
             connection.ConnectionUnblocked += (_, _) => _logger.LogDebug("RabbitMQ connection unblocked");
             connection.ConnectionShutdown += (_, _) => _logger.LogDebug("RabbitMQ connection shutdown");
-
-            if (connection is IAutorecoveringConnection autorecoveringConnection)
-            {
-                autorecoveringConnection.RecoveringConsumer += (_, _) => _logger.LogDebug("RecoveringConsumer");
-                autorecoveringConnection.RecoverySucceeded += (_, _) => _logger.LogDebug("RecoverySucceeded");
-                autorecoveringConnection.ConnectionRecoveryError += (_, args) =>
-                    _logger.LogError(args.Exception, "ConnectionRecoveryError");
-            }
+            connection.RecoveringConsumer += (_, _) => _logger.LogDebug("RecoveringConsumer");
+            connection.RecoverySucceeded += (_, _) => _logger.LogDebug("RecoverySucceeded");
+            connection.ConnectionRecoveryError += (_, args) => _logger.LogError(args.Exception, "ConnectionRecoveryError");
 
             _connection = connection;
 
@@ -190,10 +190,10 @@ public class RabbitMqClient : IQueueClient
         }
     }
 
-    private async ValueTask<IModel> GetChannelAsync(CancellationToken cancellationToken = default)
+    private async ValueTask<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
     {
         var connection = await GetConnectionAsync(cancellationToken);
-        return connection.CreateModel();
+        return await connection.CreateChannelAsync(cancellationToken);
     }
 
     private void CheckDisposed()
@@ -208,8 +208,8 @@ public class RabbitMqClient : IQueueClient
         {
             HostName = options.Host,
             Port = options.Port,
-            DispatchConsumersAsync = true,
-            AutomaticRecoveryEnabled = true
+            AutomaticRecoveryEnabled = true,
+            ConsumerDispatchConcurrency = options.ConsumerDispatchConcurrency
         };
 
         // Username

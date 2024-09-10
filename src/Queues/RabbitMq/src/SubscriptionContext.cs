@@ -1,5 +1,6 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
+using System.Diagnostics;
 using Internal;
 using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
@@ -7,7 +8,7 @@ using RabbitMQ.Client;
 public class SubscriptionContext : IAsyncDisposable
 {
     private readonly string _queueName;
-    private readonly IModel _channel;
+    private readonly IChannel _channel;
     private readonly ActiveSubscriptions _subscriptions;
     private readonly CountWaiter _taskWaiter;
     private readonly ILogger<SubscriptionContext> _logger;
@@ -16,7 +17,7 @@ public class SubscriptionContext : IAsyncDisposable
 
     internal SubscriptionContext(
         string queueName,
-        IModel channel,
+        IChannel channel,
         ActiveSubscriptions subscriptions,
         CountWaiter taskWaiter,
         ILogger<SubscriptionContext> logger)
@@ -42,18 +43,17 @@ public class SubscriptionContext : IAsyncDisposable
     /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public Task AcknowledgeAsync(ulong deliveryTag, bool multiple = false,
+    public ValueTask AcknowledgeAsync(ulong deliveryTag, bool multiple = false,
         CancellationToken cancellationToken = default)
     {
         CheckDisposed();
 
         _logger.SendingAcknowledge(deliveryTag);
 
-        _channel.BasicAck(
+        return _channel.BasicAckAsync(
             deliveryTag: deliveryTag,
-            multiple: multiple);
-
-        return Task.CompletedTask;
+            multiple: multiple,
+            cancellationToken: cancellationToken);
     }
 
     /// <summary>
@@ -64,19 +64,18 @@ public class SubscriptionContext : IAsyncDisposable
     /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <paramref name="multiple"/> is true)) with the specified delivery tag</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public Task NegativeAcknowledgeAsync(ulong deliveryTag, bool multiple = false, bool requeue = true,
+    public ValueTask NegativeAcknowledgeAsync(ulong deliveryTag, bool multiple = false, bool requeue = true,
         CancellationToken cancellationToken = default)
     {
         CheckDisposed();
 
         _logger.SendingNegativeAcknowledge(deliveryTag);
 
-        _channel.BasicNack(
+        return _channel.BasicNackAsync(
             deliveryTag: deliveryTag,
             multiple: multiple,
-            requeue: requeue);
-
-        return Task.CompletedTask;
+            requeue: requeue,
+            cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -89,7 +88,8 @@ public class SubscriptionContext : IAsyncDisposable
 
         // Unsubscribe from the queue to stop receiving any new messages
         _logger.LogDebug("Unsubscribing from queue {QueueName}", _queueName);
-        _channel.BasicCancel(_consumerTag);
+        Debug.Assert(_consumerTag != null);
+        await _channel.BasicCancelAsync(_consumerTag);
 
         // Wait for all tasks to complete before closing the connection
         // If we close the connection first then the tasks cant ack
