@@ -6,7 +6,7 @@ namespace ClickView.GoodStuff.Queues.RabbitMq.Internal;
 internal class CountWaiter
 {
     private readonly object _pendingLock = new();
-    private List<TaskCompletionSource> _pendingAwaiters = new();
+    private readonly List<TaskCompletionSource> _pendingAwaiters = new();
     private int _count;
 
     public Task WaitAsync()
