@@ -56,7 +56,7 @@ public class MessageContext<TData>
     /// Rejects one or more messages
     /// </summary>
     /// <param name="multiple">If true, reject all outstanding delivery tags up to and including the delivery tag</param>
-    /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <see cref="multiple"/> is true)) with the specified delivery tag</param>
+    /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <paramref name="multiple"/> is true)) with the specified delivery tag</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
     public Task NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true, CancellationToken cancellationToken = default)

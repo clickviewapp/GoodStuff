@@ -12,7 +12,7 @@
             _ticketStore = ticketStore;
         }
 
-        public void PostConfigure(string name, CookieAuthenticationOptions options)
+        public void PostConfigure(string? name, CookieAuthenticationOptions options)
         {
             options.SessionStore = _ticketStore;
         }

@@ -30,8 +30,8 @@
         {
             _logger.LogDebug("Processing Back-Channel logout");
 
-            context.Response.Headers.Add("Cache-Control", "no-cache, no-store");
-            context.Response.Headers.Add("Pragma", "no-cache");
+            context.Response.Headers.CacheControl = "no-cache, no-store";
+            context.Response.Headers.Pragma = "no-cache";
 
             if (!context.Request.HasFormContentType)
             {

@@ -222,7 +222,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     Debug.Assert(reason.HasValue);
 
                     Logger.LogLastProcessTime(lastProcess, timeSinceLastProcess);
-                    await ProcessItemsAsync(snapshot, latestDeliveryTag, reason!.Value, cancellationToken);
+                    await ProcessItemsAsync(snapshot, latestDeliveryTag, reason.Value, cancellationToken);
                 }
 
                 Logger.BatchProcessIntervalWait(waitTime, timeSinceLastMessage);

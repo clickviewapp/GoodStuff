@@ -87,14 +87,14 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     }
 
     /// <inheritdoc />
-    public int CompareTo(object? value)
+    public int CompareTo(object? obj)
     {
-        if (value == null)
+        if (obj == null)
             return 1;
 
         // Need to use compare because subtraction will wrap
         // to positive for very large neg numbers, etc.
-        if (value is IdLong i)
+        if (obj is IdLong i)
         {
             if (Value < i.Value) return -1;
             if (Value > i.Value) return 1;
