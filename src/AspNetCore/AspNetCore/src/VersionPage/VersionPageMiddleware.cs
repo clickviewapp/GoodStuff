@@ -7,18 +7,17 @@
 
     public sealed class VersionPageMiddleware
     {
-        private readonly RequestDelegate _next;
         private readonly ApplicationInformation _applicationInformation;
         private readonly VersionPageOptions _options;
 
-        public VersionPageMiddleware(RequestDelegate next, ApplicationInformation applicationInformation,
+        public VersionPageMiddleware(RequestDelegate next,
+            ApplicationInformation applicationInformation,
             IOptions<VersionPageOptions> options)
         {
             ArgumentNullException.ThrowIfNull(next);
             ArgumentNullException.ThrowIfNull(applicationInformation);
             ArgumentNullException.ThrowIfNull(options);
 
-            _next = next;
             _applicationInformation = applicationInformation;
             _options = options.Value;
         }

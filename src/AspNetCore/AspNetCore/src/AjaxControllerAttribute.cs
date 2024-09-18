@@ -1,11 +1,8 @@
-﻿namespace ClickView.GoodStuff.AspNetCore
-{
-    using Microsoft.AspNetCore.Mvc;
+﻿namespace ClickView.GoodStuff.AspNetCore;
 
-    /// <summary>
-    /// Attribute to denote that the controller is used to serve Ajax requests
-    /// </summary>
-    public class AjaxControllerAttribute : ApiControllerAttribute
-    {
-    }
-}
+using Microsoft.AspNetCore.Mvc;
+
+/// <summary>
+/// Attribute to denote that the controller is used to serve Ajax requests
+/// </summary>
+public class AjaxControllerAttribute : ApiControllerAttribute;

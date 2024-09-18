@@ -1,50 +1,42 @@
-namespace ClickView.GoodStuff.AspNetCore.VersionPage
+namespace ClickView.GoodStuff.AspNetCore.VersionPage;
+
+using System;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
+
+public static class ApplicationBuilderExtensions
 {
-    using System;
-    using Microsoft.AspNetCore.Builder;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Options;
-
-    public static class ApplicationBuilderExtensions
+    public static IApplicationBuilder UseVersionPage(this IApplicationBuilder app,
+        PathString path, ApplicationInformation information)
     {
-        public static IApplicationBuilder UseVersionPage(this IApplicationBuilder app,
-            PathString path, ApplicationInformation information)
-        {
-            if (app == null)
-                throw new ArgumentNullException(nameof(app));
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(information);
 
-            if (information == null)
-                throw new ArgumentNullException(nameof(information));
+        UseVersionPageCore(app, path, [information]);
 
-            UseVersionPageCore(app, path, new object[] {information});
+        return app;
+    }
 
-            return app;
-        }
+    public static IApplicationBuilder UseVersionPage(this IApplicationBuilder app,
+        PathString path, ApplicationInformation information, VersionPageOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(app);
+        ArgumentNullException.ThrowIfNull(information);
+        ArgumentNullException.ThrowIfNull(options);
 
-        public static IApplicationBuilder UseVersionPage(this IApplicationBuilder app,
-            PathString path, ApplicationInformation information, VersionPageOptions options)
-        {
-            if (app == null)
-                throw new ArgumentNullException(nameof(app));
+        UseVersionPageCore(app, path, [information, Options.Create(options)]);
 
-            if (information == null)
-                throw new ArgumentNullException(nameof(information));
+        return app;
+    }
 
-            if (options == null)
-                throw new ArgumentNullException(nameof(options));
+    private static void UseVersionPageCore(this IApplicationBuilder app, PathString path, object[] args)
+    {
+        app.MapWhen(Predicate, b => b.UseMiddleware<VersionPageMiddleware>(args));
 
-            UseVersionPageCore(app, path, new object[] {information, Options.Create(options)});
+        return;
 
-            return app;
-        }
-
-        private static void UseVersionPageCore(this IApplicationBuilder app,
-            PathString path, object[] args)
-        {
-            bool Predicate(HttpContext c) => c.Request.Path.StartsWithSegments(path, out var remaining) &&
-                                             string.IsNullOrEmpty(remaining);
-
-            app.MapWhen(Predicate, b => b.UseMiddleware<VersionPageMiddleware>(args));
-        }
+        bool Predicate(HttpContext c) => c.Request.Path.StartsWithSegments(path, out var remaining) &&
+                                         string.IsNullOrEmpty(remaining);
     }
 }
