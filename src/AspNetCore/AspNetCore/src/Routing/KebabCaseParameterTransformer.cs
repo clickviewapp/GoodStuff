@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Routing;
 /// <summary>
 /// Parameter transformer which converts route parameters to kebab-case
 /// </summary>
-public class KebabCaseParameterTransformer : IOutboundParameterTransformer
+public partial class KebabCaseParameterTransformer(bool lowercase = false) : IOutboundParameterTransformer
 {
-    private static readonly Regex ReplacerRegex = new("([a-z])([A-Z])", RegexOptions.Compiled);
+    private static readonly Regex ReplacerRegex = KebabRegex();
 
     /// <inheritdoc />
     public string? TransformOutbound(object? value)
@@ -19,6 +19,12 @@ public class KebabCaseParameterTransformer : IOutboundParameterTransformer
             return null;
 
         // Slugify value
-        return ReplacerRegex.Replace(str, "$1-$2");
+        var kebabCase = ReplacerRegex.Replace(str, "$1-$2");
+
+        // ToLower?
+        return lowercase ? kebabCase.ToLower() : kebabCase;
     }
+
+    [GeneratedRegex("([a-z])([A-Z])", RegexOptions.Compiled)]
+    private static partial Regex KebabRegex();
 }
