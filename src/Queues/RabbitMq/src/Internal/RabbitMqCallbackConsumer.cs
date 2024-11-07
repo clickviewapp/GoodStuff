@@ -5,22 +5,24 @@ using RabbitMQ.Client;
 using Serialization;
 
 internal class RabbitMqCallbackConsumer<TData>(
+    IChannel channel,
     SubscriptionContext subscriptionContext,
     Func<MessageContext<TData>, CancellationToken, Task> callback,
     CountWaiter taskWaiter,
     IMessageSerializer serializer,
     ILogger<RabbitMqCallbackConsumer<TData>> logger)
-    : AsyncDefaultBasicConsumer
+    : AsyncDefaultBasicConsumer(channel)
 {
     public override Task HandleBasicDeliverAsync(string consumerTag, ulong deliveryTag, bool redelivered,
-        string exchange, string routingKey, IReadOnlyBasicProperties properties, ReadOnlyMemory<byte> body)
+        string exchange, string routingKey, IReadOnlyBasicProperties properties, ReadOnlyMemory<byte> body,
+        CancellationToken cancellationToken = default)
     {
         logger.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
 
-        return HandleBasicDeliverAsync(deliveryTag, body);
+        return HandleBasicDeliverAsync(deliveryTag, body, cancellationToken);
     }
 
-    private async Task HandleBasicDeliverAsync(ulong deliveryTag, ReadOnlyMemory<byte> body)
+    private async Task HandleBasicDeliverAsync(ulong deliveryTag, ReadOnlyMemory<byte> body, CancellationToken cancellationToken)
     {
         try
         {
@@ -40,7 +42,7 @@ internal class RabbitMqCallbackConsumer<TData>(
             taskWaiter.Increment();
             try
             {
-                await callback(context, CancellationToken.None);
+                await callback(context, cancellationToken);
             }
             finally
             {
