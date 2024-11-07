@@ -46,7 +46,7 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        using var channel = await GetChannelAsync(cancellationToken);
+        await using var channel = await GetChannelAsync(cancellationToken);
 
         var properties = new BasicProperties {Persistent = options.Persistent};
 
@@ -89,6 +89,7 @@ public class RabbitMqClient : IQueueClient
                 logger: _options.LoggerFactory.CreateLogger<SubscriptionContext>());
 
             var consumer = new RabbitMqCallbackConsumer<TData>(
+                channel,
                 subContext,
                 callback,
                 shutdownTaskWaiter,
@@ -170,13 +171,7 @@ public class RabbitMqClient : IQueueClient
             var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             // Setup logging
-            connection.CallbackException += (_, args) => _logger.LogError(args.Exception, "Exception thrown in RabbitMQ callback");
-            connection.ConnectionBlocked += (_, _) => _logger.LogDebug("RabbitMQ connection blocked");
-            connection.ConnectionUnblocked += (_, _) => _logger.LogDebug("RabbitMQ connection unblocked");
-            connection.ConnectionShutdown += (_, _) => _logger.LogDebug("RabbitMQ connection shutdown");
-            connection.RecoveringConsumer += (_, _) => _logger.LogDebug("RecoveringConsumer");
-            connection.RecoverySucceeded += (_, _) => _logger.LogDebug("RecoverySucceeded");
-            connection.ConnectionRecoveryError += (_, args) => _logger.LogError(args.Exception, "ConnectionRecoveryError");
+            _ = new ConnectionLogger(connection, _logger);
 
             _connection = connection;
 
@@ -193,7 +188,7 @@ public class RabbitMqClient : IQueueClient
     private async Task<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
     {
         var connection = await GetConnectionAsync(cancellationToken);
-        return await connection.CreateChannelAsync(cancellationToken);
+        return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
     }
 
     private void CheckDisposed()
