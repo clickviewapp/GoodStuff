@@ -11,7 +11,7 @@ public class SubscriptionContext : IAsyncDisposable
     private readonly IChannel _channel;
     private readonly ActiveSubscriptions _subscriptions;
     private readonly CountWaiter _taskWaiter;
-    private readonly ILogger<SubscriptionContext> _logger;
+    private readonly ILogger<SubscriptionContext>? _logger;
     private string? _consumerTag;
     private bool _disposed;
 
@@ -20,7 +20,7 @@ public class SubscriptionContext : IAsyncDisposable
         IChannel channel,
         ActiveSubscriptions subscriptions,
         CountWaiter taskWaiter,
-        ILogger<SubscriptionContext> logger)
+        ILogger<SubscriptionContext>? logger)
     {
         _queueName = queueName;
         _channel = channel;
@@ -48,7 +48,7 @@ public class SubscriptionContext : IAsyncDisposable
     {
         CheckDisposed();
 
-        _logger.SendingAcknowledge(deliveryTag);
+        _logger?.SendingAcknowledge(deliveryTag);
 
         return _channel.BasicAckAsync(
             deliveryTag: deliveryTag,
@@ -69,7 +69,7 @@ public class SubscriptionContext : IAsyncDisposable
     {
         CheckDisposed();
 
-        _logger.SendingNegativeAcknowledge(deliveryTag);
+        _logger?.SendingNegativeAcknowledge(deliveryTag);
 
         return _channel.BasicNackAsync(
             deliveryTag: deliveryTag,
@@ -84,20 +84,20 @@ public class SubscriptionContext : IAsyncDisposable
         if (_disposed)
             return;
 
-        _logger.LogDebug("Disposing subscription context...");
+        _logger?.LogDebug("Disposing subscription context...");
 
         // Unsubscribe from the queue to stop receiving any new messages
-        _logger.LogDebug("Unsubscribing from queue {QueueName}", _queueName);
+        _logger?.LogDebug("Unsubscribing from queue {QueueName}", _queueName);
         Debug.Assert(_consumerTag != null);
         await _channel.BasicCancelAsync(_consumerTag);
 
         // Wait for all tasks to complete before closing the connection
         // If we close the connection first then the tasks cant ack
-        _logger.LogDebug("Waiting for all tasks to finish...");
+        _logger?.LogDebug("Waiting for all tasks to finish...");
         await _taskWaiter.WaitAsync();
 
         // Close the channel
-        _logger.LogDebug("Closing channel");
+        _logger?.LogDebug("Closing channel");
         await _channel.CloseAsync();
 
         // Dispose
@@ -106,7 +106,7 @@ public class SubscriptionContext : IAsyncDisposable
 
         _subscriptions.Remove(this);
 
-        _logger.LogDebug("Subscription context disposed");
+        _logger?.LogDebug("Subscription context disposed");
     }
 
     private void CheckDisposed()
