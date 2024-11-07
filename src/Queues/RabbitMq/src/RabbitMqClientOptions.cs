@@ -50,7 +50,7 @@ public class RabbitMqClientOptions : IOptions<RabbitMqClientOptions>
     /// <summary>
     /// The serializer to use for serializing and deserializing messages
     /// </summary>
-    public IMessageSerializer Serializer { get; set; } = NewtonsoftJsonMessageSerializer.Default;
+    public IMessageSerializer Serializer { get; set; } = new NewtonsoftJsonMessageSerializer();
 
     /// <summary>
     /// The logger factory to enable logging
