@@ -161,7 +161,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task AcknowledgeAsync(ulong deliveryTag, bool multiple = false, CancellationToken cancellationToken = default)
+    protected ValueTask AcknowledgeAsync(ulong deliveryTag, bool multiple = false, CancellationToken cancellationToken = default)
     {
         CheckDisposed();
 
@@ -169,13 +169,11 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         if (subContext is null)
             throw new InvalidOperationException("Cannot call acknowledge before starting the worker");
 
-        if (!subContext.IsOpen)
-        {
-            Logger.AcknowledgeFailureChannelNotOpen(deliveryTag);
-            return;
-        }
+        if (subContext.IsOpen)
+            return subContext.AcknowledgeAsync(deliveryTag, multiple, cancellationToken);
 
-        await subContext.AcknowledgeAsync(deliveryTag, multiple, cancellationToken);
+        Logger.AcknowledgeFailureChannelNotOpen(deliveryTag);
+        return ValueTask.CompletedTask;
     }
 
     private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options, ILoggerFactory loggerFactory)
