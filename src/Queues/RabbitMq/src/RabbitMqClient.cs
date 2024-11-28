@@ -46,12 +46,17 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        using var channel = await GetChannelAsync(cancellationToken);
+        await using var channel = await GetChannelAsync(cancellationToken);
 
-        var properties = channel.CreateBasicProperties();
-        properties.Persistent = options.Persistent;
+        var properties = new BasicProperties {Persistent = options.Persistent};
 
-        channel.BasicPublish(exchange, options.RoutingKey, properties, bytes);
+        await channel.BasicPublishAsync(
+            exchange: exchange,
+            routingKey: options.RoutingKey,
+            mandatory: true,
+            basicProperties: properties,
+            body: bytes,
+            cancellationToken: cancellationToken);
     }
 
     /// <inheritdoc />
@@ -84,6 +89,7 @@ public class RabbitMqClient : IQueueClient
                 logger: _options.LoggerFactory.CreateLogger<SubscriptionContext>());
 
             var consumer = new RabbitMqCallbackConsumer<TData>(
+                channel,
                 subContext,
                 callback,
                 shutdownTaskWaiter,
@@ -91,12 +97,13 @@ public class RabbitMqClient : IQueueClient
                 _options.LoggerFactory.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );
 
-            channel.BasicQos(0, options.PrefetchCount, false);
+            await channel.BasicQosAsync(0, options.PrefetchCount, false, cancellationToken);
 
-            var consumerTag = channel.BasicConsume(
+            var consumerTag = await channel.BasicConsumeAsync(
                 queue: queue,
                 autoAck: options.AutoAcknowledge,
-                consumer: consumer);
+                consumer: consumer,
+                cancellationToken: cancellationToken);
 
             subContext.SetConsumerTag(consumerTag);
 
@@ -161,22 +168,10 @@ public class RabbitMqClient : IQueueClient
             _logger.ConnectingToRabbitMq();
 
             // Create a new connection
-            var connection = _connectionFactory.CreateConnection();
+            var connection = await _connectionFactory.CreateConnectionAsync(token);
 
             // Setup logging
-            connection.CallbackException += (_, args) =>
-                _logger.LogError(args.Exception, "Exception thrown in RabbitMQ callback");
-            connection.ConnectionBlocked += (_, _) => _logger.LogDebug("RabbitMQ connection blocked");
-            connection.ConnectionUnblocked += (_, _) => _logger.LogDebug("RabbitMQ connection unblocked");
-            connection.ConnectionShutdown += (_, _) => _logger.LogDebug("RabbitMQ connection shutdown");
-
-            if (connection is IAutorecoveringConnection autorecoveringConnection)
-            {
-                autorecoveringConnection.RecoveringConsumer += (_, _) => _logger.LogDebug("RecoveringConsumer");
-                autorecoveringConnection.RecoverySucceeded += (_, _) => _logger.LogDebug("RecoverySucceeded");
-                autorecoveringConnection.ConnectionRecoveryError += (_, args) =>
-                    _logger.LogError(args.Exception, "ConnectionRecoveryError");
-            }
+            _ = new ConnectionLogger(connection, _logger);
 
             _connection = connection;
 
@@ -190,10 +185,10 @@ public class RabbitMqClient : IQueueClient
         }
     }
 
-    private async ValueTask<IModel> GetChannelAsync(CancellationToken cancellationToken = default)
+    private async Task<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
     {
         var connection = await GetConnectionAsync(cancellationToken);
-        return connection.CreateModel();
+        return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
     }
 
     private void CheckDisposed()
@@ -208,8 +203,8 @@ public class RabbitMqClient : IQueueClient
         {
             HostName = options.Host,
             Port = options.Port,
-            DispatchConsumersAsync = true,
-            AutomaticRecoveryEnabled = true
+            AutomaticRecoveryEnabled = true,
+            ConsumerDispatchConcurrency = options.ConsumerDispatchConcurrency
         };
 
         // Username

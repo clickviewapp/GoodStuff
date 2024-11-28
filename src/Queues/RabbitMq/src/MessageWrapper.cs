@@ -1,17 +1,10 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
-public class MessageWrapper<TData>
+public class MessageWrapper<TData>(string id, TData data, long timestamp)
 {
-    public MessageWrapper(string id, TData data, long timestamp)
-    {
-        Id = id;
-        Data = data;
-        Timestamp = timestamp;
-    }
-
-    public string Id { get; init; }
-    public TData Data { get; init; }
-    public long Timestamp { get; init; }
+    public string Id { get; init; } = id;
+    public TData Data { get; init; } = data;
+    public long Timestamp { get; init; } = timestamp;
 
     internal static MessageWrapper<TData> New(TData data) => new
     (

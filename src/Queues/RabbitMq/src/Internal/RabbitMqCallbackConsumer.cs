@@ -4,40 +4,29 @@ using Microsoft.Extensions.Logging;
 using RabbitMQ.Client;
 using Serialization;
 
-internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
+internal class RabbitMqCallbackConsumer<TData>(
+    IChannel channel,
+    SubscriptionContext subscriptionContext,
+    Func<MessageContext<TData>, CancellationToken, Task> callback,
+    CountWaiter taskWaiter,
+    IMessageSerializer serializer,
+    ILogger<RabbitMqCallbackConsumer<TData>> logger)
+    : AsyncDefaultBasicConsumer(channel)
 {
-    private readonly SubscriptionContext _subscriptionContext;
-    private readonly Func<MessageContext<TData>, CancellationToken, Task> _callback;
-    private readonly CountWaiter _taskWaiter;
-    private readonly IMessageSerializer _serializer;
-    private readonly ILogger<RabbitMqCallbackConsumer<TData>> _logger;
-
-    public RabbitMqCallbackConsumer(SubscriptionContext subscriptionContext,
-        Func<MessageContext<TData>, CancellationToken, Task> callback,
-        CountWaiter taskWaiter,
-        IMessageSerializer serializer,
-        ILogger<RabbitMqCallbackConsumer<TData>> logger)
+    public override Task HandleBasicDeliverAsync(string consumerTag, ulong deliveryTag, bool redelivered,
+        string exchange, string routingKey, IReadOnlyBasicProperties properties, ReadOnlyMemory<byte> body,
+        CancellationToken cancellationToken = default)
     {
-        _subscriptionContext = subscriptionContext;
-        _callback = callback;
-        _taskWaiter = taskWaiter;
-        _serializer = serializer;
-        _logger = logger;
+        logger.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
+
+        return HandleBasicDeliverAsync(deliveryTag, body, cancellationToken);
     }
 
-    public override Task HandleBasicDeliver(string consumerTag, ulong deliveryTag, bool redelivered,
-        string exchange, string routingKey, IBasicProperties properties, ReadOnlyMemory<byte> body)
-    {
-        _logger.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
-
-        return HandleBasicDeliverAsync(deliveryTag, body);
-    }
-
-    private async Task HandleBasicDeliverAsync(ulong deliveryTag, ReadOnlyMemory<byte> body)
+    private async Task HandleBasicDeliverAsync(ulong deliveryTag, ReadOnlyMemory<byte> body, CancellationToken cancellationToken)
     {
         try
         {
-            var message = _serializer.Deserialize<TData>(body.Span);
+            var message = serializer.Deserialize<TData>(body.Span);
 
             if (message is null)
                 throw new RabbitMqClientException("Failed to deserialize message");
@@ -47,22 +36,22 @@ internal class RabbitMqCallbackConsumer<TData> : AsyncDefaultBasicConsumer
                 deliveryTag: deliveryTag,
                 timestamp: DateTimeOffset.FromUnixTimeSeconds(message.Timestamp).UtcDateTime,
                 id: message.Id,
-                subscriptionContext: _subscriptionContext
+                subscriptionContext: subscriptionContext
             );
 
-            _taskWaiter.Increment();
+            taskWaiter.Increment();
             try
             {
-                await _callback(context, CancellationToken.None);
+                await callback(context, cancellationToken);
             }
             finally
             {
-                _taskWaiter.Decrement();
+                taskWaiter.Decrement();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unhandled exception when processing queue message");
+            logger.LogError(ex, "Unhandled exception when processing queue message");
             throw;
         }
     }

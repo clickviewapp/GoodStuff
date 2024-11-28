@@ -58,5 +58,14 @@ public class RabbitMqClientOptions : IOptions<RabbitMqClientOptions>
     /// </summary>
     public ILoggerFactory LoggerFactory { get; set; } = NullLoggerFactory.Instance;
 
+    /// <summary>
+    /// Set to a value greater than one to enable concurrent processing. For a concurrency greater than one,
+    /// tasks will be offloaded to the worker thread pool so it is important to choose the value for the concurrency wisely to avoid thread pool overloading.
+    /// Defaults to 1.
+    /// </summary>
+    /// <remarks>For concurrency greater than one this removes the guarantee that consumers handle messages in the order they receive them.
+    /// In addition to that consumers need to be thread/concurrency safe.</remarks>
+    public ushort ConsumerDispatchConcurrency { get; set; } = 1;
+
     public RabbitMqClientOptions Value => this;
 }

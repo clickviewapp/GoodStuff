@@ -161,7 +161,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected Task AcknowledgeAsync(ulong deliveryTag, bool multiple = false, CancellationToken cancellationToken = default)
+    protected ValueTask AcknowledgeAsync(ulong deliveryTag, bool multiple = false, CancellationToken cancellationToken = default)
     {
         CheckDisposed();
 
@@ -173,7 +173,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             return subContext.AcknowledgeAsync(deliveryTag, multiple, cancellationToken);
 
         Logger.AcknowledgeFailureChannelNotOpen(deliveryTag);
-        return Task.CompletedTask;
+        return ValueTask.CompletedTask;
     }
 
     private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options, ILoggerFactory loggerFactory)
