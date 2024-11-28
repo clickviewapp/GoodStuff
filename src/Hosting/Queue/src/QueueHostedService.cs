@@ -47,6 +47,8 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// <param name="cancellationToken"></param>
     private async Task OnMessageAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
     {
+        using var logScope = Logger.BeginScope(new MessageContextScope<TMessage>(messageContext));
+
         Logger.QueueMessageReceived(messageContext.Id, messageContext.Timestamp);
 
         try
