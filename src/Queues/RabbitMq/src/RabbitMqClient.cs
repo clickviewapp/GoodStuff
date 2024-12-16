@@ -46,15 +46,16 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        await using var channel = await GetChannelAsync(cancellationToken);
-
-        var properties = new BasicProperties {Persistent = options.Persistent};
+        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms, cancellationToken);
 
         await channel.BasicPublishAsync(
             exchange: exchange,
             routingKey: options.RoutingKey,
             mandatory: true,
-            basicProperties: properties,
+            basicProperties: new BasicProperties
+            {
+                Persistent = options.Persistent
+            },
             body: bytes,
             cancellationToken: cancellationToken);
     }
@@ -75,7 +76,7 @@ public class RabbitMqClient : IQueueClient
 
         // We don't want to dispose the channel here (unless an exception is thrown, see below).
         // The returned SubscriptionContext is the object that should be disposed (which disposes the channel)
-        var channel = await GetChannelAsync(cancellationToken);
+        var channel = await GetChannelAsync(false, cancellationToken);
 
         try
         {
@@ -144,7 +145,7 @@ public class RabbitMqClient : IQueueClient
         }));
     }
 
-    private ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken = default)
+    private ValueTask<IConnection> GetConnectionAsync(CancellationToken cancellationToken)
     {
         CheckDisposed();
         cancellationToken.ThrowIfCancellationRequested();
@@ -156,9 +157,9 @@ public class RabbitMqClient : IQueueClient
         return ConnectSlowAsync(cancellationToken);
     }
 
-    private async ValueTask<IConnection> ConnectSlowAsync(CancellationToken token)
+    private async ValueTask<IConnection> ConnectSlowAsync(CancellationToken cancellationToken)
     {
-        await _connectionLock.WaitAsync(token);
+        await _connectionLock.WaitAsync(cancellationToken);
 
         try
         {
@@ -168,7 +169,7 @@ public class RabbitMqClient : IQueueClient
             _logger.ConnectingToRabbitMq();
 
             // Create a new connection
-            var connection = await _connectionFactory.CreateConnectionAsync(token);
+            var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
             // Setup logging
             _ = new ConnectionLogger(connection, _logger);
@@ -185,10 +186,16 @@ public class RabbitMqClient : IQueueClient
         }
     }
 
-    private async Task<IChannel> GetChannelAsync(CancellationToken cancellationToken = default)
+    private async Task<IChannel> GetChannelAsync(bool enablePublisherConfirms, CancellationToken cancellationToken)
     {
         var connection = await GetConnectionAsync(cancellationToken);
-        return await connection.CreateChannelAsync(cancellationToken: cancellationToken);
+
+        var options = new CreateChannelOptions(
+            publisherConfirmationsEnabled: enablePublisherConfirms,
+            publisherConfirmationTrackingEnabled: enablePublisherConfirms
+        );
+
+        return await connection.CreateChannelAsync(options, cancellationToken);
     }
 
     private void CheckDisposed()
