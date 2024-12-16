@@ -1,10 +1,10 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MsSql
 {
     using System.Collections.Generic;
-    using System.Data.SqlClient;
     using System.Threading.Tasks;
     using Abstractions;
     using Dapper;
+    using Microsoft.Data.SqlClient;
 
     public abstract class BaseMsSqlRepository : BaseRepository<SqlConnection>
     {

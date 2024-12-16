@@ -1,9 +1,7 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MsSql
 {
-    using System.Data.SqlClient;
     using Abstractions.Factories;
+    using Microsoft.Data.SqlClient;
 
-    public interface IMsSqlConnectionFactory : IConnectionFactory<SqlConnection>
-    {
-    }
+    public interface IMsSqlConnectionFactory : IConnectionFactory<SqlConnection>;
 }

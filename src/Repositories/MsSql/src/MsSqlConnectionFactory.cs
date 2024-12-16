@@ -1,24 +1,16 @@
 ﻿namespace ClickView.GoodStuff.Repositories.MsSql
 {
     using System;
-    using System.Data.SqlClient;
     using Abstractions.Factories;
+    using Microsoft.Data.SqlClient;
 
-    public class MsSqlConnectionFactory : MsSqlConnectionFactory<MsSqlConnectionOptions>
-    {
-        public MsSqlConnectionFactory(ConnectionFactoryOptions<MsSqlConnectionOptions> options) : base(options)
-        {
-        }
-    }
+    public class MsSqlConnectionFactory(ConnectionFactoryOptions<MsSqlConnectionOptions> options)
+        : MsSqlConnectionFactory<MsSqlConnectionOptions>(options);
 
-    public class MsSqlConnectionFactory<TOptions>
-        : ConnectionFactory<SqlConnection, TOptions>, IMsSqlConnectionFactory
+    public class MsSqlConnectionFactory<TOptions>(ConnectionFactoryOptions<TOptions> options)
+        : ConnectionFactory<SqlConnection, TOptions>(options), IMsSqlConnectionFactory
         where TOptions : MsSqlConnectionOptions
     {
-        public MsSqlConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
-        {
-        }
-
         public override SqlConnection GetReadConnection()
         {
             var cs = ReadConnectionString;
