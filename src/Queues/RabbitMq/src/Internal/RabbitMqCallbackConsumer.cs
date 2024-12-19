@@ -10,14 +10,14 @@ internal class RabbitMqCallbackConsumer<TData>(
     Func<MessageContext<TData>, CancellationToken, Task> callback,
     CountWaiter taskWaiter,
     IMessageSerializer serializer,
-    ILogger<RabbitMqCallbackConsumer<TData>> logger)
+    ILogger<RabbitMqCallbackConsumer<TData>>? logger)
     : AsyncDefaultBasicConsumer(channel)
 {
     public override Task HandleBasicDeliverAsync(string consumerTag, ulong deliveryTag, bool redelivered,
         string exchange, string routingKey, IReadOnlyBasicProperties properties, ReadOnlyMemory<byte> body,
         CancellationToken cancellationToken = default)
     {
-        logger.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
+        logger?.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
 
         return HandleBasicDeliverAsync(deliveryTag, body, cancellationToken);
     }
@@ -51,7 +51,7 @@ internal class RabbitMqCallbackConsumer<TData>(
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "Unhandled exception when processing queue message");
+            logger?.LogError(ex, "Unhandled exception when processing queue message");
             throw;
         }
     }

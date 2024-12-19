@@ -2,7 +2,6 @@ namespace ClickView.GoodStuff.Queues.RabbitMq;
 
 using System.Security.Authentication;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Serialization;
 
@@ -56,7 +55,7 @@ public class RabbitMqClientOptions : IOptions<RabbitMqClientOptions>
     /// <summary>
     /// The logger factory to enable logging
     /// </summary>
-    public ILoggerFactory LoggerFactory { get; set; } = NullLoggerFactory.Instance;
+    public ILoggerFactory? LoggerFactory { get; set; }
 
     /// <summary>
     /// Set to a value greater than one to enable concurrent processing. For a concurrency greater than one,

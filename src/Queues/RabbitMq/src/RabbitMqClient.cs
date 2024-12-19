@@ -12,7 +12,7 @@ public class RabbitMqClient : IQueueClient
     private readonly ConnectionFactory _connectionFactory;
     private readonly SemaphoreSlim _connectionLock = new(1, 1);
     private readonly ActiveSubscriptions _activeSubscriptions = new();
-    private readonly ILogger<RabbitMqClient> _logger;
+    private readonly ILogger<RabbitMqClient>? _logger;
 
     private IConnection? _connection;
     private bool _disposed;
@@ -20,7 +20,7 @@ public class RabbitMqClient : IQueueClient
     public RabbitMqClient(IOptions<RabbitMqClientOptions> options)
     {
         _options = options.Value;
-        _logger = _options.LoggerFactory.CreateLogger<RabbitMqClient>();
+        _logger = _options.LoggerFactory?.CreateLogger<RabbitMqClient>();
         _connectionFactory = CreateConnectionFactory(_options);
     }
 
@@ -87,7 +87,7 @@ public class RabbitMqClient : IQueueClient
                 channel: channel,
                 subscriptions: _activeSubscriptions,
                 taskWaiter: shutdownTaskWaiter,
-                logger: _options.LoggerFactory.CreateLogger<SubscriptionContext>());
+                logger: _options.LoggerFactory?.CreateLogger<SubscriptionContext>());
 
             var consumer = new RabbitMqCallbackConsumer<TData>(
                 channel,
@@ -95,7 +95,7 @@ public class RabbitMqClient : IQueueClient
                 callback,
                 shutdownTaskWaiter,
                 _options.Serializer,
-                _options.LoggerFactory.CreateLogger<RabbitMqCallbackConsumer<TData>>()
+                _options.LoggerFactory?.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );
 
             await channel.BasicQosAsync(0, options.PrefetchCount, false, cancellationToken);
@@ -111,7 +111,7 @@ public class RabbitMqClient : IQueueClient
             // track our active subscriptions
             _activeSubscriptions.Add(subContext);
 
-            _logger.SubscribedToQueue(queue);
+            _logger?.SubscribedToQueue(queue);
 
             return subContext;
         }
@@ -135,7 +135,7 @@ public class RabbitMqClient : IQueueClient
         if (contexts.Count == 0)
             return;
 
-        _logger.UnsubscribingListeners(contexts.Count);
+        _logger?.UnsubscribingListeners(contexts.Count);
 
         // Unsubscribe all at once
         await Task.WhenAll(contexts.Select(async c =>
@@ -166,17 +166,18 @@ public class RabbitMqClient : IQueueClient
             if (_connection is not null)
                 return _connection;
 
-            _logger.ConnectingToRabbitMq();
+            _logger?.ConnectingToRabbitMq();
 
             // Create a new connection
             var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
             // Setup logging
-            _ = new ConnectionLogger(connection, _logger);
+            if (_logger is not null)
+                _ = new ConnectionLogger(connection, _logger);
 
             _connection = connection;
 
-            _logger.ConnectedToRabbitMq();
+            _logger?.ConnectedToRabbitMq();
 
             return connection;
         }
