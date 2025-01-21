@@ -16,8 +16,6 @@ public class NewtonsoftJsonMessageSerializer : IMessageSerializer
         _settings = settings;
     }
 
-    public static readonly NewtonsoftJsonMessageSerializer Default = new();
-
     private static JsonSerializerSettings GetDefaultSettings()
     {
         return new JsonSerializerSettings();
