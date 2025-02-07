@@ -48,14 +48,17 @@ public class RabbitMqClient : IQueueClient
 
         await using var channel = await GetChannelAsync(options.EnablePublisherConfirms, cancellationToken);
 
+        var properties = new BasicProperties
+        {
+            Persistent = options.Persistent,
+            Priority = options.Priority
+        };
+
         await channel.BasicPublishAsync(
             exchange: exchange,
             routingKey: options.RoutingKey,
             mandatory: true,
-            basicProperties: new BasicProperties
-            {
-                Persistent = options.Persistent
-            },
+            basicProperties: properties,
             body: bytes,
             cancellationToken: cancellationToken);
     }

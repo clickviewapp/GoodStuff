@@ -11,5 +11,10 @@ public class EnqueueOptions
     /// </summary>
     public bool EnablePublisherConfirms { get; set; }
 
+    /// <summary>
+    /// The priority of the message.
+    /// </summary>
+    public byte Priority { get; set; }
+
     internal static readonly EnqueueOptions Default = new();
 }
