@@ -15,8 +15,12 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <LangVersion>12.0</LangVersion>
+        <LangVersion>13.0</LangVersion>
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
+
+  <PropertyGroup>
+    <TestFrameworkVersion>net9.0</TestFrameworkVersion>
+  </PropertyGroup>
 </Project>
