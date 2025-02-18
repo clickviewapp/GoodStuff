@@ -6,16 +6,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using RequestHeader;
 
-public class CloudflareGeoLocationProvider : RequestHeaderGeoLocationProvider
+public class CloudflareGeoLocationProvider(
+    ILogger<CloudflareGeoLocationProvider> logger,
+    IOptions<CloudflareGeoLocationProviderOptions> options)
+    : RequestHeaderGeoLocationProvider(logger, options)
 {
-    private readonly ILogger<RequestHeaderGeoLocationProvider> _logger;
-
-    public CloudflareGeoLocationProvider(ILogger<CloudflareGeoLocationProvider> logger,
-        IOptions<CloudflareGeoLocationProviderOptions> options)
-        : base(logger, options)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<RequestHeaderGeoLocationProvider> _logger = logger;
 
     protected override string? GetCountryCode(HttpContext httpContext)
     {

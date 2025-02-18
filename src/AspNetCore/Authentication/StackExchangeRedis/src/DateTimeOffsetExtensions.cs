@@ -1,18 +1,17 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
+
+using System;
+
+internal static class DateTimeOffSetExtensions
 {
-    using System;
-
-    internal static class DateTimeOffSetExtensions
+    public static TimeSpan ToRedisExpiryTimeSpan(this DateTimeOffset value)
     {
-        public static TimeSpan ToRedisExpiryTimeSpan(this DateTimeOffset value)
-        {
-            var dif = value.Subtract(DateTimeOffset.UtcNow);
+        var dif = value.Subtract(DateTimeOffset.UtcNow);
 
-            //redis setex command expects the time to be positive
-            if (dif.TotalSeconds <= 0)
-                throw new Exception("Time already expired");
+        //redis setex command expects the time to be positive
+        if (dif.TotalSeconds <= 0)
+            throw new Exception("Time already expired");
 
-            return dif;
-        }
+        return dif;
     }
 }

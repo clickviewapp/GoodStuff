@@ -1,8 +1,5 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure
-{
-    using Microsoft.AspNetCore.Authentication.Cookies;
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure;
 
-    internal interface IUserSessionTicketStore : ITicketStore
-    {
-    }
-}
+using Microsoft.AspNetCore.Authentication.Cookies;
+
+internal interface IUserSessionTicketStore : ITicketStore;
