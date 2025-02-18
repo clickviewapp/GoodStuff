@@ -34,15 +34,15 @@
             if (_options.DefaultHeaders.Count == 0)
                 return _next(context);
 
-            context.Response.OnStarting(() =>
+            context.Response.OnStarting((ctx) =>
             {
                 foreach (var (key, value) in _options.DefaultHeaders)
                 {
-                    context.Response.Headers.TryAdd(key, value);
+                    ((HttpContext) ctx).Response.Headers.TryAdd(key, value);
                 }
 
                 return Task.CompletedTask;
-            });
+            }, context);
 
             return _next(context);
         }
