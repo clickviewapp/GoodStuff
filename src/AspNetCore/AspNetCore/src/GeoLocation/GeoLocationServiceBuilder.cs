@@ -2,12 +2,7 @@ namespace ClickView.GoodStuff.AspNetCore.GeoLocation;
 
 using Microsoft.Extensions.DependencyInjection;
 
-public class GeoLocationServiceBuilder
+public class GeoLocationServiceBuilder(IServiceCollection services)
 {
-    public GeoLocationServiceBuilder(IServiceCollection services)
-    {
-        Services = services;
-    }
-
-    public IServiceCollection Services { get; }
+    public IServiceCollection Services { get; } = services;
 }

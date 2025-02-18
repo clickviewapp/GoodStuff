@@ -1,79 +1,69 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Endpoints
+﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Endpoints;
+
+using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Abstractions;
+using IdentityModel;
+using Infrastructure;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using TokenValidation;
+
+internal sealed class BackChannelLogoutEndpoint(
+    ITokenValidator tokenValidator,
+    IUserSessionStore sessionStore,
+    ILogger<BackChannelLogoutEndpoint> logger)
+    : IEndpoint
 {
-    using System;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using IdentityModel;
-    using Infrastructure;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.Extensions.Logging;
-    using TokenValidation;
-
-    internal sealed class BackChannelLogoutEndpoint : IEndpoint
+    public async Task ProcessAsync(HttpContext context, CancellationToken token = default)
     {
-        private readonly ITokenValidator _tokenValidator;
-        private readonly IUserSessionStore _sessionStore;
-        private readonly ILogger<BackChannelLogoutEndpoint> _logger;
+        logger.LogDebug("Processing Back-Channel logout");
 
-        public BackChannelLogoutEndpoint(ITokenValidator tokenValidator,
-            IUserSessionStore sessionStore,
-            ILogger<BackChannelLogoutEndpoint> logger)
+        context.Response.Headers.CacheControl = "no-cache, no-store";
+        context.Response.Headers.Pragma = "no-cache";
+
+        if (!context.Request.HasFormContentType)
         {
-            _tokenValidator = tokenValidator;
-            _sessionStore = sessionStore;
-            _logger = logger;
+            logger.LogWarning("Failed to process Back-Channel logout");
+
+            context.Response.StatusCode = 400;
+            return;
         }
 
-        public async Task ProcessAsync(HttpContext context, CancellationToken token = default)
+        try
         {
-            _logger.LogDebug("Processing Back-Channel logout");
+            var logoutToken = context.Request.Form[OidcConstants.BackChannelLogoutRequest.LogoutToken]
+                .FirstOrDefault();
 
-            context.Response.Headers.CacheControl = "no-cache, no-store";
-            context.Response.Headers.Pragma = "no-cache";
-
-            if (!context.Request.HasFormContentType)
+            if (string.IsNullOrWhiteSpace(logoutToken))
             {
-                _logger.LogWarning("Failed to process Back-Channel logout");
+                logger.LogWarning("Failed to process Back-Channel logout. Missing logout token");
 
                 context.Response.StatusCode = 400;
                 return;
             }
 
-            try
+            var user = await tokenValidator.ValidateLogoutTokenAsync(logoutToken);
+
+            var sessionId = user.FindFirst(JwtClaimTypes.SessionId)?.Value;
+            if (string.IsNullOrWhiteSpace(sessionId))
             {
-                var logoutToken = context.Request.Form[OidcConstants.BackChannelLogoutRequest.LogoutToken]
-                    .FirstOrDefault();
+                logger.LogWarning("Backchannel logout does not contain a session id");
 
-                if (string.IsNullOrWhiteSpace(logoutToken))
-                {
-                    _logger.LogWarning("Failed to process Back-Channel logout. Missing logout token");
-
-                    context.Response.StatusCode = 400;
-                    return;
-                }
-
-                var user = await _tokenValidator.ValidateLogoutTokenAsync(logoutToken);
-
-                var sessionId = user.FindFirst(JwtClaimTypes.SessionId)?.Value;
-                if (string.IsNullOrWhiteSpace(sessionId))
-                {
-                    _logger.LogWarning("Backchannel logout does not contain a session id");
-
-                    context.Response.StatusCode = 400;
-                    return;
-                }
-
-                await _sessionStore.DeleteBySessionIdAsync(sessionId, token);
-
-                _logger.LogInformation("Back-Channel logout successful for SessionId: {Sid}", sessionId);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to process Back-Channel logout");
                 context.Response.StatusCode = 400;
+                return;
             }
+
+            await sessionStore.DeleteBySessionIdAsync(sessionId, token);
+
+            logger.LogInformation("Back-Channel logout successful for SessionId: {Sid}", sessionId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to process Back-Channel logout");
+            context.Response.StatusCode = 400;
         }
     }
 }
