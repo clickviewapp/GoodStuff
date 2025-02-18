@@ -19,4 +19,8 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>nullable</WarningsAsErrors>
     </PropertyGroup>
+
+  <PropertyGroup>
+    <TestFrameworkVersion>net9.0</TestFrameworkVersion>
+  </PropertyGroup>
 </Project>
