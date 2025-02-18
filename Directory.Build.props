@@ -21,6 +21,8 @@
     </PropertyGroup>
 
   <PropertyGroup>
-    <TestFrameworkVersion>net9.0</TestFrameworkVersion>
+    <CoreTargetFrameworks>net8.0;net9.0</CoreTargetFrameworks>
+    <FullTargetFrameworks>net462;netstandard2.1;net8.0;net9.0</FullTargetFrameworks>
+    <TestTargetFramework>net9.0</TestTargetFramework>
   </PropertyGroup>
 </Project>
