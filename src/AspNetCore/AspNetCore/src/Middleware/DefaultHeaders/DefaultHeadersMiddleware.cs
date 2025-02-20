@@ -36,9 +36,11 @@
 
             context.Response.OnStarting((ctx) =>
             {
+                var httpContext = (HttpContext) ctx;
+
                 foreach (var (key, value) in _options.DefaultHeaders)
                 {
-                    ((HttpContext) ctx).Response.Headers.TryAdd(key, value);
+                    httpContext.Response.Headers.TryAdd(key, value);
                 }
 
                 return Task.CompletedTask;
