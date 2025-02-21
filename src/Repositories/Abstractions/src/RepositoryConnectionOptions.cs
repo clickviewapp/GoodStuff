@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.Abstractions
+namespace ClickView.GoodStuff.Repositories.Abstractions
 {
     using System;
     using System.Collections.Generic;
@@ -84,7 +84,7 @@
             return sb.ToString();
         }
 
-        protected virtual string FormatParameter(string key, string value)
-            => string.IsNullOrWhiteSpace(value) ? string.Empty : key + "=" + value + ";";
+        protected virtual string FormatParameter(string key, string? value)
+            => string.IsNullOrEmpty(value) ? string.Empty : key + "=" + value + ";";
     }
 }
