@@ -160,11 +160,11 @@
         {
             return _retryPolicy.ExecuteAsync(async cancellationToken =>
             {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-                await using var connection = write ? GetWriteConnection() : GetReadConnection();
-#else
+#if NETFRAMEWORK
                 // ReSharper disable once UseAwaitUsing
                 using var connection = write ? GetWriteConnection() : GetReadConnection();
+#else
+                await using var connection = write ? GetWriteConnection() : GetReadConnection();
 #endif
 
                 try

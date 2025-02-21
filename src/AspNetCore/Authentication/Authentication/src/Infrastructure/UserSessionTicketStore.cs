@@ -35,11 +35,7 @@ internal sealed class UserSessionTicketStore(
         return userSessionStore.UpdateAsync(key, userSession);
     }
 
-#if NET6_0_OR_GREATER
     public async Task<AuthenticationTicket?> RetrieveAsync(string key)
-#else
-        public async Task<AuthenticationTicket> RetrieveAsync(string key)
-#endif
     {
         var userSession = await userSessionStore.GetAsync(key);
         if (userSession == null)
