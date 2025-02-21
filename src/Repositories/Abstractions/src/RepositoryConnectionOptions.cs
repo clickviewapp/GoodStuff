@@ -1,4 +1,4 @@
-namespace ClickView.GoodStuff.Repositories.Abstractions
+﻿namespace ClickView.GoodStuff.Repositories.Abstractions
 {
     using System;
     using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace ClickView.GoodStuff.Repositories.Abstractions
             var value = GetParameter(key);
 
             if (value is null)
-                return default;
+                return null;
 
             var type = typeof(T);
 
@@ -42,7 +42,11 @@ namespace ClickView.GoodStuff.Repositories.Abstractions
             {
                 try
                 {
-                    return (T)Enum.Parse(typeof(T), value, ignoreCase: true);
+#if NETFRAMEWORK
+                    return (T) Enum.Parse(typeof(T), value, ignoreCase: true);
+#else
+                    return Enum.Parse<T>(value, ignoreCase: true);
+#endif
                 }
                 catch (Exception ex) when (ex is not ArgumentException)
                 {
