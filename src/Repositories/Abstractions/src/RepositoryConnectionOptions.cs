@@ -42,10 +42,10 @@
             {
                 try
                 {
-#if NETFRAMEWORK
-                    return (T) Enum.Parse(typeof(T), value, ignoreCase: true);
-#else
+#if NET
                     return Enum.Parse<T>(value, ignoreCase: true);
+#else
+                    return (T) Enum.Parse(typeof(T), value, ignoreCase: true);
 #endif
                 }
                 catch (Exception ex) when (ex is not ArgumentException)

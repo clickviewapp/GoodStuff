@@ -43,10 +43,10 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
 
         if (value.Length > 0 && value[0] == Prefix)
         {
-#if NETFRAMEWORK
-            var idPart = value.Substring(1);
-#else
+#if NET
             var idPart = value.AsSpan(1);
+#else
+            var idPart = value.Substring(1);
 #endif
 
             return new IdLong(long.Parse(idPart));
@@ -61,18 +61,18 @@ public readonly struct IdLong : IComparable, IComparable<IdLong>, IEquatable<IdL
     /// <param name="value"></param>
     /// <param name="result"></param>
     /// <returns></returns>
-#if NETFRAMEWORK
-    public static bool TryParse(string? value, out IdLong result)
-#else
+#if NET
     public static bool TryParse([NotNullWhen(true)] string? value, out IdLong result)
+#else
+    public static bool TryParse(string? value, out IdLong result)
 #endif
     {
         if (value is { Length: > 0 } && value[0] == Prefix)
         {
-#if NETFRAMEWORK
-            var idPart = value.Substring(1);
-#else
+#if NET
             var idPart = value.AsSpan(1);
+#else
+            var idPart = value.Substring(1);
 #endif
 
             if (long.TryParse(idPart, out var longValue))
