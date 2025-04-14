@@ -1,6 +1,8 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
-public readonly struct MessagePriority(byte value)
+using System.Diagnostics.CodeAnalysis;
+
+public readonly struct MessagePriority(byte value) : IEquatable<MessagePriority>
 {
     public byte Value { get; } = value;
 
@@ -21,4 +23,29 @@ public readonly struct MessagePriority(byte value)
 
     public static implicit operator byte(MessagePriority priority) => priority.Value;
     public static implicit operator MessagePriority(byte value) => new(value);
+
+    public override bool Equals([NotNullWhen(true)] object? obj)
+    {
+        return base.Equals(obj);
+    }
+
+    public bool Equals(MessagePriority other)
+    {
+        return Value == other.Value;
+    }
+
+    public override int GetHashCode()
+    {
+        return Value.GetHashCode();
+    }
+
+    public static bool operator ==(MessagePriority left, MessagePriority right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(MessagePriority left, MessagePriority right)
+    {
+        return !left.Equals(right);
+    }
 }
