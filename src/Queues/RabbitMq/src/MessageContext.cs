@@ -4,34 +4,47 @@ public class MessageContext<TData>
 {
     private readonly SubscriptionContext _subscriptionContext;
 
-    internal MessageContext(TData data, ulong deliveryTag, DateTime timestamp, string id, SubscriptionContext subscriptionContext)
+    internal MessageContext(TData data, ulong deliveryTag, DateTime timestamp, string id, MessagePriority priority,
+        SubscriptionContext subscriptionContext, bool reDelivered)
     {
         _subscriptionContext = subscriptionContext;
+        ReDelivered = reDelivered;
         Data = data;
         DeliveryTag = deliveryTag;
         Timestamp = timestamp;
         Id = id;
+        Priority = priority;
     }
 
     /// <summary>
     /// The message data
     /// </summary>
-    public TData Data { get; set; }
+    public TData Data { get; }
 
     /// <summary>
     /// The RabbitMQ delivery tag
     /// </summary>
-    public ulong DeliveryTag { get; set; }
+    public ulong DeliveryTag { get; }
 
     /// <summary>
     /// The timestamp the message was enqueued
     /// </summary>
-    public DateTime Timestamp { get; set; }
+    public DateTime Timestamp { get; }
 
     /// <summary>
     /// The unique ID for this message
     /// </summary>
-    public string Id { get; set; }
+    public string Id { get; }
+
+    /// <summary>
+    /// The priority of the message
+    /// </summary>
+    public MessagePriority Priority { get; }
+
+    /// <summary>
+    /// True if the message has been re-delivered
+    /// </summary>
+    public bool ReDelivered { get; }
 
     /// <summary>
     /// Returns true if the RabbitMQ channel is open
