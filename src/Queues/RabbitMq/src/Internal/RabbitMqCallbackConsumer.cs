@@ -19,11 +19,11 @@ internal class RabbitMqCallbackConsumer<TData>(
     {
         logger?.QueueMessageReceived(deliveryTag, consumerTag, exchange, redelivered);
 
-        return HandleBasicDeliverAsync(deliveryTag, body, properties, redelivered, cancellationToken);
+        return HandleBasicDeliverAsync(deliveryTag, body, properties, routingKey, redelivered, cancellationToken);
     }
 
     private async Task HandleBasicDeliverAsync(ulong deliveryTag, ReadOnlyMemory<byte> body,
-        IReadOnlyBasicProperties properties, bool reDelivered, CancellationToken cancellationToken)
+        IReadOnlyBasicProperties properties, string routingKey, bool reDelivered, CancellationToken cancellationToken)
     {
         try
         {
@@ -34,6 +34,7 @@ internal class RabbitMqCallbackConsumer<TData>(
 
             var context = new MessageContext<TData>(
                 data: message.Data,
+                routingKey: routingKey,
                 deliveryTag: deliveryTag,
                 timestamp: DateTimeOffset.FromUnixTimeSeconds(message.Timestamp).UtcDateTime,
                 id: message.Id,

@@ -4,22 +4,28 @@ public class MessageContext<TData>
 {
     private readonly SubscriptionContext _subscriptionContext;
 
-    internal MessageContext(TData data, ulong deliveryTag, DateTime timestamp, string id, MessagePriority priority,
-        SubscriptionContext subscriptionContext, bool reDelivered)
+    internal MessageContext(TData data, string routingKey, ulong deliveryTag, DateTime timestamp, string id,
+        MessagePriority priority, SubscriptionContext subscriptionContext, bool reDelivered)
     {
-        _subscriptionContext = subscriptionContext;
-        ReDelivered = reDelivered;
         Data = data;
+        RoutingKey = routingKey;
         DeliveryTag = deliveryTag;
         Timestamp = timestamp;
         Id = id;
         Priority = priority;
+        _subscriptionContext = subscriptionContext;
+        ReDelivered = reDelivered;
     }
 
     /// <summary>
     /// The message data
     /// </summary>
     public TData Data { get; }
+
+    /// <summary>
+    /// The routing key of the message. If not set, this will be an empty string.
+    /// </summary>
+    public string RoutingKey { get; }
 
     /// <summary>
     /// The RabbitMQ delivery tag
@@ -52,17 +58,26 @@ public class MessageContext<TData>
     public bool IsOpen => _subscriptionContext.IsOpen;
 
     /// <summary>
+    /// Returns true if the message has been acknowledged (either ack or nack).
+    /// </summary>
+    public bool Acknowledged { get; private set; }
+
+    /// <summary>
     /// Acknowledges one or more messages
     /// </summary>
     /// <param name="multiple">If true, acknowledge all outstanding delivery tags up to and including the delivery tag</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public ValueTask AcknowledgeAsync(bool multiple = false, CancellationToken cancellationToken = default)
+    public async ValueTask AcknowledgeAsync(bool multiple = false, CancellationToken cancellationToken = default)
     {
-        return _subscriptionContext.AcknowledgeAsync(
+        CheckAcknowledged();
+
+        await _subscriptionContext.AcknowledgeAsync(
             deliveryTag: DeliveryTag,
             multiple: multiple,
             cancellationToken: cancellationToken);
+
+        Acknowledged = true;
     }
 
     /// <summary>
@@ -72,12 +87,22 @@ public class MessageContext<TData>
     /// <param name="requeue">If true, requeue the delivery (or multiple deliveries if <paramref name="multiple"/> is true)) with the specified delivery tag</param>
     /// <param name="cancellationToken">The cancellation token</param>
     /// <returns></returns>
-    public ValueTask NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true, CancellationToken cancellationToken = default)
+    public async ValueTask NegativeAcknowledgeAsync(bool multiple = false, bool requeue = true, CancellationToken cancellationToken = default)
     {
-        return _subscriptionContext.NegativeAcknowledgeAsync(
+        CheckAcknowledged();
+
+        await _subscriptionContext.NegativeAcknowledgeAsync(
             deliveryTag: DeliveryTag,
             multiple: multiple,
             requeue: requeue,
             cancellationToken: cancellationToken);
+
+        Acknowledged = true;
+    }
+
+    private void CheckAcknowledged()
+    {
+        if (Acknowledged)
+            throw new InvalidOperationException("Message has already been Acknowledged.");
     }
 }
