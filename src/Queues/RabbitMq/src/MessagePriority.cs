@@ -24,28 +24,10 @@ public readonly struct MessagePriority(byte value) : IEquatable<MessagePriority>
     public static implicit operator byte(MessagePriority priority) => priority.Value;
     public static implicit operator MessagePriority(byte value) => new(value);
 
-    public override bool Equals([NotNullWhen(true)] object? obj)
-    {
-        return base.Equals(obj);
-    }
+    public override int GetHashCode() => Value.GetHashCode();
 
-    public bool Equals(MessagePriority other)
-    {
-        return Value == other.Value;
-    }
-
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
-
-    public static bool operator ==(MessagePriority left, MessagePriority right)
-    {
-        return left.Equals(right);
-    }
-
-    public static bool operator !=(MessagePriority left, MessagePriority right)
-    {
-        return !left.Equals(right);
-    }
+    public override bool Equals([NotNullWhen(true)] object? obj) => base.Equals(obj);
+    public bool Equals(MessagePriority other) => Value == other.Value;
+    public static bool operator ==(MessagePriority left, MessagePriority right) => left.Equals(right);
+    public static bool operator !=(MessagePriority left, MessagePriority right) => !left.Equals(right);
 }
