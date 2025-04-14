@@ -51,7 +51,7 @@ public class RabbitMqClient : IQueueClient
         var properties = new BasicProperties
         {
             Persistent = options.Persistent,
-            Priority = options.Priority
+            Priority = options.Priority.Value
         };
 
         await channel.BasicPublishAsync(

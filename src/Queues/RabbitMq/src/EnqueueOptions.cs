@@ -14,7 +14,7 @@ public class EnqueueOptions
     /// <summary>
     /// The priority of the message.
     /// </summary>
-    public byte Priority { get; set; }
+    public MessagePriority Priority { get; set; } = MessagePriority.Normal;
 
     internal static readonly EnqueueOptions Default = new();
 }
