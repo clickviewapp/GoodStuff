@@ -92,6 +92,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Queue", "Queue", "{1ED7C4DE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Hosting.Queue", "src\Hosting\Queue\src\ClickView.GoodStuff.Hosting.Queue.csproj", "{F0E468DB-B42A-4204-98B8-4122291910FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Queues.RabbitMq.Tests", "src\Queues\RabbitMq\test\ClickView.GoodStuff.Queues.RabbitMq.Tests.csproj", "{4639A488-407C-4286-99A0-3A65F4B49E3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -190,6 +192,10 @@ Global
 		{F0E468DB-B42A-4204-98B8-4122291910FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F0E468DB-B42A-4204-98B8-4122291910FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0E468DB-B42A-4204-98B8-4122291910FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4639A488-407C-4286-99A0-3A65F4B49E3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4639A488-407C-4286-99A0-3A65F4B49E3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4639A488-407C-4286-99A0-3A65F4B49E3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4639A488-407C-4286-99A0-3A65F4B49E3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -228,6 +234,7 @@ Global
 		{B3CB4EF7-91A9-42E3-8174-590CC1CE5209} = {41CD17D6-2B4C-4E27-9ABB-D21A6276BE7A}
 		{1ED7C4DE-1658-4A2A-BCCE-26801724A2AB} = {251A1F7B-4B8F-4371-950C-9C55CBD7B116}
 		{F0E468DB-B42A-4204-98B8-4122291910FE} = {1ED7C4DE-1658-4A2A-BCCE-26801724A2AB}
+		{4639A488-407C-4286-99A0-3A65F4B49E3C} = {41CD17D6-2B4C-4E27-9ABB-D21A6276BE7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
