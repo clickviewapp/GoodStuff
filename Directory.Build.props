@@ -1,24 +1,25 @@
 <Project>
-    <PropertyGroup>
-        <Company>ClickView</Company>
-        <Authors>ClickView</Authors>
-        <PackageProjectUrl>https://github.com/clickviewapp/GoodStuff</PackageProjectUrl>
-        <PackageIconUrl>https://static.clickview.com.au/assets/images/nugetlogo-64x64.png</PackageIconUrl>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <NoWarn>CS1591</NoWarn>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Company>ClickView</Company>
+    <Authors>ClickView</Authors>
+    <PackageProjectUrl>https://github.com/clickviewapp/GoodStuff</PackageProjectUrl>
+    <PackageIconUrl>https://static.clickview.com.au/assets/images/nugetlogo-64x64.png</PackageIconUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <Version>1.8.0</Version>
-    </PropertyGroup>
+  <PropertyGroup>
+    <Version>1.8.0</Version>
+  </PropertyGroup>
 
-    <PropertyGroup>
-        <LangVersion>13.0</LangVersion>
-        <Nullable>enable</Nullable>
-        <WarningsAsErrors>nullable</WarningsAsErrors>
-    </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>13.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <ImplicitUsings>true</ImplicitUsings>
+  </PropertyGroup>
 
   <PropertyGroup>
     <CoreTargetFrameworks>net8.0;net9.0</CoreTargetFrameworks>

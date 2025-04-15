@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\ClickView.GoodStuff.Queues.RabbitMq.csproj" />
+    <ProjectReference Include="..\..\src\ClickView.GoodStuff.Queues.RabbitMq.csproj" />
   </ItemGroup>
 
 </Project>
