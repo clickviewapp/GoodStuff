@@ -18,10 +18,16 @@ internal static class BasicPropertiesExtensions
             return false;
         }
 
-        if (headerValue is not T typedValue)
+        if (headerValue is null)
         {
             value = default;
             return false;
+        }
+
+        if (headerValue is not T typedValue)
+        {
+            throw new InvalidCastException(
+                $"Unable to cast RabbitMq header '{headerName}' from type '{headerValue.GetType().FullName}' to type '{typeof(T).FullName}'.");
         }
 
         value = typedValue;

@@ -13,7 +13,7 @@ public class MessageContext<TData>
         MessagePriority priority,
         SubscriptionContext subscriptionContext,
         bool reDelivered,
-        int? deliveryCount)
+        long? deliveryCount)
     {
         Data = data;
         RoutingKey = routingKey;
@@ -64,7 +64,7 @@ public class MessageContext<TData>
     /// <summary>
     /// The number of unsuccessful (re)delivery attempts (only for quorum queues)
     /// </summary>
-    public int? DeliveryCount { get; }
+    public long? DeliveryCount { get; }
 
     /// <summary>
     /// Returns true if the RabbitMQ channel is open

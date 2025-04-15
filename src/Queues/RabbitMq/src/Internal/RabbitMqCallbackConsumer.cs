@@ -33,8 +33,8 @@ internal class RabbitMqCallbackConsumer<TData>(
                 throw new RabbitMqClientException("Failed to deserialize message");
 
             // If we have a delivery count, get it
-            int? deliveryCount = null;
-            if (properties.TryGetHeaderValue<int>("x-delivery-count", out var deliveryCountValue))
+            long? deliveryCount = null;
+            if (properties.TryGetHeaderValue<long>("x-delivery-count", out var deliveryCountValue))
                 deliveryCount = deliveryCountValue;
 
             var context = new MessageContext<TData>(
