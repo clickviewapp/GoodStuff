@@ -4,8 +4,16 @@ public class MessageContext<TData>
 {
     private readonly SubscriptionContext _subscriptionContext;
 
-    internal MessageContext(TData data, string routingKey, ulong deliveryTag, DateTime timestamp, string id,
-        MessagePriority priority, SubscriptionContext subscriptionContext, bool reDelivered)
+    internal MessageContext(
+        TData data,
+        string routingKey,
+        ulong deliveryTag,
+        DateTime timestamp,
+        string id,
+        MessagePriority priority,
+        SubscriptionContext subscriptionContext,
+        bool reDelivered,
+        int? deliveryCount)
     {
         Data = data;
         RoutingKey = routingKey;
@@ -15,6 +23,7 @@ public class MessageContext<TData>
         Priority = priority;
         _subscriptionContext = subscriptionContext;
         ReDelivered = reDelivered;
+        DeliveryCount = deliveryCount;
     }
 
     /// <summary>
@@ -51,6 +60,11 @@ public class MessageContext<TData>
     /// True if the message has been re-delivered
     /// </summary>
     public bool ReDelivered { get; }
+
+    /// <summary>
+    /// The number of unsuccessful (re)delivery attempts (only for quorum queues)
+    /// </summary>
+    public int? DeliveryCount { get; }
 
     /// <summary>
     /// Returns true if the RabbitMQ channel is open
