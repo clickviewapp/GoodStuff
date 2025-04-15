@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Queues.RabbitMq;
 
 /// <summary>
-/// A hosted service that connects to a queue and executes <see cref="OnMessageAsync(TMessage,System.Threading.CancellationToken)" />
+/// A hosted service that connects to a queue and executes <see cref="OnMessageAsync(QueueMessage{TMessage},CancellationToken)" />
 /// when a message is received
 /// </summary>
 /// <typeparam name="TMessage"></typeparam>
@@ -27,7 +27,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
         CancellationToken cancellationToken)
     {
         return queueClient.SubscribeAsync<TMessage>(queueName,
-            OnMessageAsync,
+            OnMessageInternalAsync,
             new SubscribeOptions {PrefetchCount = Options.ConcurrentTaskCount},
             cancellationToken);
     }
@@ -36,16 +36,16 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// This method is called when a message has been received from the configured queue.
     /// </summary>
     /// <param name="message"></param>
-    /// <param name="token"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected abstract Task OnMessageAsync(TMessage message, CancellationToken token);
+    protected abstract Task OnMessageAsync(QueueMessage<TMessage> message, CancellationToken cancellationToken);
 
     /// <summary>
     /// Triggered when a message is received from the configured queue.
     /// </summary>>
     /// <param name="messageContext"></param>
     /// <param name="cancellationToken"></param>
-    private async Task OnMessageAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
+    private async Task OnMessageInternalAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
     {
         using var logScope = Logger.BeginScope(new MessageContextScope<TMessage>(messageContext));
 
@@ -53,7 +53,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
 
         try
         {
-            await OnMessageAsync(messageContext.Data, cancellationToken);
+            await OnMessageAsync(new QueueMessage<TMessage>(messageContext), cancellationToken);
         }
         catch (OperationCanceledException)
         {
@@ -65,6 +65,8 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
             Logger.LogError(ex, "Unhandled exception caught when processing message");
         }
 
-        await AcknowledgeAsync(messageContext.DeliveryTag, false, cancellationToken);
+        // Acknowledge the message if it has not been acknowledged
+        if (!messageContext.Acknowledged)
+            await AcknowledgeAsync(messageContext.DeliveryTag, false, cancellationToken);
     }
 }
