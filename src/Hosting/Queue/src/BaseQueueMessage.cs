@@ -40,4 +40,9 @@ public abstract class BaseQueueMessage<TData>
     /// True if the message has been re-delivered
     /// </summary>
     public bool ReDelivered => MessageContext.ReDelivered;
+
+    /// <summary>
+    /// The number of unsuccessful (re)delivery attempts (only for quorum queues)
+    /// </summary>
+    public long? DeliveryCount => MessageContext.DeliveryCount;
 }
