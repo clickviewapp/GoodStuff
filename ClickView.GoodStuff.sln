@@ -50,6 +50,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solutio
 		Directory.Build.props = Directory.Build.props
 		.editorconfig = .editorconfig
 		.github\dependabot.yml = .github\dependabot.yml
+		Directory.Build.targets = Directory.Build.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Id Generators", "Id Generators", "{9478C56E-C226-4DD9-AC2E-0A4E9085414D}"

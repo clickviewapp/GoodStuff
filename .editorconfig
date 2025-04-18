@@ -246,7 +246,8 @@ dotnet_diagnostic.IDE0059.severity = warning
 # IDE0161: Convert to file-scoped namespace
 dotnet_diagnostic.IDE0161.severity = warning
 
-[*.{xml,config,*proj,nuspec,props,resx,targets,yml,tasks}]
+# Xml config files
+[*.{props,targets,ruleset,config,nuspec,resx,vsixmanifest,vsct}]
 indent_size = 2
 
 [*.json]

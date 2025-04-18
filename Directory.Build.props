@@ -4,6 +4,7 @@
     <Authors>ClickView</Authors>
     <PackageProjectUrl>https://github.com/clickviewapp/GoodStuff</PackageProjectUrl>
     <PackageIconUrl>https://static.clickview.com.au/assets/images/nugetlogo-64x64.png</PackageIconUrl>
+    <PackageIcon>package-icon.png</PackageIcon>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -13,6 +14,10 @@
   <PropertyGroup>
     <Version>1.9.0-rc1</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="$(AssemblyName).Tests" />
+  </ItemGroup>
 
   <PropertyGroup>
     <LangVersion>13.0</LangVersion>
