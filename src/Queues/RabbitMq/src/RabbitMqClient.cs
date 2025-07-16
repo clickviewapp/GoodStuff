@@ -46,7 +46,8 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms, cancellationToken);
+        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms,
+            cancellationToken : cancellationToken);
 
         var properties = new BasicProperties
         {
@@ -79,7 +80,7 @@ public class RabbitMqClient : IQueueClient
 
         // We don't want to dispose the channel here (unless an exception is thrown, see below).
         // The returned SubscriptionContext is the object that should be disposed (which disposes the channel)
-        var channel = await GetChannelAsync(false, cancellationToken);
+        var channel = await GetChannelAsync(false, options.PrefetchCount, cancellationToken);
 
         try
         {
@@ -190,13 +191,16 @@ public class RabbitMqClient : IQueueClient
         }
     }
 
-    private async Task<IChannel> GetChannelAsync(bool enablePublisherConfirms, CancellationToken cancellationToken)
+    private async Task<IChannel> GetChannelAsync(bool enablePublisherConfirms,
+        ushort consumerDispatchConcurrency = 1,
+        CancellationToken cancellationToken = default)
     {
         var connection = await GetConnectionAsync(cancellationToken);
 
         var options = new CreateChannelOptions(
             publisherConfirmationsEnabled: enablePublisherConfirms,
-            publisherConfirmationTrackingEnabled: enablePublisherConfirms
+            publisherConfirmationTrackingEnabled: enablePublisherConfirms,
+            consumerDispatchConcurrency : consumerDispatchConcurrency
         );
 
         return await connection.CreateChannelAsync(options, cancellationToken);
