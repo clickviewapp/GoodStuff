@@ -32,8 +32,11 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// Initialises a new instance of <see cref="BaseQueueHostedService{TOptions}"/>.
     /// </summary>
     /// <param name="options"></param>
+    /// <param name="consumerDispatchConcurrency"></param>
     /// <param name="loggerFactory"></param>
-    protected BaseQueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory)
+    protected BaseQueueHostedService(IOptions<TOptions> options,
+        ILoggerFactory loggerFactory,
+        ushort consumerDispatchConcurrency = 1)
     {
         var type = GetType();
 
@@ -41,7 +44,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         Options = options.Value;
         Logger = loggerFactory.CreateLogger(type);
 
-        _queueClient = new RabbitMqClient(CreateOptions(Options, loggerFactory));
+        _queueClient = new RabbitMqClient(CreateOptions(Options, consumerDispatchConcurrency, loggerFactory));
     }
 
     /// <summary>
@@ -176,7 +179,8 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         return ValueTask.CompletedTask;
     }
 
-    private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options, ILoggerFactory loggerFactory)
+    private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options,
+        ushort consumerDispatchConcurrency,  ILoggerFactory loggerFactory)
     {
         var host = options.Host;
 
@@ -192,7 +196,8 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             ConnectionTimeout = options.ConnectionTimeout,
             EnableSsl = options.EnableSsl,
             IgnoreSslErrors = options.IgnoreSslErrors,
-            LoggerFactory = loggerFactory
+            LoggerFactory = loggerFactory,
+            ConsumerDispatchConcurrency = consumerDispatchConcurrency
         };
 
         if (options.SslVersion != null)
