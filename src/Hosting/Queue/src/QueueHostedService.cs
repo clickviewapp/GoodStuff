@@ -18,8 +18,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// </summary>
     /// <param name="options"></param>
     /// <param name="loggerFactory"></param>
-    protected QueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory)
-        : base(options, loggerFactory, options.Value.ConcurrentTaskCount)
+    protected QueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory) : base(options, loggerFactory)
     {
     }
 

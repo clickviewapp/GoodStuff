@@ -34,9 +34,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// <param name="options"></param>
     /// <param name="consumerDispatchConcurrency"></param>
     /// <param name="loggerFactory"></param>
-    protected BaseQueueHostedService(IOptions<TOptions> options,
-        ILoggerFactory loggerFactory,
-        ushort consumerDispatchConcurrency = 1)
+    protected BaseQueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory)
     {
         var type = GetType();
 
@@ -44,7 +42,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         Options = options.Value;
         Logger = loggerFactory.CreateLogger(type);
 
-        _queueClient = new RabbitMqClient(CreateOptions(Options, consumerDispatchConcurrency, loggerFactory));
+        _queueClient = new RabbitMqClient(CreateOptions(Options, loggerFactory));
     }
 
     /// <summary>
@@ -179,8 +177,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         return ValueTask.CompletedTask;
     }
 
-    private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options,
-        ushort consumerDispatchConcurrency,  ILoggerFactory loggerFactory)
+    private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options, ILoggerFactory loggerFactory)
     {
         var host = options.Host;
 
@@ -197,7 +194,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             EnableSsl = options.EnableSsl,
             IgnoreSslErrors = options.IgnoreSslErrors,
             LoggerFactory = loggerFactory,
-            ConsumerDispatchConcurrency = consumerDispatchConcurrency
+            ConsumerDispatchConcurrency = options.ConcurrentTaskCount
         };
 
         if (options.SslVersion != null)

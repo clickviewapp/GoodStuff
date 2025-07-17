@@ -5,8 +5,4 @@ namespace ClickView.GoodStuff.Hosting.Queue;
 /// </summary>
 public abstract class QueueHostedServiceOptions : BaseQueueHostedServiceOptions
 {
-    /// <summary>
-    /// The number of tasks to run concurrently.
-    /// </summary>
-    public ushort ConcurrentTaskCount { get; set; } = 1;
 }

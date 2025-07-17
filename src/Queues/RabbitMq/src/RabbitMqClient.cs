@@ -46,8 +46,7 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms,
-            cancellationToken : cancellationToken);
+        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms, cancellationToken);
 
         var properties = new BasicProperties
         {
@@ -219,7 +218,7 @@ public class RabbitMqClient : IQueueClient
             HostName = options.Host,
             Port = options.Port,
             AutomaticRecoveryEnabled = true,
-            ConsumerDispatchConcurrency = options.ConsumerDispatchConcurrency
+            ConsumerDispatchConcurrency = 1 //options.ConsumerDispatchConcurrency
         };
 
         // Username
