@@ -46,7 +46,9 @@ public class RabbitMqClient : IQueueClient
         var message = MessageWrapper<TData>.New(data);
         var bytes = _options.Serializer.Serialize(message);
 
-        await using var channel = await GetChannelAsync(options.EnablePublisherConfirms, cancellationToken);
+        await using var channel = await GetChannelAsync(
+            options.EnablePublisherConfirms,
+            cancellationToken : cancellationToken);
 
         var properties = new BasicProperties
         {
