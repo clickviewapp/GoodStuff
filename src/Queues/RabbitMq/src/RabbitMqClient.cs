@@ -220,7 +220,7 @@ public class RabbitMqClient : IQueueClient
             HostName = options.Host,
             Port = options.Port,
             AutomaticRecoveryEnabled = true,
-            ConsumerDispatchConcurrency = 1 //options.ConsumerDispatchConcurrency
+            ConsumerDispatchConcurrency = options.ConsumerDispatchConcurrency
         };
 
         // Username
