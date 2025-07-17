@@ -32,7 +32,6 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// Initialises a new instance of <see cref="BaseQueueHostedService{TOptions}"/>.
     /// </summary>
     /// <param name="options"></param>
-    /// <param name="consumerDispatchConcurrency"></param>
     /// <param name="loggerFactory"></param>
     protected BaseQueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory)
     {
