@@ -28,7 +28,11 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     {
         return queueClient.SubscribeAsync<TMessage>(queueName,
             OnMessageInternalAsync,
-            new SubscribeOptions {PrefetchCount = Options.ConcurrentTaskCount},
+            new SubscribeOptions
+            {
+                PrefetchCount = Options.ConcurrentTaskCount,
+                ConsumerDispatchConcurrency = Options.ConcurrentTaskCount
+            },
             cancellationToken);
     }
 

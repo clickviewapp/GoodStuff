@@ -57,9 +57,4 @@ public abstract class BaseQueueHostedServiceOptions
     /// The serializer to use for deserializing messages from the Queue
     /// </summary>
     public IMessageSerializer? Serializer { get; set; }
-
-    /// <summary>
-    /// The number of tasks to run concurrently.
-    /// </summary>
-    public ushort ConcurrentTaskCount { get; set; } = 1;
 }

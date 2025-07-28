@@ -192,8 +192,7 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
             ConnectionTimeout = options.ConnectionTimeout,
             EnableSsl = options.EnableSsl,
             IgnoreSslErrors = options.IgnoreSslErrors,
-            LoggerFactory = loggerFactory,
-            ConsumerDispatchConcurrency = options.ConcurrentTaskCount
+            LoggerFactory = loggerFactory
         };
 
         if (options.SslVersion != null)
