@@ -49,6 +49,8 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
         var subscribeOptions = new SubscribeOptions
         {
             PrefetchCount = Options.BatchSize,
+            // We only want to run 1 thread when processing batches
+            ConsumerDispatchConcurrency = 1,
             AutoAcknowledge = false
         };
 
@@ -212,7 +214,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
                     }
                     else
                     {
-                        snapshot = Array.Empty<TMessage>();
+                        snapshot = [];
                         latestDeliveryTag = 0;
                     }
                 }
