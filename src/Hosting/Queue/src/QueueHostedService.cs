@@ -59,9 +59,9 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
         {
             await OnMessageAsync(new QueueMessage<TMessage>(messageContext), cancellationToken);
         }
-        catch (OperationCanceledException)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Propagate up to caller to handle
+            // Only ignore operation canceled when its us cancelling the task
             throw;
         }
         catch (Exception ex)
