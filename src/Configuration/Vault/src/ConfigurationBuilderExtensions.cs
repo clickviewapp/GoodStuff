@@ -14,8 +14,10 @@ public static class ConfigurationBuilderExtensions
         string? mountPoint = null,
         int? version = null)
     {
+        ArgumentNullException.ThrowIfNull(configurationBuilder);
         ArgumentNullException.ThrowIfNull(vaultUrl);
         ArgumentNullException.ThrowIfNull(token);
+        ArgumentNullException.ThrowIfNull(path);
 
         var client = new VaultClient(new VaultClientSettings(vaultUrl, new TokenAuthMethodInfo(token)));
 
