@@ -11,7 +11,7 @@ public static class BuildEnvironmentHelper
     /// Checks to see if the current environment is any known build server
     /// </summary>
     /// <returns></returns>
-    public static bool IsBuildEnvironment() => IsOnTeamCity() || IsOnAppVeyor() || IsOnGitHubActions();
+    public static bool IsBuildEnvironment() => IsOnTeamCity() || IsOnAppVeyor() || IsOnGitHubActions() || IsOnGitLabCI();
 
     /// <summary>
     /// Checks to see if the current environment is TeamCity
@@ -30,6 +30,12 @@ public static class BuildEnvironmentHelper
     /// </summary>
     /// <returns></returns>
     public static bool IsOnGitHubActions() => HasEnvironmentVariable("GITHUB_ACTIONS");
+
+    /// <summary>
+    /// Checks to see if the current environment is GitLab CI
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsOnGitLabCI() => HasEnvironmentVariable("GITLAB_CI");
 
     private static bool HasEnvironmentVariable(string name) =>
         !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(name));
