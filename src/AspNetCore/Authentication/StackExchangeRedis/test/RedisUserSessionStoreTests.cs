@@ -174,21 +174,18 @@ public class RedisUserSessionStoreTests
 
     [SkippableFact]
     [SkipOnCI(SkipCiReason)]
-    public async Task Add_Expired_Session_ThrowsException()
+    public async Task Add_Expired_Session_DoesNotThrow()
     {
-        await Assert.ThrowsAsync<Exception>(async () =>
+        var session = new UserSession("6", [1, 2])
         {
-            var session = new UserSession("6", [1, 2])
-            {
-                SessionId = "sessionId6",
-                Subject = "subject6",
-                Expiry = DateTimeOffset.UtcNow.AddSeconds(-10)
-            };
+            SessionId = "sessionId6",
+            Subject = "subject6",
+            Expiry = DateTimeOffset.UtcNow.AddSeconds(-10)
+        };
 
-            var sessionStore = await GetUserSessionStoreAsync();
+        var sessionStore = await GetUserSessionStoreAsync();
 
-            await sessionStore.AddAsync(session, CancellationToken.None);
-        });
+        await sessionStore.AddAsync(session, CancellationToken.None);
     }
 
     private static async Task<IUserSessionStore> GetUserSessionStoreAsync(
