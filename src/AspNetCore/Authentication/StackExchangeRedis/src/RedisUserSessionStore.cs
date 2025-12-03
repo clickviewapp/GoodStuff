@@ -113,12 +113,14 @@ public class RedisUserSessionStore : IUserSessionStore
 
     private void AddInternal(ITransaction transaction, string key, UserSession session)
     {
-        var expireTimeSpan = session.Expiry?.ToRedisExpiryTimeSpan();
+        var expiration = session.Expiry.HasValue
+            ? new Expiration(session.Expiry.Value.UtcDateTime)
+            : default;
 
-        _ = transaction.StringSetAsync(_keyPrefix.Append(key), Serialize(session), expireTimeSpan);
+        _ = transaction.StringSetAsync(_keyPrefix.Append(key), Serialize(session), expiry: expiration);
 
         if (!string.IsNullOrWhiteSpace(session.SessionId))
-            _ = transaction.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, expireTimeSpan);
+            _ = transaction.StringSetAsync(GetSessionIdKey(session.SessionId), session.Key, expiry: expiration);
     }
 
     private static UserSession? Deserialize(byte[] value) => JsonSerializer.Deserialize<UserSession>(value);
