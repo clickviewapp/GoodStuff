@@ -4,7 +4,7 @@ public interface IQueueClient : IAsyncDisposable
 {
     /// <summary>
     /// Connects to the Queue.
-    /// This is not required as the client will auto connect, but is useful for forcing a connection.
+    /// This is not required as the client will auto-connect, but is useful for forcing a connection.
     /// </summary>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
