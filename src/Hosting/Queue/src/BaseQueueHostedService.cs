@@ -6,7 +6,7 @@ using Microsoft.Extensions.Options;
 using Queues.RabbitMq;
 
 /// <summary>
-/// A base class for all queue hosted services to inherit from
+/// A base class for all queue-hosted services to inherit from
 /// </summary>
 /// <typeparam name="TOptions"></typeparam>
 public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncDisposable
@@ -32,16 +32,16 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// Initialises a new instance of <see cref="BaseQueueHostedService{TOptions}"/>.
     /// </summary>
     /// <param name="options"></param>
+    /// <param name="queueClient"></param>
     /// <param name="loggerFactory"></param>
-    protected BaseQueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory)
+    protected BaseQueueHostedService(IOptions<TOptions> options, IQueueClient queueClient, ILoggerFactory loggerFactory)
     {
         var type = GetType();
 
         _name = type.Name;
+        _queueClient = queueClient;
         Options = options.Value;
         Logger = loggerFactory.CreateLogger(type);
-
-        _queueClient = new RabbitMqClient(CreateOptions(Options, loggerFactory));
     }
 
     /// <summary>
@@ -126,12 +126,9 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
 
         _disposed = true;
 
-        // If we still have an open subscription, Dispose it
+        // If we still have an open subscription, dispose it
         if (_subscriptionContext != null)
             await _subscriptionContext.DisposeAsync();
-
-        // Then finally dispose the client
-        await _queueClient.DisposeAsync();
 
         // Clean up everything else
         _subscriptionLock.Dispose();
@@ -176,37 +173,8 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
         return ValueTask.CompletedTask;
     }
 
-    private static RabbitMqClientOptions CreateOptions(BaseQueueHostedServiceOptions options, ILoggerFactory loggerFactory)
-    {
-        var host = options.Host;
-
-        if (string.IsNullOrWhiteSpace(host))
-            throw new ArgumentException($"{nameof(QueueHostedServiceOptions.Host)} is required");
-
-        var o = new RabbitMqClientOptions
-        {
-            Host = host,
-            Port = options.Port,
-            Username = options.Username,
-            Password = options.Password,
-            ConnectionTimeout = options.ConnectionTimeout,
-            EnableSsl = options.EnableSsl,
-            IgnoreSslErrors = options.IgnoreSslErrors,
-            LoggerFactory = loggerFactory
-        };
-
-        if (options.SslVersion != null)
-            o.SslVersion = options.SslVersion.Value;
-
-        if (options.Serializer != null)
-            o.Serializer = options.Serializer;
-
-        return o;
-    }
-
     private void CheckDisposed()
     {
-        if (_disposed)
-            throw new ObjectDisposedException(GetType().Name);
+        ObjectDisposedException.ThrowIf(_disposed, this);
     }
 }
