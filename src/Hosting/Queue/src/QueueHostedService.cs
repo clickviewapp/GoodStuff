@@ -17,8 +17,10 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
     /// Initialises a new instance of <see cref="QueueHostedService{TMessage,TOptions}"/>.
     /// </summary>
     /// <param name="options"></param>
+    /// <param name="queueClient"></param>
     /// <param name="loggerFactory"></param>
-    protected QueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory) : base(options, loggerFactory)
+    protected QueueHostedService(IOptions<TOptions> options, IQueueClient queueClient, ILoggerFactory loggerFactory) :
+        base(options, queueClient, loggerFactory)
     {
     }
 

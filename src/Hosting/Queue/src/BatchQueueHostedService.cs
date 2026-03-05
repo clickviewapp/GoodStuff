@@ -29,8 +29,10 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
     /// Initialises a new instance of <see cref="QueueHostedService{TMessage,TOptions}"/>.
     /// </summary>
     /// <param name="options"></param>
+    /// <param name="queueClient"></param>
     /// <param name="loggerFactory"></param>
-    protected BatchQueueHostedService(IOptions<TOptions> options, ILoggerFactory loggerFactory) : base(options, loggerFactory)
+    protected BatchQueueHostedService(IOptions<TOptions> options, IQueueClient queueClient,
+        ILoggerFactory loggerFactory) : base(options, queueClient, loggerFactory)
     {
         _currentBuffer = new List<TMessage>(Options.BatchSize);
     }
