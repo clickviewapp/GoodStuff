@@ -7,7 +7,7 @@ public static class ServiceCollectionExtensions
 {
     extension(IServiceCollection services)
     {
-        public QueueClientBuilder AddKeyedRabbitMq(string name, Action<RabbitMqClientOptions> configure)
+        public RabbitMqClientBuilder AddKeyedRabbitMq(string name, Action<RabbitMqClientOptions> configure)
         {
             ArgumentNullException.ThrowIfNull(services);
 
@@ -20,10 +20,10 @@ public static class ServiceCollectionExtensions
                 return new RabbitMqClient(options);
             });
 
-            return new QueueClientBuilder(services, name);
+            return new RabbitMqClientBuilder(services, name);
         }
 
-        public QueueClientBuilder AddRabbitMq(Action<RabbitMqClientOptions> configure)
+        public RabbitMqClientBuilder AddRabbitMq(Action<RabbitMqClientOptions> configure)
         {
             ArgumentNullException.ThrowIfNull(services);
 
@@ -31,7 +31,7 @@ public static class ServiceCollectionExtensions
             services.AddSingleton<IPostConfigureOptions<RabbitMqClientOptions>, PostRabbitMqOptions>();
             services.AddSingleton<IQueueClient, RabbitMqClient>();
 
-            return new QueueClientBuilder(services);
+            return new RabbitMqClientBuilder(services);
         }
     }
 }

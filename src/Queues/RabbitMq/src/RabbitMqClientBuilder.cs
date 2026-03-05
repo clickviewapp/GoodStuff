@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serialization;
 
-public class QueueClientBuilder(IServiceCollection services, string name = "")
+public class RabbitMqClientBuilder(IServiceCollection services, string name = "")
 {
     public IServiceCollection Services { get; } = services;
 
-    public QueueClientBuilder UseNewtonsoftJsonMessageSerializer(Action<JsonSerializerSettings>? configure = null)
+    public RabbitMqClientBuilder UseNewtonsoftJsonMessageSerializer(Action<JsonSerializerSettings>? configure = null)
     {
         Services.Configure<RabbitMqClientOptions>(name, o =>
         {
@@ -17,13 +17,13 @@ public class QueueClientBuilder(IServiceCollection services, string name = "")
 
             configure?.Invoke(settings);
 
-            o.Serializer = new NewtonsoftJsonMessageSerializer();
+            o.Serializer = new NewtonsoftJsonMessageSerializer(settings);
         });
 
         return this;
     }
 
-    public QueueClientBuilder UseSystemTextJsonSerializer(Action<JsonSerializerOptions>? configure = null)
+    public RabbitMqClientBuilder UseSystemTextJsonSerializer(Action<JsonSerializerOptions>? configure = null)
     {
         Services.Configure<RabbitMqClientOptions>(name, o =>
         {
