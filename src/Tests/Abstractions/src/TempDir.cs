@@ -4,7 +4,7 @@ namespace ClickView.GoodStuff.Tests.Abstractions
     using System.Diagnostics;
     using System.IO;
 
-    public class TempDir : IDisposable
+    public sealed class TempDir : IDisposable
     {
         private readonly string _path;
 
