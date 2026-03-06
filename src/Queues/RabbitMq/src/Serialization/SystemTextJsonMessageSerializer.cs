@@ -15,7 +15,7 @@ public class SystemTextJsonMessageSerializer : IMessageSerializer
         _options = options;
     }
 
-    private static JsonSerializerOptions GetDefaultOptions()
+    public static JsonSerializerOptions GetDefaultOptions()
     {
         return new JsonSerializerOptions
         {
