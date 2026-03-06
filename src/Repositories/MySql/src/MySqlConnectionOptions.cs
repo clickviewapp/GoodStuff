@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.MySql
+namespace ClickView.GoodStuff.Repositories.MySql
 {
     using Abstractions;
 

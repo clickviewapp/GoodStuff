@@ -1,8 +1,8 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
 
+using System;
 using Abstractions;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 public static class BuilderExtensions
 {

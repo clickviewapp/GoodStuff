@@ -1,7 +1,7 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
 
-using StackExchange.Redis;
 using System;
+using StackExchange.Redis;
 
 public class RedisUserSessionCacheOptions
 {

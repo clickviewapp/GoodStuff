@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.Abstractions.Factories
+namespace ClickView.GoodStuff.Repositories.Abstractions.Factories
 {
     public interface IConnectionFactory<out TConnection>
     {

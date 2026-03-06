@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
 
 using System;
 using System.Collections.Generic;
@@ -95,7 +95,7 @@ internal sealed class TokenValidator : ITokenValidator
             var e = Base64Url.Decode(webKey.E);
             var n = Base64Url.Decode(webKey.N);
 
-            yield return new RsaSecurityKey(new RSAParameters {Exponent = e, Modulus = n})
+            yield return new RsaSecurityKey(new RSAParameters { Exponent = e, Modulus = n })
             {
                 KeyId = webKey.Kid
             };

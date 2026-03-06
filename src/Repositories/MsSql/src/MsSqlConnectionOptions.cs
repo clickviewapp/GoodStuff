@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.MsSql
+namespace ClickView.GoodStuff.Repositories.MsSql
 {
     using Abstractions;
 

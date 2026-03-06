@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.IdGen;
+namespace ClickView.GoodStuff.IdGenerators.IdGen;
 
 using System;
 using System.Diagnostics;
@@ -21,7 +21,7 @@ internal class GeneratorIdSource
         if (bits <= 0)
             throw new ArgumentException("Value must be greater than 0", nameof(bits));
 
-        if(bits > 32)
+        if (bits > 32)
             throw new ArgumentException("Value must be less than 32", nameof(bits));
 
         if (TryGetIdFromPrivateIpV4(bits, out var generatorId))

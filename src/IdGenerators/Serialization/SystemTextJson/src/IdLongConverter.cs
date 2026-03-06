@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.Serialization.SystemTextJson;
+namespace ClickView.GoodStuff.IdGenerators.Serialization.SystemTextJson;
 
 using System;
 using System.Text.Json;

@@ -1,4 +1,4 @@
-﻿// See https://aka.ms/new-console-template for more information
+// See https://aka.ms/new-console-template for more information
 
 using ClickView.GoodStuff.Queues.RabbitMq;
 using ClickView.GoodStuff.Queues.RabbitMq.Serialization;
@@ -58,7 +58,7 @@ var logger = loggerFactory.CreateLogger("Main");
 
 Console.WriteLine("Hit enter to start!");
 Console.ReadLine();
-await EnqueueAsync(new TestData {Message = "Basic message. Should ack"});
+await EnqueueAsync(new TestData { Message = "Basic message. Should ack" });
 
 await EnqueueAsync(new TestData
 {
@@ -66,8 +66,8 @@ await EnqueueAsync(new TestData
     ShouldAck = false
 });
 
-await EnqueueAsync(new TestData {Message = "High priority message"},
-    new EnqueueOptions {Priority = MessagePriority.High});
+await EnqueueAsync(new TestData { Message = "High priority message" },
+    new EnqueueOptions { Priority = MessagePriority.High });
 
 return;
 

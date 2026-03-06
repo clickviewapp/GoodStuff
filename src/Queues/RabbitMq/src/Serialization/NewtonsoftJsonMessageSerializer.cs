@@ -7,7 +7,7 @@ public class NewtonsoftJsonMessageSerializer : IMessageSerializer
 {
     private readonly JsonSerializerSettings _settings;
 
-    public NewtonsoftJsonMessageSerializer() :this(GetDefaultSettings())
+    public NewtonsoftJsonMessageSerializer() : this(GetDefaultSettings())
     {
     }
 

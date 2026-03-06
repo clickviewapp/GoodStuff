@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.Abstractions
+namespace ClickView.GoodStuff.Repositories.Abstractions
 {
     using System;
     using Factories;

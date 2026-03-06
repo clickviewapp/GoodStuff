@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.Abstractions;
+namespace ClickView.GoodStuff.IdGenerators.Abstractions;
 
 using System;
 using System.Diagnostics.CodeAnalysis;

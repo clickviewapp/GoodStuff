@@ -74,7 +74,7 @@ namespace ClickView.GoodStuff.Repositories.MySql.Tests
             Assert.Equal("hello", options.Host);
             Assert.Equal("db", options.Database);
             Assert.Equal("pw", options.Password);
-            Assert.Equal((ushort?)123, options.Port);
+            Assert.Equal((ushort?) 123, options.Port);
             Assert.Equal("user", options.Username);
             Assert.Equal(true, options.Pipelining);
             Assert.Equal(LoadBalance.LeastConnections, options.LoadBalance);

@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Tests
+namespace ClickView.GoodStuff.AspNetCore.Tests
 {
     using System;
     using Xunit;

@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Abstractions;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.Abstractions;
 
 using System;
 

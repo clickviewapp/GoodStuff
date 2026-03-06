@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.IdGen;
+namespace ClickView.GoodStuff.IdGenerators.IdGen;
 
 using System;
 using System.Threading;

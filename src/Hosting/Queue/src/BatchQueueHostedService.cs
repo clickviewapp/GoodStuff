@@ -94,11 +94,11 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
     /// <inheritdoc />
     protected override async ValueTask DisposeAsyncCore()
     {
-         await base.DisposeAsyncCore();
+        await base.DisposeAsyncCore();
 
-         _cts?.Dispose();
-         _workerLock.Dispose();
-         _workerTask = null;
+        _cts?.Dispose();
+        _workerLock.Dispose();
+        _workerTask = null;
     }
 
     /// <summary>

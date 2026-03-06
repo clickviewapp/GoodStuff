@@ -1,13 +1,13 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis;
 
-using Abstractions;
-using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 using System;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Abstractions;
+using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 public class RedisUserSessionStore : IUserSessionStore
 {
@@ -27,7 +27,7 @@ public class RedisUserSessionStore : IUserSessionStore
 
         var instanceName = options.InstanceName;
         if (!string.IsNullOrEmpty(instanceName))
-            _keyPrefix = (RedisKey)Encoding.UTF8.GetBytes(instanceName);
+            _keyPrefix = (RedisKey) Encoding.UTF8.GetBytes(instanceName);
     }
 
     public Task<UserSession?> GetAsync(string key, CancellationToken token = default)

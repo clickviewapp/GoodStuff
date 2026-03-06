@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.IdGen.Tests;
+namespace ClickView.GoodStuff.IdGenerators.IdGen.Tests;
 
 using Xunit;
 
