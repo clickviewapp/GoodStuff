@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
 
 using System;
 using Microsoft.Extensions.Options;

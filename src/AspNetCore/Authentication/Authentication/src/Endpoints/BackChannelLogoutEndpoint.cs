@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Endpoints;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.Endpoints;
 
 using System;
 using System.Linq;

@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.VersionPage
+namespace ClickView.GoodStuff.AspNetCore.VersionPage
 {
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Http;

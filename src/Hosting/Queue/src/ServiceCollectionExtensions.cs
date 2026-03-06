@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Hosting.Queue;
+namespace ClickView.GoodStuff.Hosting.Queue;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

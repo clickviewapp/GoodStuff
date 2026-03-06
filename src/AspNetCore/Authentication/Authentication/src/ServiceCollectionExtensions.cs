@@ -1,5 +1,6 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication;
+namespace ClickView.GoodStuff.AspNetCore.Authentication;
 
+using System;
 using Endpoints;
 using Infrastructure;
 using Microsoft.AspNetCore.Authentication;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using System;
 using TokenValidation;
 
 public static class ServiceCollectionExtensions

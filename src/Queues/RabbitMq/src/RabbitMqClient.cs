@@ -49,7 +49,7 @@ public class RabbitMqClient : IQueueClient
         await using var channel = await GetChannelAsync(
             options.EnablePublisherConfirms,
             consumerDispatchConcurrency: null,
-            cancellationToken : cancellationToken);
+            cancellationToken: cancellationToken);
 
         var properties = new BasicProperties
         {

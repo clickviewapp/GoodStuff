@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Middleware.DefaultHeaders
+namespace ClickView.GoodStuff.AspNetCore.Middleware.DefaultHeaders
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;

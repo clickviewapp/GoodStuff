@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authorization
+namespace ClickView.GoodStuff.AspNetCore.Authorization
 {
     using System;
     using Microsoft.AspNetCore.Authorization;

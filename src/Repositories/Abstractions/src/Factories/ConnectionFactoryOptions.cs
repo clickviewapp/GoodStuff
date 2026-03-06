@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.Abstractions.Factories
+namespace ClickView.GoodStuff.Repositories.Abstractions.Factories
 {
     public class ConnectionFactoryOptions<TOptions> where TOptions : RepositoryConnectionOptions
     {

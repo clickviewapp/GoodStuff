@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.Repositories.MySql.TestApp
+namespace ClickView.GoodStuff.Repositories.MySql.TestApp
 {
     using System;
     using System.Linq;

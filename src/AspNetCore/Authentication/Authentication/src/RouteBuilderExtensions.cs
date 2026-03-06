@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication;
+namespace ClickView.GoodStuff.AspNetCore.Authentication;
 
 using System.Threading.Tasks;
 using Endpoints;

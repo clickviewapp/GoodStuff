@@ -1,13 +1,13 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.Tests;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.StackExchangeRedis.Tests;
 
-using Abstractions;
-using Microsoft.Extensions.DependencyInjection;
-using StackExchange.Redis;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Abstractions;
 using GoodStuff.Tests.xUnit;
 using McMaster.Extensions.Xunit;
+using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using Xunit;
 
 public class RedisUserSessionStoreTests

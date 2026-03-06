@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure;
+namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure;
 
 using Microsoft.AspNetCore.Authentication.Cookies;
 

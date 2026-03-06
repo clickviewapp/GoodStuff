@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.IdGenerators.Abstractions.Tests;
+namespace ClickView.GoodStuff.IdGenerators.Abstractions.Tests;
 
 using System;
 using Xunit;
@@ -18,7 +18,7 @@ public class IdLongTests
     {
         var id = IdLong.Parse("_1234");
 
-        Assert.Equal(1234, (long)id);
+        Assert.Equal(1234, (long) id);
     }
 
     [Theory]
@@ -33,7 +33,7 @@ public class IdLongTests
     public void TryParse_ReturnsTrue()
     {
         Assert.True(IdLong.TryParse("_1234", out var value));
-        Assert.Equal(1234, (long)value);
+        Assert.Equal(1234, (long) value);
     }
 
     [Theory]

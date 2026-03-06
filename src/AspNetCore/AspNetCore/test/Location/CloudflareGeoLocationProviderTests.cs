@@ -10,7 +10,7 @@ using Xunit;
 
 public class CloudflareGeoLocationProviderTests
 {
-   [Fact]
+    [Fact]
     public async Task GetGeoLocationInfoAsync_XXIPCountry_ReturnsNull()
     {
         var options = new CloudflareGeoLocationProviderOptions();

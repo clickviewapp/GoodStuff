@@ -1,4 +1,4 @@
-﻿namespace ClickView.GoodStuff.AspNetCore;
+namespace ClickView.GoodStuff.AspNetCore;
 
 using Microsoft.AspNetCore.Mvc;
 
