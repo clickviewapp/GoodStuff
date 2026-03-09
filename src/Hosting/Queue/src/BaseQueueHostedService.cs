@@ -66,6 +66,18 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
                 throw new ArgumentException($"{nameof(QueueHostedServiceOptions.QueueName)} is required");
 
             _subscriptionContext = await SubscribeAsync(_queueClient, queueName, cancellationToken);
+
+            // Call OnStart in a try/catch so any exceptions thrown kill the current subscription context
+            try
+            {
+                await OnStartAsync(cancellationToken);
+            }
+            catch
+            {
+                await _subscriptionContext.DisposeAsync();
+                _subscriptionContext = null;
+                throw;
+            }
         }
         finally
         {
@@ -143,6 +155,13 @@ public abstract class BaseQueueHostedService<TOptions> : IHostedService, IAsyncD
     /// <returns></returns>
     protected abstract Task<SubscriptionContext> SubscribeAsync(IQueueClient queueClient, string queueName,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Called when the queue service is starting and the subscription has been created.
+    /// </summary>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    protected virtual Task OnStartAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
     /// <summary>
     /// Called when the queue service is stopping and the subscription has been unsubscribed

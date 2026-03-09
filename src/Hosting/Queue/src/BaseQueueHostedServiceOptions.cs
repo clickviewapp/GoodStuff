@@ -1,5 +1,7 @@
 namespace ClickView.GoodStuff.Hosting.Queue;
 
+using Queues.RabbitMq.Serialization;
+
 /// <summary>
 /// Base queue options which are shared amongst the various hosted queue workers
 /// </summary>
@@ -9,4 +11,10 @@ public abstract class BaseQueueHostedServiceOptions
     /// The name of the queue to subscribe to.
     /// </summary>
     public string? QueueName { get; set; }
+
+    /// <summary>
+    /// Optional serializer override for subscriptions created by this hosted service.
+    /// If null, the queue client's configured serializer is used.
+    /// </summary>
+    public IMessageSerializer? Serializer { get; set; }
 }
