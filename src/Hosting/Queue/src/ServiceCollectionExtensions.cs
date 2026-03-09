@@ -20,7 +20,6 @@ public static class ServiceCollectionExtensions
         /// <typeparam name="TOptions"></typeparam>
         public void AddQueueHostedService<THostedService, TMessage, TOptions>(IConfiguration config)
             where THostedService : QueueHostedService<TMessage, TOptions>
-            where TMessage : class, new()
             where TOptions : QueueHostedServiceOptions
         {
             ArgumentNullException.ThrowIfNull(services);
@@ -39,7 +38,6 @@ public static class ServiceCollectionExtensions
         /// <typeparam name="TOptions"></typeparam>
         public void AddQueueHostedService<THostedService, TMessage, TOptions>(Action<TOptions> configure)
             where THostedService : QueueHostedService<TMessage, TOptions>
-            where TMessage : class, new()
             where TOptions : QueueHostedServiceOptions
         {
             ArgumentNullException.ThrowIfNull(services);
@@ -57,7 +55,6 @@ public static class ServiceCollectionExtensions
         /// <typeparam name="TOptions"></typeparam>
         public void AddQueueHostedService<THostedService, TMessage, TOptions>()
             where THostedService : QueueHostedService<TMessage, TOptions>
-            where TMessage : class, new()
             where TOptions : QueueHostedServiceOptions
         {
             ArgumentNullException.ThrowIfNull(services);
