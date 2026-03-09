@@ -1,6 +1,7 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
 public static class ServiceCollectionExtensions
@@ -12,15 +13,9 @@ public static class ServiceCollectionExtensions
             ArgumentNullException.ThrowIfNull(services);
 
             services.Configure(name, configure);
-            services.AddSingleton<IPostConfigureOptions<RabbitMqClientOptions>, PostRabbitMqOptions>();
-            services.AddKeyedSingleton<IQueueClient>(name, (provider, o) =>
-            {
-                var optionsName = (string) o!;
-                var options = provider.GetRequiredService<IOptionsMonitor<RabbitMqClientOptions>>().Get(optionsName);
-                return new RabbitMqClient(options);
-            });
+            services.AddKeyedSingleton<IQueueClient>(name, KeyedClientBuilder);
 
-            return new RabbitMqClientBuilder(services, name);
+            return services.AddRabbitMqCore(name);
         }
 
         public RabbitMqClientBuilder AddRabbitMq(Action<RabbitMqClientOptions> configure)
@@ -28,10 +23,24 @@ public static class ServiceCollectionExtensions
             ArgumentNullException.ThrowIfNull(services);
 
             services.Configure(configure);
-            services.AddSingleton<IPostConfigureOptions<RabbitMqClientOptions>, PostRabbitMqOptions>();
             services.AddSingleton<IQueueClient, RabbitMqClient>();
 
-            return new RabbitMqClientBuilder(services);
+            return services.AddRabbitMqCore(string.Empty);
+        }
+
+        private RabbitMqClientBuilder AddRabbitMqCore(string name)
+        {
+            // Setup post configure hook to configure logging
+            services.TryAddSingleton<IPostConfigureOptions<RabbitMqClientOptions>, PostRabbitMqOptions>();
+
+            return new RabbitMqClientBuilder(services, name);
+        }
+
+        private static RabbitMqClient KeyedClientBuilder(IServiceProvider provider, object? keyName)
+        {
+            var optionsName = (string) keyName!;
+            var options = provider.GetRequiredService<IOptionsMonitor<RabbitMqClientOptions>>().Get(optionsName);
+            return new RabbitMqClient(options);
         }
     }
 }

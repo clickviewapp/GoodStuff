@@ -5,13 +5,21 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serialization;
 
-public class RabbitMqClientBuilder(IServiceCollection services, string name = "")
+public class RabbitMqClientBuilder
 {
-    public IServiceCollection Services { get; } = services;
+    private readonly string _name;
+
+    internal RabbitMqClientBuilder(IServiceCollection services, string name)
+    {
+        _name = name;
+        Services = services;
+    }
+
+    public IServiceCollection Services { get; }
 
     public RabbitMqClientBuilder UseNewtonsoftJsonMessageSerializer(Action<JsonSerializerSettings>? configure = null)
     {
-        Services.Configure<RabbitMqClientOptions>(name, o =>
+        Services.Configure<RabbitMqClientOptions>(_name, o =>
         {
             var settings = NewtonsoftJsonMessageSerializer.GetDefaultSettings();
 
@@ -25,7 +33,7 @@ public class RabbitMqClientBuilder(IServiceCollection services, string name = ""
 
     public RabbitMqClientBuilder UseSystemTextJsonSerializer(Action<JsonSerializerOptions>? configure = null)
     {
-        Services.Configure<RabbitMqClientOptions>(name, o =>
+        Services.Configure<RabbitMqClientOptions>(_name, o =>
         {
             var options = SystemTextJsonMessageSerializer.GetDefaultOptions();
 
