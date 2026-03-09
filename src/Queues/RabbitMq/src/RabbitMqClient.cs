@@ -103,7 +103,7 @@ public class RabbitMqClient : IQueueClient
                 subContext,
                 callback,
                 shutdownTaskWaiter,
-                _options.Serializer,
+                options.Serializer ?? _options.Serializer,
                 _options.LoggerFactory?.CreateLogger<RabbitMqCallbackConsumer<TData>>()
             );
 

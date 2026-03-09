@@ -33,7 +33,8 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
             new SubscribeOptions
             {
                 PrefetchCount = Options.ConcurrentTaskCount,
-                ConsumerDispatchConcurrency = Options.ConcurrentTaskCount
+                ConsumerDispatchConcurrency = Options.ConcurrentTaskCount,
+                Serializer = Options.Serializer
             },
             cancellationToken);
     }
@@ -63,7 +64,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {
-            // Only ignore operation canceled when its us cancelling the task
+            // Only ignore operation cancelled when it's us cancelling the task
             throw;
         }
         catch (Exception ex)

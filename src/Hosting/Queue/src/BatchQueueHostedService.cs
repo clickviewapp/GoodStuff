@@ -53,7 +53,8 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             PrefetchCount = Options.BatchSize,
             // We only want to run 1 thread when processing batches
             ConsumerDispatchConcurrency = 1,
-            AutoAcknowledge = false
+            AutoAcknowledge = false,
+            Serializer = Options.Serializer
         };
 
         var subscriptionContext = await queueClient.SubscribeAsync<TMessage>(
@@ -62,7 +63,7 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
             subscribeOptions,
             cancellationToken);
 
-        // Start background worker task if we have a minimum or a maximum flush interval
+        // Start the background worker task if we have a minimum or a maximum flush interval
         if (minFlushInterval > TimeSpan.Zero || maxFlushInterval > TimeSpan.Zero)
         {
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -76,7 +77,9 @@ public abstract class BatchQueueHostedService<TMessage, TOptions> : BaseQueueHos
     protected override async Task OnStopAsync(CancellationToken cancellationToken)
     {
         // Stop the worker task and wait for it to finish if it exists
-        _cts?.Cancel();
+        if (_cts is not null)
+            await _cts.CancelAsync();
+
         var workerTask = _workerTask;
         if (workerTask is not null)
         {

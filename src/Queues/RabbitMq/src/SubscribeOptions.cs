@@ -1,5 +1,7 @@
 namespace ClickView.GoodStuff.Queues.RabbitMq;
 
+using Serialization;
+
 public class SubscribeOptions
 {
     public bool AutoAcknowledge { get; init; }
@@ -13,6 +15,8 @@ public class SubscribeOptions
     /// <remarks>For concurrency greater than one this removes the guarantee that consumers handle messages in the order they receive them.
     /// In addition to that consumers need to be thread/concurrency safe.</remarks>
     public ushort? ConsumerDispatchConcurrency { get; set; }
+
+    public IMessageSerializer? Serializer { get; set; }
 
     internal static readonly SubscribeOptions Default = new();
 }
