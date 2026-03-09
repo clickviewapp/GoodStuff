@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Serialization;
 
+/// <summary>
+/// Builder for configuring <see cref="RabbitMqClientOptions"/> registered in dependency injection.
+/// </summary>
 public class RabbitMqClientBuilder
 {
     private readonly string _name;
@@ -15,8 +18,16 @@ public class RabbitMqClientBuilder
         Services = services;
     }
 
+    /// <summary>
+    /// The <see cref="IServiceCollection"/> being configured.
+    /// </summary>
     public IServiceCollection Services { get; }
 
+    /// <summary>
+    /// Configures Newtonsoft.Json as the serializer for this client registration.
+    /// </summary>
+    /// <param name="configure">Optional settings callback.</param>
+    /// <returns>The current builder.</returns>
     public RabbitMqClientBuilder UseNewtonsoftJsonMessageSerializer(Action<JsonSerializerSettings>? configure = null)
     {
         Services.Configure<RabbitMqClientOptions>(_name, o =>
@@ -31,6 +42,11 @@ public class RabbitMqClientBuilder
         return this;
     }
 
+    /// <summary>
+    /// Configures System.Text.Json as the serializer for this client registration.
+    /// </summary>
+    /// <param name="configure">Optional options callback.</param>
+    /// <returns>The current builder.</returns>
     public RabbitMqClientBuilder UseSystemTextJsonSerializer(Action<JsonSerializerOptions>? configure = null)
     {
         Services.Configure<RabbitMqClientOptions>(_name, o =>

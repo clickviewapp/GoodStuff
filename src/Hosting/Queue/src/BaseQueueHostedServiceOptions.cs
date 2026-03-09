@@ -12,5 +12,9 @@ public abstract class BaseQueueHostedServiceOptions
     /// </summary>
     public string? QueueName { get; set; }
 
+    /// <summary>
+    /// Optional serializer override for subscriptions created by this hosted service.
+    /// If null, the queue client's configured serializer is used.
+    /// </summary>
     public IMessageSerializer? Serializer { get; set; }
 }

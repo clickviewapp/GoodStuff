@@ -49,7 +49,7 @@ public abstract class QueueHostedService<TMessage, TOptions> : BaseQueueHostedSe
 
     /// <summary>
     /// Triggered when a message is received from the configured queue.
-    /// </summary>>
+    /// </summary>
     /// <param name="messageContext"></param>
     /// <param name="cancellationToken"></param>
     private async Task OnMessageInternalAsync(MessageContext<TMessage> messageContext, CancellationToken cancellationToken)
