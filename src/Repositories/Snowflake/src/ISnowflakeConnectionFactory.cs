@@ -1,9 +1,6 @@
-﻿namespace ClickView.GoodStuff.Repositories.Snowflake
-{
-    using Abstractions.Factories;
-    using global::Snowflake.Data.Client;
+﻿namespace ClickView.GoodStuff.Repositories.Snowflake;
 
-    public interface ISnowflakeConnectionFactory : IConnectionFactory<SnowflakeDbConnection>
-    {
-    }
-}
+using Abstractions.Factories;
+using global::Snowflake.Data.Client;
+
+public interface ISnowflakeConnectionFactory : IConnectionFactory<SnowflakeDbConnection>;

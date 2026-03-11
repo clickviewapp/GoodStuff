@@ -1,13 +1,11 @@
-﻿namespace ClickView.GoodStuff.Repositories.Snowflake
-{
-    using System.Collections.Generic;
-    using System.Threading.Tasks;
-    using Abstractions;
-    using Dapper;
-    using global::Snowflake.Data.Client;
+namespace ClickView.GoodStuff.Repositories.Snowflake;
 
-    public class BaseSnowflakeRepository : BaseRepository<SnowflakeDbConnection>
-    {
+using Abstractions;
+using Dapper;
+using global::Snowflake.Data.Client;
+
+public class BaseSnowflakeRepository : BaseRepository<SnowflakeDbConnection>
+{
         public BaseSnowflakeRepository(ISnowflakeConnectionFactory connectionFactory) : base(
             connectionFactory)
         {
