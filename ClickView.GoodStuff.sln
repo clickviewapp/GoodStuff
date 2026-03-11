@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28917.181
@@ -102,6 +102,12 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Vault", "Vault", "{AFB5C6D0-7ABE-4809-90C8-6A3EB2CE1A14}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Configuration.Vault", "src\Configuration\Vault\src\ClickView.GoodStuff.Configuration.Vault.csproj", "{0CE2213A-4C95-4692-96BC-B16079C601BE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Snowflake", "Snowflake", "{FB39F90B-78CE-416D-99DF-ED74B3D5483E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.Snowflake", "src\Repositories\Snowflake\src\ClickView.GoodStuff.Repositories.Snowflake.csproj", "{AAC65E72-7744-42D6-94DB-D2041B8DC39C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClickView.GoodStuff.Repositories.Snowflake.Tests", "src\Repositories\Snowflake\test\ClickView.GoodStuff.Repositories.Snowflake.Tests.csproj", "{6C099EEC-28F1-4F65-B6AF-9410AC821B7C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -213,6 +219,14 @@ Global
 		{0CE2213A-4C95-4692-96BC-B16079C601BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CE2213A-4C95-4692-96BC-B16079C601BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CE2213A-4C95-4692-96BC-B16079C601BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAC65E72-7744-42D6-94DB-D2041B8DC39C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAC65E72-7744-42D6-94DB-D2041B8DC39C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAC65E72-7744-42D6-94DB-D2041B8DC39C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAC65E72-7744-42D6-94DB-D2041B8DC39C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C099EEC-28F1-4F65-B6AF-9410AC821B7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C099EEC-28F1-4F65-B6AF-9410AC821B7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C099EEC-28F1-4F65-B6AF-9410AC821B7C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C099EEC-28F1-4F65-B6AF-9410AC821B7C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -255,6 +269,9 @@ Global
 		{51DC2CBC-4C90-4533-919F-7053F7E21FD8} = {41CD17D6-2B4C-4E27-9ABB-D21A6276BE7A}
 		{AFB5C6D0-7ABE-4809-90C8-6A3EB2CE1A14} = {28B6F3FE-DB59-4FB9-A0F1-264E17CFA5C9}
 		{0CE2213A-4C95-4692-96BC-B16079C601BE} = {AFB5C6D0-7ABE-4809-90C8-6A3EB2CE1A14}
+		{FB39F90B-78CE-416D-99DF-ED74B3D5483E} = {17A5F05F-B3EB-4011-A58C-BB1BB7995692}
+		{AAC65E72-7744-42D6-94DB-D2041B8DC39C} = {FB39F90B-78CE-416D-99DF-ED74B3D5483E}
+		{6C099EEC-28F1-4F65-B6AF-9410AC821B7C} = {FB39F90B-78CE-416D-99DF-ED74B3D5483E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F935033F-FAFD-48D4-843C-C7C8A9AE6562}
