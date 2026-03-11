@@ -1,5 +1,6 @@
 namespace ClickView.GoodStuff.Repositories.Snowflake;
 
+using System.Threading;
 using Abstractions;
 using Dapper;
 using global::Snowflake.Data.Client;
@@ -12,16 +13,15 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// </summary>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<int> ExecuteAsync(string sql, object? param = null)
+    protected Task<int> ExecuteAsync(string sql, object? param = null, CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetWriteConnection();
-#else
-        using var conn = GetWriteConnection();
-#endif
-            
-        return await conn.ExecuteAsync(sql, param);
+        return WrapAsync((con, cd) => con.ExecuteAsync(cd),
+            write: true,
+            sql,
+            param,
+            cancellationToken);
     }
 
     /// <summary>
@@ -30,16 +30,16 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// <typeparam name="T"></typeparam>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<T?> ExecuteScalarAsync<T>(string sql, object? param = null)
+    protected Task<T?> ExecuteScalarAsync<T>(string sql, object? param = null,
+        CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetWriteConnection();
-#else
-            using var conn = GetWriteConnection();
-#endif
-
-        return await conn.ExecuteScalarAsync<T>(sql, param);
+        return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
+            write: true,
+            sql,
+            param,
+            cancellationToken);
     }
 
     /// <summary>
@@ -48,16 +48,16 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// <typeparam name="T"></typeparam>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<T?> QueryScalarValueAsync<T>(string sql, object? param = null)
+    protected Task<T?> QueryScalarValueAsync<T>(string sql, object? param = null,
+        CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetReadConnection();
-#else
-            using var conn = GetReadConnection();
-#endif
-
-        return await conn.ExecuteScalarAsync<T>(sql, param);
+        return WrapAsync((con, cd) => con.ExecuteScalarAsync<T>(cd),
+            write: false,
+            sql,
+            param,
+            cancellationToken);
     }
 
     /// <summary>
@@ -66,16 +66,16 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// <typeparam name="T"></typeparam>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null)
+    protected Task<T?> QueryFirstOrDefaultAsync<T>(string sql, object? param = null,
+        CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetReadConnection();
-#else
-            using var conn = GetReadConnection();
-#endif
-
-        return await conn.QueryFirstOrDefaultAsync<T>(sql, param);
+        return WrapAsync((con, cd) => con.QueryFirstOrDefaultAsync<T>(cd),
+            write: false,
+            sql,
+            param,
+            cancellationToken);
     }
 
     /// <summary>
@@ -84,16 +84,16 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// <typeparam name="T"></typeparam>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null)
+    protected Task<T?> QuerySingleOrDefaultAsync<T>(string sql, object? param = null,
+        CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetReadConnection();
-#else
-            using var conn = GetReadConnection();
-#endif
-
-        return await conn.QuerySingleOrDefaultAsync<T>(sql, param);
+        return WrapAsync((con, cd) => con.QuerySingleOrDefaultAsync<T>(cd),
+            write: false,
+            sql,
+            param,
+            cancellationToken);
     }
 
     /// <summary>
@@ -102,27 +102,40 @@ public abstract class BaseSnowflakeRepository(ISnowflakeConnectionFactory connec
     /// <typeparam name="T"></typeparam>
     /// <param name="sql"></param>
     /// <param name="param"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    protected async Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null)
+    protected Task<IEnumerable<T>> QueryAsync<T>(string sql, object? param = null,
+        CancellationToken cancellationToken = default)
     {
-#if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetReadConnection();
-#else
-            using var conn = GetReadConnection();
-#endif
-
-        return await conn.QueryAsync<T>(sql, param);
+        return WrapAsync((con, cd) => con.QueryAsync<T>(cd),
+            write: false,
+            sql,
+            param,
+            cancellationToken);
     }
 
-    protected async Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql,
-        Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, string splitOn = "Id")
+    protected Task<IEnumerable<TReturn>> QueryAsync<TFirst, TSecond, TThird, TReturn>(string sql,
+        Func<TFirst, TSecond, TThird, TReturn> map, object? param = null, string splitOn = "Id",
+        CancellationToken cancellationToken = default)
+    {
+        return WrapAsync((con, cd) => con.QueryAsync(cd, map, splitOn: splitOn),
+            write: false,
+            sql,
+            param,
+            cancellationToken);
+    }
+
+    private async Task<T> WrapAsync<T>(Func<SnowflakeDbConnection, CommandDefinition, Task<T>> func,
+        bool write, string sql, object? param, CancellationToken cancellationToken)
     {
 #if NETSTANDARD2_1_OR_GREATER || NET6_0_OR_GREATER
-        await using var conn = GetReadConnection();
+        await using var conn = write ? GetWriteConnection() : GetReadConnection();
 #else
-            using var conn = GetReadConnection();
+        using var conn = write ? GetWriteConnection() : GetReadConnection();
 #endif
 
-        return await conn.QueryAsync(sql, map, splitOn: splitOn, param: param);
+        var command = new CommandDefinition(sql, param, cancellationToken: cancellationToken);
+
+        return await func(conn, command);
     }
 }
