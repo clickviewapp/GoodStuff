@@ -3,21 +3,13 @@
 using Abstractions.Factories;
 using global::Snowflake.Data.Client;
 
-public class SnowflakeConnectionFactory : SnowflakeConnectionFactory<SnowflakeConnectionOptions>
-{
-    public SnowflakeConnectionFactory(ConnectionFactoryOptions<SnowflakeConnectionOptions> options) : base(options)
-    {
-    }
-}
+public class SnowflakeConnectionFactory(ConnectionFactoryOptions<SnowflakeConnectionOptions> options)
+    : SnowflakeConnectionFactory<SnowflakeConnectionOptions>(options);
 
-public class SnowflakeConnectionFactory<TOptions>
-    : ConnectionFactory<SnowflakeDbConnection, TOptions>, ISnowflakeConnectionFactory
+public class SnowflakeConnectionFactory<TOptions>(ConnectionFactoryOptions<TOptions> options)
+    : ConnectionFactory<SnowflakeDbConnection, TOptions>(options), ISnowflakeConnectionFactory
     where TOptions : SnowflakeConnectionOptions
 {
-    public SnowflakeConnectionFactory(ConnectionFactoryOptions<TOptions> options) : base(options)
-    {
-    }
-
     public override SnowflakeDbConnection GetReadConnection()
     {
         if (string.IsNullOrEmpty(ReadConnectionString))
