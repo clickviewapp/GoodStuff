@@ -4,6 +4,15 @@ using Abstractions;
 
 public class SnowflakeConnectionOptions : RepositoryConnectionOptions
 {
+    public SnowflakeConnectionOptions()
+    {
+    }
+
+    public SnowflakeConnectionOptions(ISnowflakeAuthenticator authenticator)
+    {
+        UseAuthenticator(authenticator);
+    }
+
     /// <summary>
     /// The full account name which might include additional segments that identify the region and
     /// cloud platform where your account is hosted
@@ -57,5 +66,34 @@ public class SnowflakeConnectionOptions : RepositoryConnectionOptions
     {
         set => SetParameter("password", value);
         get => GetParameter("password");
+    }
+
+    public string? Authenticator
+    {
+        set => SetParameter("authenticator", value);
+        get => GetParameter("authenticator");
+    }
+
+    /// <summary>
+    /// Used to set the name of the cloud provider when authenticator=workload_identity
+    /// </summary>
+    public string? WorkloadIdentityProvider
+    {
+        set => SetParameter("workload_identity_provider", value);
+        get => GetParameter("workload_identity_provider");
+    }
+
+    /// <summary>
+    /// Used to set the programmatic access token (PAT) when authenticator=programmatic_access_token
+    /// </summary>
+    public string? Token
+    {
+        set => SetParameter("token", value);
+        get => GetParameter("token");
+    }
+
+    public void UseAuthenticator(ISnowflakeAuthenticator authenticator)
+    {
+        authenticator.SetOptions(this);
     }
 }
