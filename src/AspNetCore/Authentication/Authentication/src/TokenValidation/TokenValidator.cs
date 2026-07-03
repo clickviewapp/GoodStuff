@@ -54,24 +54,30 @@ internal sealed class TokenValidator : ITokenValidator
         if (claims.FindFirst(JwtRegisteredClaimNames.Sub) == null &&
             claims.FindFirst(JwtRegisteredClaimNames.Sid) == null)
         {
-            throw new Exception(
+            throw new InvalidLogoutTokenException(
                 $"Invalid logout token. {JwtRegisteredClaimNames.Sub} or {JwtRegisteredClaimNames.Sid} missing");
         }
 
         var nonce = claims.FindFirst(JwtRegisteredClaimNames.Nonce)?.Value;
 
         if (!string.IsNullOrWhiteSpace(nonce))
-            throw new Exception($"Invalid logout token. {JwtRegisteredClaimNames.Nonce} missing");
+            throw new InvalidLogoutTokenException($"Invalid logout token. {JwtRegisteredClaimNames.Nonce} missing");
+
+        if (claims.FindFirst(JwtRegisteredClaimNames.Jti) == null)
+            throw new InvalidLogoutTokenException($"Invalid logout token. {JwtRegisteredClaimNames.Jti} missing");
 
         var eventsJson = claims.FindFirst(EventsClaimType)?.Value;
 
         if (string.IsNullOrWhiteSpace(eventsJson))
-            throw new Exception($"Invalid logout token. {EventsClaimType} missing");
+            throw new InvalidLogoutTokenException($"Invalid logout token. {EventsClaimType} missing");
 
         var events = JsonDocument.Parse(eventsJson).RootElement;
 
-        if (!events.TryGetProperty(BackChannelScheme, out _))
-            throw new Exception("Invalid logout token");
+        if (!events.TryGetProperty(BackChannelScheme, out var backChannelEvent) ||
+            backChannelEvent.ValueKind != JsonValueKind.Object)
+        {
+            throw new InvalidLogoutTokenException("Invalid logout token");
+        }
 
         return claims;
     }
@@ -93,7 +99,7 @@ internal sealed class TokenValidator : ITokenValidator
         var result = await _handler.ValidateTokenAsync(jwt, parameters);
 
         if (!result.IsValid)
-            throw result.Exception ?? new SecurityTokenException("Invalid logout token");
+            throw new InvalidLogoutTokenException("Invalid logout token", result.Exception);
 
         return new ClaimsPrincipal(result.ClaimsIdentity);
     }
