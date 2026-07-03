@@ -19,7 +19,7 @@ internal sealed class BackChannelLogoutEndpoint(
 {
     private const string LogoutTokenFormField = "logout_token";
 
-    public async Task ProcessAsync(HttpContext context, CancellationToken token = default)
+    public async Task ProcessAsync(HttpContext context, CancellationToken cancellationToken = default)
     {
         logger.LogDebug("Processing Back-Channel logout");
 
@@ -47,7 +47,7 @@ internal sealed class BackChannelLogoutEndpoint(
                 return;
             }
 
-            var user = await tokenValidator.ValidateLogoutTokenAsync(logoutToken);
+            var user = await tokenValidator.ValidateLogoutTokenAsync(logoutToken, cancellationToken);
 
             var sessionId = user.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
             if (string.IsNullOrWhiteSpace(sessionId))
@@ -58,7 +58,7 @@ internal sealed class BackChannelLogoutEndpoint(
                 return;
             }
 
-            await sessionStore.DeleteBySessionIdAsync(sessionId, token);
+            await sessionStore.DeleteBySessionIdAsync(sessionId, cancellationToken);
 
             logger.LogInformation("Back-Channel logout successful for SessionId: {Sid}", sessionId);
         }

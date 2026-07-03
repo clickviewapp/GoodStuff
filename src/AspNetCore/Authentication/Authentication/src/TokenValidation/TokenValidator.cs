@@ -3,6 +3,7 @@ namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
 using System;
 using System.Security.Claims;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -12,10 +13,10 @@ using Microsoft.IdentityModel.Tokens;
 
 internal sealed class TokenValidator : ITokenValidator
 {
-    private static readonly JsonWebTokenHandler Handler = new();
+    private static readonly JsonWebTokenHandler _handler = new();
 
     private readonly TokenValidatorOptions _options;
-    private readonly ConfigurationManager<OpenIdConnectConfiguration> _configurationManager;
+    private readonly IConfigurationManager<OpenIdConnectConfiguration> _configurationManager;
 
     private const string RoleClaimType = "role";
     private const string EventsClaimType = "events";
@@ -34,14 +35,21 @@ internal sealed class TokenValidator : ITokenValidator
             new OpenIdConnectConfigurationRetriever());
     }
 
-    public Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken)
+    internal TokenValidator(TokenValidatorOptions options, IConfigurationManager<OpenIdConnectConfiguration> configurationManager)
     {
-        return ValidateLogoutTokenAsync(logoutToken, _options.DefaultAudience);
+        _options = options;
+        _configurationManager = configurationManager;
     }
 
-    public async Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience)
+    public Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, CancellationToken cancellationToken = default)
     {
-        var claims = await ValidateJwtAsync(logoutToken, validAudience);
+        return ValidateLogoutTokenAsync(logoutToken, _options.DefaultAudience, cancellationToken);
+    }
+
+    public async Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience,
+        CancellationToken cancellationToken = default)
+    {
+        var claims = await ValidateJwtAsync(logoutToken, validAudience, cancellationToken);
 
         if (claims.FindFirst(JwtRegisteredClaimNames.Sub) == null &&
             claims.FindFirst(JwtRegisteredClaimNames.Sid) == null)
@@ -68,21 +76,21 @@ internal sealed class TokenValidator : ITokenValidator
         return claims;
     }
 
-    private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience)
+    private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience,
+        CancellationToken cancellationToken)
     {
-        var discoveryDocument = await _configurationManager.GetConfigurationAsync();
+        var openIdConnectConfiguration = await _configurationManager.GetConfigurationAsync(cancellationToken);
 
         var parameters = new TokenValidationParameters
         {
-            ValidIssuer = discoveryDocument.Issuer,
+            ValidIssuer = openIdConnectConfiguration.Issuer,
             ValidAudience = validAudience,
-            IssuerSigningKeys = discoveryDocument.SigningKeys,
-
+            IssuerSigningKeys = openIdConnectConfiguration.SigningKeys,
             NameClaimType = JwtRegisteredClaimNames.Name,
             RoleClaimType = RoleClaimType
         };
 
-        var result = await Handler.ValidateTokenAsync(jwt, parameters);
+        var result = await _handler.ValidateTokenAsync(jwt, parameters);
 
         if (!result.IsValid)
             throw result.Exception ?? new SecurityTokenException("Invalid logout token");

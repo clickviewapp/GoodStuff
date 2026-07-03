@@ -5,6 +5,6 @@ using System.Threading.Tasks;
 
 internal interface ITokenValidator
 {
-    Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken);
-    Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience);
+    Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, CancellationToken cancellationToken = default);
+    Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience, CancellationToken cancellationToken = default);
 }
