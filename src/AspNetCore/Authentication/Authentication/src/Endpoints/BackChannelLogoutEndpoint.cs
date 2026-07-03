@@ -5,10 +5,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Abstractions;
-using IdentityModel;
 using Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 using TokenValidation;
 
 internal sealed class BackChannelLogoutEndpoint(
@@ -17,6 +17,8 @@ internal sealed class BackChannelLogoutEndpoint(
     ILogger<BackChannelLogoutEndpoint> logger)
     : IEndpoint
 {
+    private const string LogoutTokenFormField = "logout_token";
+
     public async Task ProcessAsync(HttpContext context, CancellationToken token = default)
     {
         logger.LogDebug("Processing Back-Channel logout");
@@ -34,7 +36,7 @@ internal sealed class BackChannelLogoutEndpoint(
 
         try
         {
-            var logoutToken = context.Request.Form[OidcConstants.BackChannelLogoutRequest.LogoutToken]
+            var logoutToken = context.Request.Form[LogoutTokenFormField]
                 .FirstOrDefault();
 
             if (string.IsNullOrWhiteSpace(logoutToken))
@@ -47,7 +49,7 @@ internal sealed class BackChannelLogoutEndpoint(
 
             var user = await tokenValidator.ValidateLogoutTokenAsync(logoutToken);
 
-            var sessionId = user.FindFirst(JwtClaimTypes.SessionId)?.Value;
+            var sessionId = user.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
             if (string.IsNullOrWhiteSpace(sessionId))
             {
                 logger.LogWarning("Backchannel logout does not contain a session id");

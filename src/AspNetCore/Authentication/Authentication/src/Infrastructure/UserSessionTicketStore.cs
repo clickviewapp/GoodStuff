@@ -1,11 +1,12 @@
 namespace ClickView.GoodStuff.AspNetCore.Authentication.Infrastructure;
 
 using System;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Abstractions;
-using IdentityModel;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 internal sealed class UserSessionTicketStore(
     IUserSessionStore userSessionStore,
@@ -15,7 +16,7 @@ internal sealed class UserSessionTicketStore(
 {
     public async Task<string> StoreAsync(AuthenticationTicket ticket)
     {
-        var key = CryptoRandom.CreateUniqueId(format: CryptoRandom.OutputFormat.Hex);
+        var key = RandomNumberGenerator.GetHexString(32);
 
         var userSession = CreateUserSession(key, ticket);
 
@@ -66,8 +67,8 @@ internal sealed class UserSessionTicketStore(
 
         ArgumentNullException.ThrowIfNull(ticket);
 
-        var subject = ticket.Principal.FindFirst(JwtClaimTypes.Subject)?.Value;
-        var sessionId = ticket.Principal.FindFirst(JwtClaimTypes.SessionId)?.Value;
+        var subject = ticket.Principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var sessionId = ticket.Principal.FindFirst(JwtRegisteredClaimNames.Sid)?.Value;
 
         return new UserSession(key, ticketSerializer.Serialize(ticket))
         {
