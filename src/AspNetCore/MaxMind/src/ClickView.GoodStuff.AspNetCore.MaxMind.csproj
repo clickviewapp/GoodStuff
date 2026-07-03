@@ -6,9 +6,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="ClickView.Extensions.Primitives" Version="1.6.0" />
-      <PackageReference Include="ClickView.Extensions.Utilities" Version="1.6.0" />
-      <PackageReference Include="MaxMind.GeoIP2" Version="5.4.1" />
+      <PackageReference Include="ClickView.Extensions.Primitives" Version="1.8.0" />
+      <PackageReference Include="ClickView.Extensions.Utilities" Version="1.8.0" />
+      <PackageReference Include="MaxMind.GeoIP2" Version="6.0.0" />
     </ItemGroup>
 
     <ItemGroup>
