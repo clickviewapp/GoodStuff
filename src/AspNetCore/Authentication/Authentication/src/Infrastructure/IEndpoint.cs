@@ -6,5 +6,5 @@ using Microsoft.AspNetCore.Http;
 
 internal interface IEndpoint
 {
-    Task ProcessAsync(HttpContext context, CancellationToken token = default);
+    Task ProcessAsync(HttpContext context, CancellationToken cancellationToken = default);
 }

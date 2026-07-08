@@ -1,23 +1,25 @@
 namespace ClickView.GoodStuff.AspNetCore.Authentication.TokenValidation;
 
 using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Security.Cryptography;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
-using IdentityModel;
-using IdentityModel.Client;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
-using JsonWebKeySet = IdentityModel.Jwk.JsonWebKeySet;
 
 internal sealed class TokenValidator : ITokenValidator
 {
-    private readonly TokenValidatorOptions _options;
-    private readonly DiscoveryCache _discoveryCache;
+    private static readonly JsonWebTokenHandler _handler = new();
 
+    private readonly TokenValidatorOptions _options;
+    private readonly IConfigurationManager<OpenIdConnectConfiguration> _configurationManager;
+
+    private const string RoleClaimType = "role";
+    private const string EventsClaimType = "events";
     private const string BackChannelScheme = "http://schemas.openid.net/event/backchannel-logout";
 
     public TokenValidator(IOptions<TokenValidatorOptions> options)
@@ -28,77 +30,77 @@ internal sealed class TokenValidator : ITokenValidator
             throw new ArgumentException("Authority must be set");
 
         _options = o;
-        _discoveryCache = new DiscoveryCache(o.Authority.AbsoluteUri);
+        _configurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+            new Uri(o.Authority, ".well-known/openid-configuration").AbsoluteUri,
+            new OpenIdConnectConfigurationRetriever());
     }
 
-    public Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken)
+    internal TokenValidator(TokenValidatorOptions options, IConfigurationManager<OpenIdConnectConfiguration> configurationManager)
     {
-        return ValidateLogoutTokenAsync(logoutToken, _options.DefaultAudience);
+        _options = options;
+        _configurationManager = configurationManager;
     }
 
-    public async Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience)
+    public Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, CancellationToken cancellationToken = default)
     {
-        var claims = await ValidateJwtAsync(logoutToken, validAudience);
+        return ValidateLogoutTokenAsync(logoutToken, _options.DefaultAudience, cancellationToken);
+    }
 
-        if (claims.FindFirst(JwtClaimTypes.Subject) == null && claims.FindFirst(JwtClaimTypes.SessionId) == null)
+    public async Task<ClaimsPrincipal> ValidateLogoutTokenAsync(string logoutToken, string? validAudience,
+        CancellationToken cancellationToken = default)
+    {
+        var claims = await ValidateJwtAsync(logoutToken, validAudience, cancellationToken);
+
+        if (claims.FindFirst(JwtRegisteredClaimNames.Sub) == null &&
+            claims.FindFirst(JwtRegisteredClaimNames.Sid) == null)
         {
-            throw new Exception(
-                $"Invalid logout token. {JwtClaimTypes.Subject} or {JwtClaimTypes.SessionId} missing");
+            throw new InvalidLogoutTokenException(
+                $"Invalid logout token. {JwtRegisteredClaimNames.Sub} or {JwtRegisteredClaimNames.Sid} missing");
         }
 
-        var nonce = claims.FindFirst(JwtClaimTypes.Nonce)?.Value;
+        var nonce = claims.FindFirst(JwtRegisteredClaimNames.Nonce)?.Value;
 
         if (!string.IsNullOrWhiteSpace(nonce))
-            throw new Exception($"Invalid logout token. {JwtClaimTypes.Nonce} missing");
+            throw new InvalidLogoutTokenException($"Invalid logout token. {JwtRegisteredClaimNames.Nonce} missing");
 
-        var eventsJson = claims.FindFirst(JwtClaimTypes.Events)?.Value;
+        if (claims.FindFirst(JwtRegisteredClaimNames.Jti) == null)
+            throw new InvalidLogoutTokenException($"Invalid logout token. {JwtRegisteredClaimNames.Jti} missing");
+
+        var eventsJson = claims.FindFirst(EventsClaimType)?.Value;
 
         if (string.IsNullOrWhiteSpace(eventsJson))
-            throw new Exception($"Invalid logout token. {JwtClaimTypes.Events} missing");
+            throw new InvalidLogoutTokenException($"Invalid logout token. {EventsClaimType} missing");
 
         var events = JsonDocument.Parse(eventsJson).RootElement;
-        var logoutEvent = events.TryGetString(BackChannelScheme);
 
-        if (logoutEvent == null)
-            throw new Exception("Invalid logout token");
+        if (!events.TryGetProperty(BackChannelScheme, out var backChannelEvent) ||
+            backChannelEvent.ValueKind != JsonValueKind.Object)
+        {
+            throw new InvalidLogoutTokenException("Invalid logout token");
+        }
 
         return claims;
     }
 
-    private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience)
+    private async Task<ClaimsPrincipal> ValidateJwtAsync(string jwt, string? validAudience,
+        CancellationToken cancellationToken)
     {
-        var discoveryDocument = await _discoveryCache.GetAsync();
+        var openIdConnectConfiguration = await _configurationManager.GetConfigurationAsync(cancellationToken);
 
         var parameters = new TokenValidationParameters
         {
-            ValidIssuer = discoveryDocument.Issuer,
+            ValidIssuer = openIdConnectConfiguration.Issuer,
             ValidAudience = validAudience,
-            IssuerSigningKeys = GetSecurityKeys(discoveryDocument.KeySet),
-
-            NameClaimType = JwtClaimTypes.Name,
-            RoleClaimType = JwtClaimTypes.Role
+            IssuerSigningKeys = openIdConnectConfiguration.SigningKeys,
+            NameClaimType = JwtRegisteredClaimNames.Name,
+            RoleClaimType = RoleClaimType
         };
 
-        var handler = new JwtSecurityTokenHandler();
-        handler.InboundClaimTypeMap.Clear();
+        var result = await _handler.ValidateTokenAsync(jwt, parameters);
 
-        return handler.ValidateToken(jwt, parameters, out _);
-    }
+        if (!result.IsValid)
+            throw new InvalidLogoutTokenException("Invalid logout token", result.Exception);
 
-    private static IEnumerable<SecurityKey> GetSecurityKeys(JsonWebKeySet? keySet)
-    {
-        if (keySet is null)
-            yield break;
-
-        foreach (var webKey in keySet.Keys)
-        {
-            var e = Base64Url.Decode(webKey.E);
-            var n = Base64Url.Decode(webKey.N);
-
-            yield return new RsaSecurityKey(new RSAParameters { Exponent = e, Modulus = n })
-            {
-                KeyId = webKey.Kid
-            };
-        }
+        return new ClaimsPrincipal(result.ClaimsIdentity);
     }
 }
