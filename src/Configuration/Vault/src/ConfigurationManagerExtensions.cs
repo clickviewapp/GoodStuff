@@ -1,5 +1,6 @@
 namespace ClickView.GoodStuff.Configuration.Vault;
 
+using System;
 using Microsoft.Extensions.Configuration;
 
 public static class ConfigurationManagerExtensions
@@ -15,6 +16,8 @@ public static class ConfigurationManagerExtensions
         Action<VaultOptions>? configure = null)
     {
         ArgumentNullException.ThrowIfNull(configurationManager);
+
+        configurationManager.Sources.Insert(0, new VaultTokenFileConfigurationSource());
 
         var options = GetOptions(configurationManager);
 
