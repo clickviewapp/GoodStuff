@@ -25,7 +25,7 @@ namespace ClickView.GoodStuff.AspNetCore.Authorization
         public Task HandleAsync(RequestDelegate next, HttpContext context, AuthorizationPolicy policy,
             PolicyAuthorizationResult authorizeResult)
         {
-            // If the endpoint is not marked as ajax, fall back to the default handlers.
+            // If the endpoint is not marked as ajax, fall back to the default handler.
             if (!context.IsAjaxEndpoint())
                 return _handler.HandleAsync(next, context, policy, authorizeResult);
 
